@@ -1,0 +1,50 @@
+{   
+    "For Loop": {
+        "prefix": "for",
+        "body":"for (${1:var} = ${2:value} to ${3:array}.count) ${4:where} ${5:(condition)} ${6:do|collect} (\n\t$0\n)",
+        "description": "For loop"
+    },
+    "For Loop iterate": {
+        "prefix": "for",
+        "body": "for (${1:var} in ${3:array}) ${4:where} ${5:(condition)} ${6:do|collect} (\n\t$0\n)",
+        "description": "For Loop - Iterate"
+    },
+    "If condition": {
+        "prefix": "if",
+        "body":[
+            "if (${1:condition}) then (",
+                "\t$0",
+            ") else if (${2:condition}) then (",
+                "\t$0",
+            ") else (\n\t$0\n)"
+        ],
+        "description":"If block"
+    },
+    "While loop":{
+        "prefix":"while",
+        "body":"while (${1:var} ${2:!=|==|<|>|<=|>=} ${3:value}) ${4:do|collect} (\n\t$0\n)",
+        "description":"While loop"
+    },
+    "Case selector":{
+        "prefix":"case",
+        "body":[
+            "case ${1:var} of (",
+                "\t${2:value}:(${3:body})",
+                "\tdefault:(${4:body})",
+            ")"
+        ],
+        "description":"Case block"
+    },
+    "Function":{
+        "prefix":"function",
+        "body":"function ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)"
+    },
+    "Function short":{
+        "prefix":"function",
+        "body":"fn ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)"
+    },
+    "Rollout":{
+        "prefix":"rollout",
+        "body":"rollout ${1:r_name} \"${2:r_title}\" ${3:width:} ${4:height:} ${5:pos:[${6:100},${7:100}]\n(\n\t$0\n)"
+    }
+}
