@@ -1,0 +1,4 @@
+{	
+"name": "support.variable.ObjectSet.maxscript",
+	"match": "(?i)\\b(ObjectSet|cameras|geometry|helpers|lights|objects|selection|shapes|spacewarps|systems)(?!\\s*:)\\b"
+},

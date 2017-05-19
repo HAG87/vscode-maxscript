@@ -1,0 +1,12 @@
+"api":[
+    {"name":"cameras"},
+    {"name":"geometry"},
+    {"name":"helpers"},
+    {"name":"lights"},
+    {"name":"objects"},
+    {"name":"ObjectSet"},
+    {"name":"selection"},
+    {"name":"shapes"},
+    {"name":"spacewarps"},
+    {"name":"systems"}
+]

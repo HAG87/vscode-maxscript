@@ -1,0 +1,4 @@
+{	
+"name": "support.constant.maxscript",
+	"match": "(?i)\\b(?|Constant|HKEY_CLASSES_ROOT|HKEY_CURRENT_CONFIG|HKEY_CURRENT_USER|HKEY_LOCAL_MACHINE|HKEY_PERFORMANCE_DATA|HKEY_USERS|assetUser|black|blue|brown|e|emptyVal|false|gray|green|meditMaterials|ok|orange|pi|red|selectionSets|true|unsupplied|white|x_axis|y_axis|yellow|z_axis)(?!\\s*:)\\b"
+},

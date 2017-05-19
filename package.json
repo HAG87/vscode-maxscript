@@ -30,16 +30,27 @@
         "@types/mocha": "^2.2.32"
     },
     "contributes": {
-        "commands":[{
-                "command": "mxs.help",
-                "title": "MaxScript help"
-        }],
         "languages": [{
             "id": "maxscript",
-            "aliases": ["maxscript", "maxscript"],
+            "aliases": ["MaxScript", "maxscript", "mxs"],
             "extensions": [".ms",".mcr"],
             "configuration": "./language-configuration.json"
         }],
+        "commands":[
+            {
+                "command": "mxs.help",
+                "title": "MaxScript help"
+            }
+        ],
+        "menus":{
+            "editor/context": [
+                {
+                    "when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
+                    "command": "mxs.help",
+                    "group": "navigation@1"
+                }
+            ]
+        },
         "grammars": [{
             "language": "maxscript",
             "scopeName": "source.mxs",
