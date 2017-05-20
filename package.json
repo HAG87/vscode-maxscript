@@ -2,21 +2,82 @@
     "name": "language-maxscript",
     "displayName": "Language MaxScript",
     "description": "Autodesk 3ds Max MaxScript language support",
-    "version": "0.0.1",
-    "publisher": "AtelierBump",
-    "icon": "./images/mxs.png",
+    "version": "1.1.0",
+    "publisher": "atelierbump",
+    "icon": "mxs.png",
+    "homepage": "https://github.com/HAG87/vscode-maxscript",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/HAG87/vscode-maxscript"
+    },
     "engines": {
         "vscode": "^1.12.0"
     },
     "categories": [
         "Languages",
-        "Themes"
+        "Themes",
+        "Snippets"
+    ],
+    "keywords": [
+        "MaxScript"
     ],
     "activationEvents": [
         "onLanguage:maxscript",
         "onCommand:mxs.help"
     ],
     "main": "./out/src/mxsMain",
+    "contributes": {
+        "languages": [
+            {
+                "id": "maxscript",
+                "aliases": [
+                    "MaxScript",
+                    "maxscript",
+                    "mxs"
+                ],
+                "extensions": [
+                    ".ms",
+                    ".mcr"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "mxs.help",
+                "title": "MaxScript help"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
+                    "command": "mxs.help",
+                    "group": "navigation@1"
+                }
+            ]
+        },
+        "grammars": [
+            {
+                "language": "maxscript",
+                "scopeName": "source.mxs",
+                "path": "./syntaxes/maxscript.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "maxscript",
+                "path": "./snippets/maxscript.json"
+            }
+        ],
+        "themes": [
+            {
+                "label": "One Dark MXS",
+                "uiTheme": "vs-dark",
+                "path": "./theme/OneDark-MXS.json"
+            }
+        ]
+    },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
         "compile": "tsc -watch -p ./",
@@ -29,45 +90,5 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
-    },
-    "contributes": {
-        "languages": [{
-            "id": "maxscript",
-            "aliases": ["MaxScript", "maxscript", "mxs"],
-            "extensions": [".ms",".mcr"],
-            "configuration": "./language-configuration.json"
-        }],
-        "commands":[
-            {
-                "command": "mxs.help",
-                "title": "MaxScript help"
-            }
-        ],
-        "menus":{
-            "editor/context": [
-                {
-                    "when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
-                    "command": "mxs.help",
-                    "group": "navigation@1"
-                }
-            ]
-        },
-        "grammars": [{
-            "language": "maxscript",
-            "scopeName": "source.mxs",
-            "path": "./syntaxes/maxscript.tmLanguage.json"
-        }],
-        "snippets": [{
-            "language": "maxscript",
-            "path": "./snippets/maxscript.json"
-        }],
-        "themes": [
-            {
-				"label": "One Dark MXS",
-				"uiTheme": "vs-dark",
-				"path": "./theme/OneDark-MXS.json"
-			}
-            
-        ]
     }
 }

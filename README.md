@@ -10,10 +10,10 @@ Autodesk 3ds Max Scripting language (MaxScript) support.
 - Customized theme to match MaxScript elements diversity.
 - Help command (*MaxScript help. Accessible from the right-click menu.*): Select a keyword and open related online documentation.
 
-![feature X](./images/feature-1.png)
+![feature X](images/feature-1.png)
 
 
-![feature X](./images/feature-2.gif)
+![feature X](images/feature-2.gif)
 
 ## Requirements
 
