@@ -1,6 +1,6 @@
 # language-maxscript README
 
-This is the README for your extension "language-maxscript". After writing up a brief description, we recommend including the following sections.
+Autodesk 3ds Max Scripting language (MaxScript) support.
 
 ## Features
 
@@ -14,7 +14,7 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+none.
 
 ## Extension Settings
 

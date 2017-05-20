@@ -125,14 +125,14 @@ class mxsCompletion implements vscode.CompletionItemProvider
         let dotPattern = /\w+[.]\w*?$/;
         let notDotPattern = /[^.]\w+$/;
         let dotTest = dotPattern.test(lineTillCurrentPosition); 
-
+        let notDotTest = notDotPattern.test(lineTillCurrentPosition);
         let components = new Array<vscode.CompletionItem>(),
             general    = new Array<vscode.CompletionItem>(),
             properties = new Array<vscode.CompletionItem>();
             //values     = new Array<vscode.CompletionItem>(),
 
         if (!dotTest) {
-            if (notDotPattern) {
+            if (notDotTest) {
                 // componets : struct | class | interface
                 components = maxcompletionComponentItems(mxsSchema);
                 // generics ???? prmitives??? et.....

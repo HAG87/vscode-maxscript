@@ -34,7 +34,7 @@ export function msxHelp(help_addr:string)
 export function activate(context:vscode.ExtensionContext): void {
     vscode.languages.setLanguageConfiguration(MXS_MODE.language, {
 		indentationRules: {
-            increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect)\b\s*)$/,
+            increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b\s*)$/,
 		    decreaseIndentPattern: /^\s*\)/
 		}
 		// need to fix this
@@ -43,9 +43,7 @@ export function activate(context:vscode.ExtensionContext): void {
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => {msxHelp(help_addr);}));
 	// code completion -- need to check triggercharacters
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE.language, new mxsCompletion(),'.', '\"'));
-
-	//mxsDecorator(context); -> INCOMPLETE
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE.language, new mxsCompletion(),'.','='));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {}
