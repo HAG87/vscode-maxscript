@@ -1,65 +1,62 @@
-# language-maxscript README
+# MaxScript language support
 
 Autodesk 3ds Max Scripting language (MaxScript) support.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- Syntax highlight.
+- Code autocompletion; for keywords, primitives, generic functions, structDefs, interfaces and classes.
+- Snippets for most used code blocks.
+- Customized theme to match MaxScript elements diversity.
+- Help command (*MaxScript help. Accessible from the right-click menu.*): Select a keyword and open related online documentation.
 
-For example if there is an image subfolder under your extension project workspace:
+![feature X](./images/feature-1.png)
 
-\!\[feature X\]\(images/feature-x.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![feature X](./images/feature-2.gif)
 
 ## Requirements
 
-none.
+None.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+None yet.
 
-For example:
+## Executing MaxScript
 
-This extension contributes the following settings:
+MXSPyCOM project allow for editing & execution of 3ds Max MaxScript and Python files from external code editors.
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+- Get it here: [MXSPyCOM by Jeff Hannna](https://github.com/JeffHanna/MXSPyCOM)
+- Follow the configuration guide to register the COM server.
+- Set up a vscode task:
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+```json
+{
+    "version": "0.1.0",
+    "command": "C:/MXSPyCOM/MXSPyCOM.exe",
+    "isShellCommand": false,
+    "args": ["-f"],
+    "showOutput": "always",
+    "tasks": [
+        {
+         "taskName": "Execute in Max",
+         "args": ["${file}"],
+         "suppressTaskName": true
+        }
+    ]
+}
+```
+- run the task, enjoy the 3ds max listener throwing errors.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+[Changelog](./CHANGELOG.md)
 
-### 1.0.0
+Initial release.
 
-Initial release of ...
+## Contribute
 
-### 1.0.1
 
-Fixed issue #.
 
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+>Note: MaxScript Structure is to say at least, chaotic. I've done my best to organize structs, classes, interfaces and so on. However the grammar is usable enough.

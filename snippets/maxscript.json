@@ -25,6 +25,11 @@
         "body":"while (${1:var} ${2:!=|==|<|>|<=|>=} ${3:value}) ${4:do|collect} (\n\t$0\n)",
         "description":"While loop"
     },
+    "Do loop":{
+        "prefix":"do",
+        "body":"do (\n\t${1:loop_body}\n) while ( ${2:loop_condition} )",
+        "description":"Do loop"
+    },
     "Case selector":{
         "prefix":"case",
         "body":[
@@ -37,14 +42,27 @@
     },
     "Function":{
         "prefix":"function",
-        "body":"function ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)"
+        "body":"function ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)",
+        "description":"Function declaration"
     },
     "Function short":{
         "prefix":"function",
-        "body":"fn ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)"
+        "body":"fn ${function_name:TM_SELECTED_TEXT} ${2:params} ${3:optional_param:unsupplied} =\n(\n\t$0\n)",
+        "description":"Function declaration"
+    },
+    "Struct":{
+        "prefix":"struct",
+        "body":"struct ${1:struct_name}\n(\n\t$0,\n)",
+        "description":"Struct definition"
     },
     "Rollout":{
         "prefix":"rollout",
-        "body":"rollout ${1:r_name} \"${2:r_title}\" ${3:width:} ${4:height:} ${5:pos:[${6:100},${7:100}]\n(\n\t$0\n)"
+        "body":"rollout ${1:r_name} \"${2:r_title}\" ${3:width:} ${4:height:} ${5:pos:[${6:100},${7:100}]\n(\n\t$0\n)",
+        "description":"Rollout definition"
+    },
+    "Event":{
+        "prefix":"on",
+        "body":"on ${1:rollout_control} ${2:event} ${3:args} do \n(\n\t$0\n)",
+        "description":"Rollout control Event declaration"
     }
 }

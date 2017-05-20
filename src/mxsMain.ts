@@ -7,7 +7,6 @@ import fs = require('fs');
 //import cp = require('child_process');
 import { getTextSel, fileExists } from './utils';
 import mxsCompletion from './mxsAutocomplete';
-import mxsDecorator from './mxsDecorator';
 
 export const MXS_MODE: vscode.DocumentFilter = { language: 'maxscript', scheme: 'file' };
 export const help_addr: string = 'http://help.autodesk.com/view/3DSMAX/2018/ENU/'
@@ -42,7 +41,7 @@ export function activate(context:vscode.ExtensionContext): void {
 	});
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => {msxHelp(help_addr);}));
-	// code completion -- need to check triggercharacters
+	// code completion -- need to check trigger characters
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE.language, new mxsCompletion(),'.','='));
 }
 // this method is called when your extension is deactivated

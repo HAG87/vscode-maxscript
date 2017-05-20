@@ -22353,7 +22353,8 @@ export const maxcompletionGeneral = [
         "kind": CompletionItemKind.Keyword,
         "api": [
             { "name": "function" },
-            { "name": "Struct" }
+            { "name": "Struct" },
+            {"name": "return"}
         ]
     },
     {
