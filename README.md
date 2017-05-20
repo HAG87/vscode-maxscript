@@ -47,6 +47,7 @@ MXSPyCOM project allow for editing & execution of 3ds Max MaxScript and Python f
     ]
 }
 ```
+
 - run the task, enjoy the 3ds max listener throwing errors.
 
 ## Release Notes
@@ -57,6 +58,6 @@ Initial release.
 
 ## Contribute
 
-
+[gitHub](https://github.com/HAG87/vscode-maxscript)
 
 >Note: MaxScript Structure is to say at least, chaotic. I've done my best to organize structs, classes, interfaces and so on. However the grammar is usable enough.
