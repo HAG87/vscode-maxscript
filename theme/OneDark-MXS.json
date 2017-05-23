@@ -1092,6 +1092,27 @@
             }
         },
         {
+            "name":"mxs event declaration",
+            "scope":"entity.event.type.maxscript, entity.event.keyword.maxscript",
+            "settings":{
+                "foreground":"#E06C75"
+            }
+        },
+        {
+            "name":"mxs event target",
+            "scope":"entity.event.target.maxscript",
+            "settings":{
+                "fontStyle":"italic"
+            }
+        },
+        {
+            "name":"mxs event action",
+            "scope":"entity.event.action.maxscript",
+            "settings":{
+                "foreground":"#7EB33D"
+            }
+        },
+        {
             "name": "mxs array",
             "scope": "storage.type.array, storage.type.bitarray",
             "settings": {
@@ -1120,10 +1141,8 @@
             }
         },
         {
-            "name": "settings",
-            "scope":             
-                ["mxs support specific",
-                "support.constant, support.class.primitive, support.variable.system, support.type.generic"],
+            "name": "mxs support specific",
+            "scope": "support.constant, support.class.primitive, support.variable.system, support.type.generic",
             "settings": {
                 "foreground": "#759FD1"
             }

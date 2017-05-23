@@ -91,11 +91,11 @@
 			"patterns": [
 				{
 					"name": "keyword.control.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(animate|at|case|catch|collect|continue|do|else|exit|for|if|max|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*[:.])"
+					"match": "(?i)\\b(?<![\\.\\$])(animate|at|case|catch|collect|continue|do|of|else|exit|for|if|max|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*[:.])"
 				},
 				{
 					"name":"keyword.operator.maxscript",
-					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|:|&|={1,2}|<=?|>=?|\\$|\\\\))|(\\.{1,3}(?!\\d))|(?:\\b(?<![\\.\\$])(and|as|by|in|not|of|or|to)\\b(?!\\s*[:.]))"
+					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|:|&|={1,2}|<=?|>=?|\\$|\\\\))|(\\.{1,3}(?!\\d))|(?:\\b(?<![\\.\\$])(and|as|by|in|not|or|to)\\b(?!\\s*[:.]))"
 				},
 				{
 					"name":  "keyword.reserved.maxscript",
@@ -196,6 +196,23 @@
 				{
 					"name":"meta.property.maxscript",
 					"match": "(?<=\\.)(\\b\\w*?[^0-9]\\w*?\\b)(?=\\s*\\=)"
+				},
+				{
+					"name":"meta.event.maxscript",
+					"begin": "(?i)(on)\\s+(\\w+)\\s+(\\w+)\\s+((?!\\bdo\\b)\\w+)?",
+					"end":"(do)",
+					"patterns":[
+						{"include": "$self"}
+					],
+					"beginCaptures": {
+						"1":{"name":"entity.event.type.maxscript"},
+						"2":{"name":"entity.event.target.maxscript"},
+						"3":{"name":"entity.event.action.maxscript"},
+						"4":{"name":"entity.event.argument.maxscript"}						
+					},
+					"endCaptures": {
+						"1":{"name":"entity.event.keyword.maxscript"}
+					}
 				}
 			]
 		},
@@ -244,7 +261,7 @@
 				},
 				{
 					"name":  "constant.language.boolean.true.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(true|on)(?!\\s*:)\\b"
+					"match": "(?i)\\b(?<![\\.\\$])(true)(?!\\s*:)\\b"
 				},
 				{ 
 					"name":  "constant.language.boolean.false.maxscript",
