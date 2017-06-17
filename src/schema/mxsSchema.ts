@@ -22360,8 +22360,6 @@ export const maxcompletionGeneral = [
             { "name": "SetPatchSteps" },
             { "name": "SetPosTaskWeight" },
             { "name": "setProgressCancel" },
-            { "name": "setProperty" },
-            { "name": "setPropertyController" },
             { "name": "SetQuietMode" },
             { "name": "setReactionFalloff" },
             { "name": "setReactionInfluence" },
@@ -22491,7 +22489,7 @@ export const maxcompletionGeneral = [
         ]
     },
     {
-        "name": "code-block keyword",
+        "name": "code-block-keyword",
         "desc": "code-block definition",
         "kind": CompletionItemKind.Keyword,
         "api": [
@@ -22501,7 +22499,7 @@ export const maxcompletionGeneral = [
         ]
     },
     {
-        "name": "code-block ui",
+        "name": "code-block-ui",
         "desc": "code-block UI  keyword",
         "kind": CompletionItemKind.Keyword,
         "api": [
@@ -22512,6 +22510,39 @@ export const maxcompletionGeneral = [
             { "name": "rollout" },
             { "name": "tool" },
             { "name": "utility" }
+        ]
+    },
+    {
+        "name": "ui-control",
+        "desc": "rollout UI control",
+        "kind": CompletionItemKind.Keyword,
+        "api": [
+            {"name": "angle"},
+            {"name": "slider"},
+            {"name": "spinner"},
+            {"name": "button"},
+            {"name": "checkbutton"},
+            {"name": "mapbutton"},
+            {"name": "materialbutton"},
+            {"name": "pickbutton"},
+            {"name": "checkbox"},
+            {"name": "colorpicker"},
+            {"name": "listbox"},
+            {"name": "multilistbox"},
+            {"name": "dropdownlist"},
+            {"name": "dotnetControl"},
+            {"name": "combobox"},
+            {"name": "edittext"},
+            {"name": "groupBox"},
+            {"name": "hyperLink"},
+            {"name": "label"},
+            {"name": "progressbar"},
+            {"name": "radiobuttons"},
+            {"name": "imgTag"},
+            {"name": "SubRollout"},
+            {"name": "curvecontrol"},
+            {"name": "popUpMenu"},
+            {"name": "timer"}
         ]
     },
     {
