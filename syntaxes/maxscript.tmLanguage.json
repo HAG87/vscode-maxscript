@@ -91,15 +91,15 @@
 			"patterns": [
 				{
 					"name": "keyword.control.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(animate|at|case|catch|collect|continue|do|of|else|exit|for|if|max|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*[:.])"
+					"match": "(?i)\\b(?<![\\.\\$])(animate|at|case|catch|collect|continue|do|of|else|exit|for|if|max|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*(:[^:]|[.]))"
 				},
 				{
 					"name":"keyword.operator.maxscript",
-					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|:|&|={1,2}|<=?|>=?|\\$|\\\\))|(\\.{1,3}(?!\\d))|(?:\\b(?<![\\.\\$])(and|as|by|in|not|or|to)\\b(?!\\s*[:.]))"
+					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|:|&|={1,2}|<=?|>=?|\\$|\\\\))|(\\.{1,3}(?!\\d))|(?:\\b(?<![\\.\\$])(and|as|by|in|not|or|to)\\b(?!\\s*(:[^:]|[.])))"
 				},
 				{
 					"name":  "keyword.reserved.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(from)\\b(?!\\s*[:.])"
+					"match": "(?i)\\b(?<![\\.\\$])(from)\\b(?!\\s*(:[^:]|[.]))"
 				}
 			]
 		},
