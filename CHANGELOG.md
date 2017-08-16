@@ -2,7 +2,7 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
-## [1.3.0] - 2017-05-23
+## [1.4.0] - 2017-08-15
 
 - Code highlight improvements
 - Dropped custom Theme, for vscode 1.15.0 and up, please use the new *Custom syntax highlighting* setting.
