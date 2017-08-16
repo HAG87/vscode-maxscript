@@ -1,17 +1,13 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "maxscript",
-	"fileTypes": [
-		"ms",
-		"mse",
-		"mcr"
-	],
+	"fileTypes": [ "ms", "mse", "mcr" ],
 	"foldingStartMarker": "(-{2})?\\(\\s*$",
 	"foldingStopMarker": "^\\s*(-{2})?\\s*\\)",
 
 	"patterns": [
 		{ "include": "#basic-punctuation"},
-		{"include": "#braces"},
+		{ "include": "#braces"},
 		{ "include": "#variable"},
 		{ "include": "#comment" },
 		{ "include": "#keywords" },
@@ -28,28 +24,28 @@
 		"braces":{
 			"patterns": [
 				{
-					"name": "meta.brace.curly.maxscript",
-					"match": "\\{|\\}"
+					"name": "punctuation.section.brackets.begin",
+					"match": "\\["
 				},
 				{
-					"name": "meta.brace.round.maxscript",
-					"begin": "\\(",
-					"end": "\\)",
-					"patterns": [
-						{"include": "$self"}
-					]
+					"name": "punctuation.section.brackets.end",
+					"match": "\\]"
 				},
 				{
-					"name": "meta.brace.square.maxscript",
-					"begin": "\\[",
-					"end": "\\]",
-					"patterns": [
-						{"include": "#numeric"},
-						{ "include": "#strings" },
-						{ "include": "#constant" },
-						{ "include": "#basic-punctuation"},
-						{ "include": "#support"}
-					]
+					"name": "punctuation.section.braces.begin",
+					"match": "\\{"
+				},
+				{
+					"name": "punctuation.section.braces.end",
+					"match": "\\}"
+				},
+				{
+					"name": "punctuation.section.block.begin",
+					"match": "\\("
+				},
+				{
+					"name": "punctuation.section.block.end",
+					"match": "\\)"
 				}
 			]
 		},
@@ -60,12 +56,20 @@
 					"match": ";"
 				},
 				{
-					"name": "meta.delimiter.comma.maxscript",
-					"match": ","
+					"name": "punctuation.delimiter.comma.maxscript",
+					"match": ",(?!\\d)"
 				},
 				{
-					"name": "meta.delimiter.period.maxscript",
+					"name": "punctuation.delimiter.period.maxscript",
 					"match": "\\.(?!\\d)"
+				},
+				{
+					"name": "punctuation.definition.variable.maxscript",
+					"match": "(\\$|:{2})(\\w+)"
+				},
+				{
+					"name":"punctuation.definition.byref.keyword.maxscript",
+					"match": "(&)(?=\\w)"
 				}
 			]
 		},
@@ -74,9 +78,11 @@
 				{
 					"name": "comment.line.double-dash.maxscript",
 					"begin":"--",
-					"end":"$"
-				}
-				,
+					"end":"$",
+					"captures": {
+						"1":{"name":"punctuation.definition.comment.maxscript"}						
+					}
+				},
 				{
 					"name":"comment.block.maxscript",
 					"begin": "/\\*",
@@ -90,16 +96,20 @@
 		"keywords": {
 			"patterns": [
 				{
-					"name": "keyword.control.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(animate|at|case|catch|collect|continue|do|of|else|exit|for|if|max|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*(:[^:]|[.]))"
-				},
-				{
 					"name":"keyword.operator.maxscript",
-					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|:|&|={1,2}|<=?|>=?|\\$|\\\\))|(\\.{1,3}(?!\\d))|(?:\\b(?<![\\.\\$])(and|as|by|in|not|or|to)\\b(?!\\s*(:[^:]|[.])))"
+					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|={1,2}|<=?|>=?|\\\\))"
 				},
 				{
-					"name":  "keyword.reserved.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(from)\\b(?!\\s*(:[^:]|[.]))"
+					"name":"keyword.operator.word.maxscript",
+					"match": "(?i)((?<![.$])\\b(and|at|as|by|in|not|or|to)\\b(?!\\s*(:[^:]|[.])))"
+				},
+				{
+					"name": "keyword.control.maxscript",
+					"match": "(?i)\\b(?<![\\.\\$])(case|catch|collect|continue|do|of|else|exit|for|if|return|set|then|throw|try|undo|when|where|while|with)\\b(?!\\s*(:[^:]|[.]))"
+				},
+				{
+					"name":  "keyword.other.maxscript",
+					"match": "(?i)(?<![.$])\\b(max|animate|from)\\b(?!\\s*(:[^:]|[.]))"
 				}
 			]
 		},
@@ -163,7 +173,7 @@
 					"match": "(?i)\\b(struct)\\b\\s+(\\w+)",
 					"captures": {
 						"1":{"name":"entity.struct.type.maxscript"},
-						"2":{"name":"entity.name.struct.maxscript"}
+						"2":{"name":"entity.struct.name.maxscript"}
 					}
 				},
 				{
@@ -173,57 +183,64 @@
 					"beginCaptures": {
 						"1": {"name": "entity.function.modifier.maxscript"},
 						"2": {"name": "entity.function.type.maxscript"},
-						"3": {"name": "entity.name.function.maxscript"},
+						"3": {"name": "entity.function.name.maxscript"},
 						"4": {"name": "entity.function.parameter.maxscript"}
 					},
 					"endCaptures": {
 						"1": {"name": "keyword.operator.maxscript"}
 					},
 					"patterns": [
-						{"include": "#variable"},
-						{"include": "#strings"},
-						{"include": "#storage"},
-						{"include": "#constant"},
 						{"include": "#basic-punctuation"},
-						{"include": "#support"}
+						{"include": "#braces"},
+						{"include": "#constant"},
+						{"include": "#keywords"},
+						{"include": "#storage"},
+						{"include": "#strings"},
+						{"include": "#support"},
+						{"include": "#variable"}
 					]
 				},
 				{
-					"name":"meta.function.method.call.maxscript",
-					"match": "(?<=\\.)(\\b\\w*?[^0-9]\\w*?\\b)(?!\\s*\\=)"
-	
-				},
-				{
-					"name":"meta.property.maxscript",
-					"match": "(?<=\\.)(\\b\\w*?[^0-9]\\w*?\\b)(?=\\s*\\=)"
-				},
-				{
 					"name":"meta.event.maxscript",
-					"begin": "(?i)\\b(on)\\b\\s+(\\w+)\\s+(\\w+)\\s+((?!\\bdo\\b)\\w+)?",
-					"end":"(do)",
-					"patterns":[
-						{"include": "$self"}
-					],
-					"beginCaptures": {
+					"match": "(?i)\\b(on)\\b\\s+(\\w+)\\s+(\\w+)\\s+\\b(do)\\b",
+					"captures": {
 						"1":{"name":"entity.event.type.maxscript"},
 						"2":{"name":"entity.event.target.maxscript"},
 						"3":{"name":"entity.event.action.maxscript"},
-						"4":{"name":"entity.event.argument.maxscript"}						
-					},
-					"endCaptures": {
-						"1":{"name":"entity.event.keyword.maxscript"}
+						"4":{"name":"entity.event.keyword.maxscript"}						
+					}
+				},
+				{
+					"name": "meta.utility.maxscript",
+					"match": "(?i)\\b(macroscript|parameters|plugin|rcmenu|rollout|tool|utility)\\b\\s+(\\w+)",
+					"captures": {
+						"1":{"name":"entity.utility.type.maxscript"},
+						"2":{"name":"entity.utility.name.maxscript"}
 					}
 				}
+
 			]
 		},
 		"variable":{
 			"patterns": [
 				{
-					"name": "variable.parameter.maxscript",
+					"name":"variable.property.maxscript",
+					"match": "(?<=\\.)\\b(\\w*?[_]*?\\w*)\\b(?=\\s*\\=)"
+				},
+				{
+					"name":"variable.parameter.maxscript",
+					"match": "(?<=\\.)\\b(\\w*?[_]*?\\w*)\\b(?!\\s*\\=)"
+				},
+				{
+					"name":"variable.language.maxscript",
+					"match": "(?!)\\b(this)\\b"
+				},
+				{
+					"name": "variable.other.maxscript",
 					"comment": "Matches keyword assignment in function calls and definitions (e.g., fn add flag:#optional)",
 					"match":   "\\b(\\w+)\\b(?:[:])",
 					"captures": {
-						"1":{"name":"variable.parameter.name.maxscript"}
+						"1":{"name":"variable.other.name.maxscript"}
 					}
 
 				}
@@ -261,15 +278,15 @@
 				},
 				{
 					"name":  "constant.language.boolean.true.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(true)(?!\\s*:)\\b"
+					"match": "(?i)\\b(?<![\\.\\$])(true|on)(?!\\s*:)\\b"
 				},
 				{ 
 					"name":  "constant.language.boolean.false.maxscript",
 					"match": "(?i)\\b(?<![\\.\\$])(false|off)(?!\\s*:)\\b"
 				},
 				{
-					"name":  "constant.language.math.pi.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(pi)(?!\\s*:)\\b"
+					"name":  "constant.language.math.maxscript",
+					"match": "(?i)\\b(?<![\\.\\$])(pi|e)(?!\\s*:)\\b"
 				},
 				{
 					"name":  "constant.language.colour.maxscript",
@@ -284,57 +301,36 @@
 					"match": "(?i)\\b(?<![\\.\\$])ok(?!\\s*:)\\b"
 				},
 				{
-					"name":  "constant.language.undefined.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])undefined(?!\\s*:)\\b"
-				},
-				{
-					"name":  "constant.language.unsupplied.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])unsupplied(?!\\s*:)\\b"
+					"name":  "constant.language.null.maxscript",
+					"match": "(?i)\\b(?<![\\.\\$])(undefined|unsupplied)(?!\\s*:)\\b"
 				},
 				{
 					"name":  "constant.language.dontcollect.maxscript",
 					"match": "(?i)\\b(?<![\\.\\$])dontcollect(?!\\s*:)\\b"
-				},
-				{
-					"name":  "constant.language.math.euler.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])e(?!\\s*:)\\b"
 				}
 			]
 		},
 		"storage":{
 			"patterns": [
 				{
-					"name":"support.variable.struct-ref.maxscript",
-					"match":"\\b([Tt]his)\\b(?!\\s*:)"
-				},
-				{
-					"name":  "storage.type.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(macroscript|parameters|plugin|rcmenu|rollout|tool|utility)(?!\\s*[:.])\\b"
-				},
-				{
-					"name":  "storage.modifier.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(about|coordsys|global|local|mapped|private|public|persistent|((?:\\s+)::(?:\\w)))(?!\\s*[:.])\\b"
-				},
-				{
-					"name":  "keyword.reserved.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(from)\\b(?!\\s*[:.])"
+					"name": "storage.modifier.maxscript",
+					"match": "(?i)(?<![\\.\\$])\\b(about|coordsys|global|local|mapped|private|public|persistent)\\b(?!\\s*[:.])"
 				},
 				{
 					"name": "storage.type.array.maxscript",
+					"begin": "(#)\\s*(\\()",
+					"end": "\\)",
+					"beginCaptures":{
+						"1": {"name": "keyword.definition.array.begin.maxscript"},
+						"2": {"name": "punctuation.section.block.begin"}
+					},
+					"endCaptures":{
+						"0": {"name": "punctuation.section.block.end"}
+					},
 					"patterns": [
 						{"include": "$self"},
 						{"include": "#braces"}			
-						
-					],
-					"begin":    "(#)\\s*(\\()",
-					"end":      "\\)",
-					"beginCaptures":{
-						"1": {"name": "punctuation.definition.array.begin.maxscript"},
-						"2": {"name": "meta.brace.round.maxscript"}
-					},
-					"endCaptures":{
-						"0": {"name": "meta.brace.round.maxscript"}
-					}
+					]
 				},
 				{
 					"name": "storage.type.bitarray.maxscript",
@@ -342,11 +338,11 @@
 					"begin": "(#)\\s*(\\{)",
 					"end": "\\}",
 					"beginCaptures":{
-						"1": {"name": "punctuation.definition.bit.array.begin.maxscript"},
-						"2": {"name": "meta.brace.curly.maxscript"}
+						"1": {"name": "keyword.definition.bit.array.begin.maxscript"},
+						"2": {"name": "punctuation.section.braces.begin"}
 					},
 					"endCaptures":{
-						"0": {"name": "meta.brace.curly.maxscript"}
+						"0": {"name": "punctuation.section.braces.end"}
 					}
 				},
 				{
@@ -395,12 +391,10 @@
 					"name": "support.variable.ObjectSet.maxscript",
 					"match": "(?i)\\b(ObjectSet|cameras|geometry|helpers|lights|objects|selection|shapes|spacewarps|systems)\\b(?!\\s*[:.])"
 				},
-
 				{
 					"name": "support.constant.maxscript",
 					"match": "(?i)\\b(Constant|HKEY_PERFORMANCE_DATA|emptyVal|selectionSets|meditMaterials|\\?|assetUser|HKEY_CLASSES_ROOT|HKEY_CURRENT_CONFIG|HKEY_CURRENT_USER|HKEY_LOCAL_MACHINE|HKEY_USERS)\\b(?!\\s*[:.])"
 				},
-				
 				{
 					"name":  "support.class.rollout-control.maxscript",
 					"match": "(?i)\\b(angle|button|check(?:box|button)|colorpicker|group|(?:combo|group|multilist|list)Box|(?:curve|dotNet|Schematic)Control|dropdownList|editText|hyperLink|imgTag|label|(?:map|material|pick)button|popUpMenu|progressbar|radiobuttons|slider|spinner|SubRollout|timer)\\b(?!\\s*[:.])"	
@@ -413,7 +407,6 @@
 					"name": "support.variable.system.maxscript",
 					"match": "(?i)\\b(RenderEffects|activeMeditSlot|activegrid|ambientColor|ambientColorController|animButtonEnabled|animButtonState|animateMode|animationRange|backgroundColor|backgroundColorController|backgroundImageFileName|currentMaterialLibrary|currentTime|displaySafeFrames|editorFont|editorFontSize|editorShowPath|editorTabWidth|enableAccelerators|environmentMap|escapeEnable|flyOffTime|frameRate|globalTracks|hardwareLockID|heapFree|heapSize|inputTextColor|lightLevelController|lightTintColor|lightTintColorController|listener|localPreRendScript|localTime|lyricDirectory|macroRecorder|manipulateMode|maxFilePath|messageTextColor|numAtmospherics|numEffects|numSubObjectLevels|outputTextColor|playActiveOnly|playbackLoop|postRendScript|preRendScript|productAppID|realTimePlayback|rendAtmosphere|rendCamNode|rendColorCheck|rendDither256|rendDitherTrue|rendEnd|rendFieldOrder|rendFieldRender|rendFileNumberBase|rendForce2Side|rendHidden|rendImgSeqType|rendLockImageAspectRatio|rendLockPixelAspectRatio|rendMultiThread|rendNTSC_PAL|rendNThFrame|rendNThSerial|rendOutputFilename|rendPickupFrames|rendSaveFile|rendShowVFB|rendSimplifyAreaLights|rendStart|rendSuperBlack|rendSuperBlackThresh|rendTimeType|rendUseActiveView|rendUseDevice|rendUseImgSeq|rendUseNet|rendVidCorrectMethod|rendViewID|rendViewIndex|renderDisplacements|renderHeight|renderWidth|renderer|rootNode|rootScene|sceneMaterials|scriptsPath|showEndResult|skipRenderedFrames|sliderTime|stackLimit|subObjectLevel|ticksPerFrame|timeDisplayMode|trackViewNodes|useEnvironmentMap|usePreRendScript|videoPostTracks)\\b(?!\\s*[:.])"
 				},
-
 				{
 					"name": "support.type.generic.maxscript",
 					"match": "(?i)\\b(ActivateTimeWarp|BipedGeneric|Conjugate|CurveCtlGeneric|DeactivateTimeWarp|DeleteTw|DeleteWeight|Generic|Generic|GetMixerInterval|GetNodes|GetOrgTimeAtWarpedTime|GetTrackInterval|GetTrackgroupInterval|GetTwOrgTime|GetWarpedTimeAtOrgTime|GetWeightAtTime|GetWeightTime|Identity|InitializeTimeWarp|InsertWarpAtOrgTime|Inverse|IsTimeWarpActive|LnDif|LogN|MappedGeneric|NURBSGenericMethods|NURBSGenericMethodsWrapper|NodeGeneric|Orthogonalize|PreRotate|PreRotateX|PreRotateY|PreRotateZ|PreScale|PreTranslate|ProMaterials__Generic_V2|QCompA|Rotate|RotateX|RotateY|RotateZ|SetNodes|SetTwOrgTime|SetTwWarpTime|SetWeight|SetWeightAtTime|SetWeightTime|Simple_Mtl_Generic__adsk|Slerp|Squad|Translate|UserGeneric|XFormMat|Zero|Zoom|abs|acos|addAndWeld|addEaseCurve|addKnot|addModifier|addMultiplierCurve|addNewKey|addNewNoteKey|addNewSpline|addScript|addSnippet|addTranInfo|addTransition|adsk_Mtl_SimpleGeneric|adsk_Mtl_SimpleGeneric_V2|adsk_Utility_GenericNoise|append|appendClip|appendCurve|appendCurveByID|appendGizmo|appendObject|appendTrack|appendTrackgroup|appendUCurve|appendUCurveByID|appendVCurve|appendVCurveByID|asin|atan|atan2|attach|bindKnot|bindSpaceWarp|buildTVFaces|buildVCFaces|canConvertTo|ceil|classOf|clear|clearAllAppData|clearCacheEntry|clearMixer|clearProdTess|clearTrack|clearTrackgroup|clearViewTess|close|closeU|closeV|collapseStack|collapseface|composite|computeAnimation|contains|convertTo|convertToMesh|convertToPoly|convertToSplineShape|copy|copyMixdownToBiped|cos|cosh|createInstance|crop|cross|curveLength|defaultVCFaces|deleteAllCopies|deleteAppData|deleteCopy|deleteEaseCurve|deleteGizmo|deleteKey|deleteKeys|deleteKnot|deleteModifier|deleteMultiplierCurve|deleteNoteKey|deleteNoteKeys|deleteObjects|deletePoint|deleteScript|deleteSnippet|deleteSpline|deleteTime|deleteTrack|deleteTracker|deleteTrackgroup|deleteTranInfo|deleteTransition|deleteTransitionsTo|deleteface|deletevert|deselect|deselectKey|deselectKeys|detachFaces|detachVerts|disconnect|displacementToPreset|display|distance|dot|empty|enableORTs|enlargeBy|eof|evalPos|evalTangent|evalUTangent|evalVTangent|execute|exp|expandToInclude|extrudeface|filepos|findItem|findPattern|findString|flagChanged|flagForeground|floor|flush|free|freeze|getAfterORT|getAppData|getBeforeORT|getCV|getChannel|getChannelAsMask|getClip|getCopy|getCurve|getCurveID|getCurveStartPoint|getDisplacementMapping|getEdge|getEdgeSelection|getEdgeVis|getFaceMatID|getFaceNormal|getFaceSelection|getFaceSmoothGroup|getFilter|getFlip|getFlipTrim|getGenerateUVs|getGizmo|getInVec|getIndexedPixels|getInterface|getInterfaces|getKeyIndex|getKeyTime|getKnot|getKnotPoint|getKnotType|getModContextBBoxMax|getModContextBBoxMin|getModContextTM|getMultiplierValue|getNoteKeyIndex|getNoteKeyTime|getNumCPVVerts|getNumFaces|getNumTVerts|getNumVerts|getObject|getOutVec|getParent|getParentID|getPixels|getPoint|getProdTess|getPropNames|getRadius|getScriptIndex|getSeed|getSegmentType|getSelectedPts|getSnippetIndex|getSplitMesh|getSubAnim|getSubAnimName|getSubAnimNames|getSubdivisionDisplacement|getTVFace|getTextureSurface|getTextureUVs|getTiling|getTilingOffset|getTimeRange|getTrack|getTracker|getTrackgroup|getTrimSurface|getUCurve|getUCurveID|getUKnot|getUserProp|getUserPropBuffer|getVCFace|getVCurve|getVCurveID|getVKnot|getValue|getVert|getVertSelection|getViewTess|getface|getnormal|gettvert|getvertcolor|globalInpoint|globalOutpoint|globalToLocal|globalToScaledLocal|gotoFrame|hide|hideSelectedSegments|hideSelectedSplines|hideSelectedVerts|insertPoint|insertSnippet|insertTime|insertTrack|insertTrackgroup|instance|instanceReplace|intersectRay|intersects|invalTrack|invert|isAnimated|isClosed|isCompatible|isDeleted|isEmpty|isIdentity|isKeySelected|isKindOf|join|length|lengthInterp|lengthTangent|lengthToPathParam|loadFrames|loadMaxAnimationFile|loadMixFile|loadMoFlowFile|loadSnippetFiles|loadfile|localToGlobal|localToScaledLocal|log|log10|makeCube|mapKeys|materialID|merge|mixdown|mod|move|moveClip|moveKey|moveKeys|nearestPathParam|newSnippet|normalize|numCopies|numEaseCurves|numKeys|numKnots|numMultiplierCurves|numSegments|numSelKeys|numSplines|open|optimizeClipTransition|optimizeTransitions|particleAge|particleCount|particlePos|particleSize|particleVelocity|pathInterp|pathTangent|pathToLengthParam|perspectiveMatch|pow|print|printstack|qorthog|random|readChar|readChars|readDelimitedString|readExpr|readLine|readValue|rectify|reduceKeys|reference|referenceReplace|refine|refineSegment|refineU|refineV|removeObject|renderMap|reparameterize|replace|resample|reset|resetShape|resetZoom|reverse|reverseTime|save|saveMixFile|saveMoFlowFile|scale|scaleClip|scaleTime|scaledLocalToGlobal|scaledLocalToLocal|seek|select|selectKey|selectKeys|selectmore|setAfterORT|setAppData|setAsBackground|setBeforeORT|setCV|setCacheEntry|setCurve|setCurveByID|setCurveStartPoint|setDisplacementMapping|setEdge|setEdgeSelection|setEdgeVis|setFaceMatID|setFaceSelection|setFaceSmoothGroup|setFade|setFilter|setFirstKnot|setFirstSpline|setFlip|setGenerateUVs|setInVec|setIndexedPixels|setKnot|setKnotPoint|setKnotType|setMesh|setNumCPVVerts|setNumFaces|setNumTVerts|setNumVerts|setObject|setOutVec|setParent|setParentID|setPixels|setPoint|setProdTess|setRadius|setSeed|setSegmentType|setSelectedPts|setSize|setSplitMesh|setStruct|setSubdivisionDisplacement|setTVFace|setTextureSurface|setTextureUVs|setTiling|setTilingOffset|setTimeRange|setTrimSurface|setUCurve|setUCurveByID|setUKnot|setUserProp|setUserPropBuffer|setVCFace|setVCurve|setVCurveByID|setVKnot|setVert|setVertColor|setVertSelection|setface|setfacenormal|setnormal|settvert|showEvents|showInterface|showInterfaces|showMethods|showProperties|showTrack|sin|sinh|skipToNextLine|skipToString|snapshot|sort|sortKeys|sortNoteKeys|sqrt|substring|superClassOf|supportsTimeOperations|tan|tanh|toLower|toUpper|transpose|unDisplay|unbindKnot|unfreeze|unhide|unhideSegments|update|updateBindList|updateShape|updateXRef)\\b(?!\\s*[:.])"

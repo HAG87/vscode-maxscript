@@ -32,9 +32,10 @@ export function msxHelp(help_addr:string)
  */
 export function activate(context:vscode.ExtensionContext): void {
     vscode.languages.setLanguageConfiguration(MXS_MODE.language, {
+		// remove in future versions since 1.14.0
 		indentationRules: {
-            increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b\s*)$/,
-		    decreaseIndentPattern: /^\s*\)/
+            increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b)\s*$/,
+		    decreaseIndentPattern: /^\s*[)](\s*[,]?)\s*$/
 		}
 		// need to fix this
 		//wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,

@@ -1040,149 +1040,156 @@
             }
         },
         {
+            "name": "msx function name",
+            "scope":"entity.name.function.maxscript",
+            "settings": {
+              "fontStyle": "bold"
+            }
+          },
+          {
             "name": "mxs keyword other",
-            "scope": "keyword.reserved",
+            "scope": "keyword.reserved.maxscript",
             "settings": {
-                "foreground": "#E6B52E",
-                "fontStyle": "italic"
+              "foreground": "#E6B52E",
+              "fontStyle": "italic"
             }
-        },
-        {
+          },
+          {
             "name": "mxs meta",
-            "scope": "meta.struct, entity.function.type",
+            "scope": "entity.struct.type.maxscript, entity.function.type.maxscript, entity.utility.type.maxscript",
             "settings": {
-                "foreground": "#E06C75",
-                "fontStyle": "bold"
+              "foreground": "#E06B74",
+              "fontStyle": "bold"
             }
-        },
-        {
+          },
+          {
             "name": "mxs function call",
-            "scope": "meta.function.method.call",
+            "scope": "meta.call.maxscript",
             "settings": {
-                "foreground": "#78BEC2"
+              "foreground": "#78BEC2"
             }
-        },
-        {
+          },
+          {
             "name": "mxs property member",
-            "scope": "meta.property",
+            "scope": "meta.property.maxscript",
             "settings": {
-                "foreground": "#61AFEF"
+              "foreground": "#61AFEF"
             }
-        },
-        {
+          },
+          {
             "name": "mxs parameter",
-            "scope": "variable.parameter.name",
+            "scope": "variable.parameter.name.maxscript",
             "settings": {
-                "fontStyle": "italic",
-                "foreground": "#98C379"
+              "fontStyle": "italic",
+              "foreground": "#98C379"
             }
-        },
-        {
+          },
+          {
             "name": "mxs constant",
             "scope": "constant.language",
             "settings": {
-                "foreground": "#528BFF"
+              "foreground": "#528BFF"
             }
-        },
-        {
-            "name": "mxs storage mofidier",
+          },
+          {
+            "name": "mxs storage modifier",
             "scope": "storage.modifier.maxscript",
             "settings": {
-                "foreground": "#7EB33D"
+              "foreground": "#7EB33D"
             }
-        },
-        {
-            "name":"mxs event declaration",
-            "scope":"entity.event.type.maxscript, entity.event.keyword.maxscript",
-            "settings":{
-                "foreground":"#E06C75"
+          },
+          {
+            "name": "mxs event declaration",
+            "scope": "entity.event.type.maxscript, entity.event.keyword.maxscript",
+            "settings": {
+              "foreground": "#E06C75"
             }
-        },
-        {
-            "name":"mxs event target",
-            "scope":"entity.event.target.maxscript",
-            "settings":{
-                "fontStyle":"italic"
+          },
+          {
+            "name": "mxs event target",
+            "scope": "entity.event.target.maxscript",
+            "settings": {
+              "fontStyle": "italic"
             }
-        },
-        {
-            "name":"mxs event action",
-            "scope":"entity.event.action.maxscript",
-            "settings":{
-                "foreground":"#7EB33D"
+          },
+          {
+            "name": "mxs event action",
+            "scope": "entity.event.action.maxscript",
+            "settings": {
+              "foreground": "#7EB33D"
             }
-        },
-        {
+          },
+          {
             "name": "mxs array",
-            "scope": "storage.type.array, storage.type.bitarray",
+            "scope": "storage.type.array.maxscript, storage.type.bitarray.maxscript",
             "settings": {
-                "foreground": "#E6B38A"
+              "foreground": "#E6B38A"
             }
-        },
-        {
+          },
+          {
             "name": "mxs array def",
-            "scope": "punctuation.definition.array",
+            "scope": "punctuation.definition.array.maxscript",
             "settings": {
-                "foreground": "#676a70"
+              "foreground": "#676a70"
             }
-        },
-        {
+          },
+          {
             "name": "mxs support generic",
             "scope": "support.type, support.class",
             "settings": {
-                "foreground": "#5572C2"
+              "foreground": "#5572C2"
             }
-        },
-        {
+          },
+          {
             "name": "mxs support objectset",
-            "scope": "support.variable.ObjectSet",
+            "scope": "support.variable.ObjectSet.maxscript",
             "settings": {
-                "foreground": "#E6B52E"
+              "foreground": "#E6B52E"
             }
-        },
-        {
+          },
+          {
             "name": "mxs support specific",
-            "scope": "support.constant, support.class.primitive, support.variable.system, support.type.generic",
+            "scope": "support.class.primitive, support.variable.system, support.type.generic",
             "settings": {
-                "foreground": "#759FD1"
+              "foreground": "#759FD1"
             }
-        },
-        {
+          },
+          {
             "name": "mxs interface",
-            "scope": "support.type.interface",
+            "scope": "support.type.interface.maxscript",
             "settings": {
-                "foreground": "#759FD1"
+              "foreground": "#759FD1"
             }
-        },
-        {
+          },
+          {
             "name": "mxs support other",
-            "scope": "support.other",
+            "scope": "support.other.primitive.maxscript",
             "settings": {
-                "foreground": "#759FD1"
+              "foreground": "#759FD1"
             }
-        },
-        {
+          },
+          {
             "name": "mxs rollout",
-            "scope": "support.class.rollout-control",
+            "scope": "support.class.rollout-control.maxscript",
             "settings": {
-                "foreground": "#E06C92"
+              "foreground": "#E06C92"
             }
-        },
-        {
+          },
+          {
             "name": "mxs system",
-            "scope": "support.constant",
+            "scope": "support.constant.maxscript",
             "settings": {
-                "fontStyle": "italic",
-                "foreground": "#E06C75"
+              "fontStyle": "italic",
+              "foreground": "#E06C75"
             }
-        },
-        {
-            "name": "mxs storage type",
-            "scope": "storage.type.maxscript",
+          },
+          {
+            "name": "mxs utility type",
+            "scope": "meta.utility.maxscript",
             "settings": {
-                "foreground": "c678dd",
-                "fontStyle": "bold"
+              "foreground": "#c678dd",
+              "fontStyle": "bold"
             }
-        }
+          }
     ]
 }
