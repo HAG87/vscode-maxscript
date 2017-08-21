@@ -41,6 +41,13 @@ Default settings for **Custom highlighting**
         }
       },
       {
+        "name": "mxs name values",
+        "scope": "punctuation.definition.name.begin.maxscript, punctuation.definition.name.unquoted.maxscript, string.other.name.maxscript",
+        "settings": {
+          "foreground": "#c678dd"
+        }
+      },
+      {
         "name": "mxs meta type",
         "scope": "entity.function.modifier.maxscript, entity.struct.type.maxscript, entity.function.type.maxscript",
         "settings": {
