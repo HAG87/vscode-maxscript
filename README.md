@@ -12,7 +12,6 @@ Autodesk 3ds Max Scripting language (MaxScript) support.
 
 ![feature X](images/feature-1.png)
 
-
 ![feature X](images/feature-2.gif)
 
 ## Requirements

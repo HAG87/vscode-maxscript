@@ -307,6 +307,10 @@
 				{
 					"name":  "constant.language.dontcollect.maxscript",
 					"match": "(?i)\\b(?<![\\.\\$])dontcollect(?!\\s*:)\\b"
+				},
+				{
+					"name": "constant.other.hex.maxscript",
+					"match": "\\b(0x\\w+)\\b"
 				}
 			]
 		},
