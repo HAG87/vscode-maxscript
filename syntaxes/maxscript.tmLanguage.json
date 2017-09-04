@@ -278,7 +278,7 @@
 				},
 				{
 					"name":  "constant.language.boolean.true.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(true|on)(?!\\s*:)\\b"
+					"match": "(?i)\\b(?<![\\.\\$])(true)(?!\\s*:)\\b"
 				},
 				{ 
 					"name":  "constant.language.boolean.false.maxscript",

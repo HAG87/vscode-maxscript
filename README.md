@@ -47,6 +47,20 @@ Default settings for **Custom highlighting**
         }
       },
       {
+        "name": "mxs verbatim string",
+        "scope": "punctuation.definition.verbatim.string.begin.maxscript",
+        "settings": {
+          "foreground": "#78BEC2"
+        }
+      },
+      {
+        "name": "mxs hex value",
+        "scope": "constant.other.hex.maxscript",
+        "settings": {
+          "foreground": "#E06B74"
+        }
+      },
+      {
         "name": "mxs meta type",
         "scope": "entity.function.modifier.maxscript, entity.struct.type.maxscript, entity.function.type.maxscript",
         "settings": {
