@@ -202,12 +202,13 @@
 				},
 				{
 					"name":"meta.event.maxscript",
-					"match": "(?i)\\b(on)\\b\\s+(\\w+)\\s+(\\w+)\\s+\\b(do)\\b",
+					"match": "(?i)\\b(on)\\b\\s+(?:(\\w+)\\s+(\\w+)|(\\w+))\\s+\\b(do)\\b",
 					"captures": {
 						"1":{"name":"entity.event.type.maxscript"},
 						"2":{"name":"entity.event.target.maxscript"},
 						"3":{"name":"entity.event.action.maxscript"},
-						"4":{"name":"entity.event.keyword.maxscript"}						
+						"4":{"name":"entity.event.action.maxscript"},
+						"5":{"name":"entity.event.keyword.maxscript"}						
 					}
 				},
 				{
