@@ -202,7 +202,7 @@
 				},
 				{
 					"name":"meta.event.maxscript",
-					"match": "(?i)\\b(on)\\b\\s+(?:(\\w+)\\s+(\\w+)|(\\w+))\\s+\\b(do)\\b",
+					"match": "(?i)\\b(on)\\b\\s+(?:(\\w+)\\s+(\\w+)|(\\w+))\\s+\\b(do|return)\\b",
 					"captures": {
 						"1":{"name":"entity.event.type.maxscript"},
 						"2":{"name":"entity.event.target.maxscript"},
