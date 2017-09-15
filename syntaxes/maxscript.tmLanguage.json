@@ -233,6 +233,10 @@
 					"match": "(?<=\\.)\\b(\\w*?[_]*?\\w*)\\b(?!\\s*\\=)"
 				},
 				{
+					"name":"variable.reference.maxscript",
+					"match":"(?<!\\.)\\b(\\w+)\\b[.]"
+				},
+				{
 					"name":"variable.language.maxscript",
 					"match": "(?!)\\b(this)\\b"
 				},
