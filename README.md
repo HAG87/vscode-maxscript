@@ -48,7 +48,7 @@ Default settings for **Custom highlighting**
       },
       {
         "name": "mxs verbatim string",
-        "scope": "punctuation.definition.verbatim.string.begin.maxscript",
+        "scope": "punctuation.definition.verbatim.string.begin.maxscript, punctuation.definition.verbatim.string.end.maxscript",
         "settings": {
           "foreground": "#78BEC2"
         }
@@ -106,8 +106,15 @@ Default settings for **Custom highlighting**
         }
       },
       {
+        "name": "msx object reference",
+        "scope": "variable.reference.maxscript",
+        "settings": {
+          "foreground": "#61AFEF"
+        }
+      },
+      {
         "name": "mxs event declaration",
-        "scope": "entity.event.type.maxscript, entity.event.keyword.maxscript",
+        "scope": "entity.event.type.maxscript",
         "settings": {
           "foreground": "#E06C75"
         }
@@ -118,6 +125,13 @@ Default settings for **Custom highlighting**
         "settings": {
           "foreground": "#E6B52E",
           "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "mxs event args",
+        "scope": "entity.event.argument.maxscript",
+        "settings": {
+          "foreground": "#898989"
         }
       },
       {

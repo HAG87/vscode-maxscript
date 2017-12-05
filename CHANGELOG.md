@@ -2,6 +2,11 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.7.2] - 2017 -12-05
+
+- Event syntax highlight fix
+- Minor fixes
+
 ## [1.4.0] - 2017-08-15
 
 - Code highlight improvements
@@ -67,7 +72,7 @@ All notable changes to the "language-maxscript" extension will be documented in 
       },
       {
         "name": "mxs event declaration",
-        "scope": "entity.event.type.maxscript, entity.event.keyword.maxscript",
+        "scope": "entity.event.type.maxscript",
         "settings": {
           "foreground": "#E06C75"
         }
@@ -78,6 +83,13 @@ All notable changes to the "language-maxscript" extension will be documented in 
         "settings": {
           "foreground": "#E6B52E",
           "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "mxs event args",
+        "scope": "entity.event.argument.maxscript",
+        "settings": {
+          "foreground": "#898989"
         }
       },
       {

@@ -134,10 +134,10 @@
 				},
 				{
 				"name":  "string.quoted.verbatim.double.maxscript",
-				"begin": "@\"",
+				"begin": "(@)\"",
 				"end":   "\"",
 				"beginCaptures": {"0": {"name": "punctuation.definition.verbatim.string.begin.maxscript" }},
-				"endCaptures":   {"0": {"name": "punctuation.definition.verbatim.string.end.maxscript"   }}
+				"endCaptures":   {"0": {"name": "punctuation.definition.verbatim.string.end.maxscript" }}
 				},
 				{
 					"name":  "string.quoted.single.maxscript",
@@ -202,13 +202,12 @@
 				},
 				{
 					"name":"meta.event.maxscript",
-					"match": "(?i)\\b(on)\\b\\s+(?:(\\w+)\\s+(\\w+)|(\\w+))\\s+\\b(do|return)\\b",
+					"match": "(?i)(on)\\b\\s+(?:(\\w+\\b)?\\s*(\\w+)\\s*(\\w+)?)\\s+(?=do|return)",
 					"captures": {
 						"1":{"name":"entity.event.type.maxscript"},
 						"2":{"name":"entity.event.target.maxscript"},
 						"3":{"name":"entity.event.action.maxscript"},
-						"4":{"name":"entity.event.action.maxscript"},
-						"5":{"name":"entity.event.keyword.maxscript"}						
+						"4":{"name":"entity.event.argument.maxscript"}						
 					}
 				},
 				{

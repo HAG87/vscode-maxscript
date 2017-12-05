@@ -1,87 +1,92 @@
 {
-    "name": "language-maxscript",
-    "displayName": "Language MaxScript",
-    "description": "Autodesk 3ds Max MaxScript language support",
-    "version": "1.7.1",
-    "publisher": "atelierbump",
-    "icon": "mxs.png",
-    "homepage": "https://github.com/HAG87/vscode-maxscript",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/HAG87/vscode-maxscript"
-    },
-    "engines": {
-        "vscode": "^1.12.0"
-    },
-    "categories": [
-        "Languages",
-        "Themes",
-        "Snippets"
-    ],
-    "keywords": [
-        "MaxScript"
-    ],
-    "activationEvents": [
-        "onLanguage:maxscript",
-        "onCommand:mxs.help"
-    ],
-    "main": "./out/src/mxsMain",
-    "contributes": {
-        "languages": [
-            {
-                "id": "maxscript",
-                "aliases": [
-                    "MaxScript",
-                    "maxscript",
-                    "mxs"
-                ],
-                "extensions": [
-                    ".ms",
-                    ".mcr"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "commands": [
-            {
-                "command": "mxs.help",
-                "title": "MaxScript help"
-            }
-        ],
-        "menus": {
-            "editor/context": [
-                {
-                    "when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
-                    "command": "mxs.help",
-                    "group": "navigation@1"
-                }
-            ]
-        },
-        "grammars": [
-            {
-                "language": "maxscript",
-                "scopeName": "source.mxs",
-                "path": "./syntaxes/maxscript.tmLanguage.json"
-            }
-        ],
-        "snippets": [
-            {
-                "language": "maxscript",
-                "path": "./snippets/maxscript.json"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0",
-        "mocha": "^2.3.3",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
-    }
+	"name": "language-maxscript",
+	"displayName": "Language MaxScript",
+	"description": "Autodesk 3ds Max MaxScript language support",
+	"version": "1.7.1",
+	"publisher": "atelierbump",
+	"icon": "mxs.png",
+	"homepage": "https://github.com/HAG87/vscode-maxscript",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/HAG87/vscode-maxscript"
+	},
+	"engines": {
+		"vscode": "^1.12.0"
+	},
+	"categories": [
+		"Languages",
+		"Themes",
+		"Snippets"
+	],
+	"keywords": [
+		"MaxScript"
+	],
+	"activationEvents": [
+		"onLanguage:maxscript",
+		"onCommand:mxs.help"
+	],
+	"main": "./out/src/mxsMain",
+	"contributes": {
+		"languages": [
+			{
+				"id": "maxscript",
+				"aliases": [
+					"MaxScript",
+					"maxscript",
+					"mxs"
+				],
+				"extensions": [
+					".ms",
+					".mcr"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "mxs.help",
+				"title": "MaxScript help"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
+					"command": "mxs.help",
+					"group": "navigation@1"
+				}
+			]
+		},
+		"grammars": [
+			{
+				"language": "maxscript",
+				"scopeName": "source.mxs",
+				"path": "./syntaxes/maxscript.tmLanguage.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "maxscript",
+				"path": "./snippets/maxscript.json"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^2.0.3",
+		"vscode": "^1.0.0",
+		"mocha": "^2.3.3",
+		"@types/node": "^6.0.40",
+		"@types/mocha": "^2.2.32"
+	},
+	"__metadata": {
+		"id": "7f2edb68-8e0f-4a8c-9380-24d100650a02",
+		"publisherDisplayName": "Atelier Bump",
+		"publisherId": "9039a6b2-5163-4caa-8366-6f65e2d75d03"
+	}
 }
