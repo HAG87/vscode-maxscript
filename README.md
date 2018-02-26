@@ -284,16 +284,25 @@ MXSPyCOM project allow for editing & execution of 3ds Max MaxScript and Python f
 
 ```json
 {
-    "version": "0.1.0",
-    "command": "C:/MXSPyCOM/MXSPyCOM.exe",
-    "isShellCommand": false,
-    "args": ["-f"],
-    "showOutput": "always",
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
     "tasks": [
         {
-         "taskName": "Execute in Max",
-         "args": ["${file}"],
-         "suppressTaskName": true
+            "label": "Execute in Max",
+            "type": "process",
+            "command": "C:/MXSPyCOM/MXSPyCOM.exe",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": [
+                "-f",
+                "${file}"
+            ],
+            
         }
     ]
 }
