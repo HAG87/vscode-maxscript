@@ -54,6 +54,20 @@ Default settings for **Custom highlighting**
         }
       },
       {
+        "name": "mxs localized resources - var name",
+        "scope": "string.localized.maxscript",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "mxs localized resources",
+        "scope": "punctuation.definition.localized.string.begin.maxscript, punctuation.definition.localized.string.end.maxscript",
+        "settings": {
+          "foreground": "#8f724a"
+        }
+      },
+      {
         "name": "mxs hex value",
         "scope": "constant.other.hex.maxscript",
         "settings": {

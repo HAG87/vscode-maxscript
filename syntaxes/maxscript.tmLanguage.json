@@ -116,6 +116,23 @@
 		"strings": {
 			"patterns": [
 				{
+					"name":"string.localized.maxscript",
+					"begin": "~",
+					"end": "~",
+					"beginCaptures": {
+						"0": {"name":"punctuation.definition.localized.string.begin.maxscript"}
+					},
+					"endCaptures": {
+						"0": {"name": "punctuation.definition.localized.string.end.maxscript"}
+					},
+					"patterns": [
+						{
+							"name":  "constant.character.escape.maxscript",
+							"match": "\\\\(\\*|\\?|\\\\|\\')"
+						}
+					]
+				},
+				{
 					"name": "string.quoted.double.maxscript",
 					"begin": "(?<!@)\"",
 					"end": "\"",

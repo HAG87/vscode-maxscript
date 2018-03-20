@@ -25,7 +25,8 @@
         ["[", "]"],
         ["(", ")"],
         ["\"", "\""],
-        ["'", "'"]
+        ["'", "'"],
+        ["~", "~"]
     ],
      "indentationRules": {
         "increaseIndentPattern": "^\\s*(([(]|\\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\\b))\\s*$",
