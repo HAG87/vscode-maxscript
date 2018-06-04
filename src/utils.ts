@@ -31,3 +31,6 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
 	doubleQuotesCnt += lineTillCurrentPosition.startsWith('\"') ? 1 : 0;
 	return doubleQuotesCnt % 2 === 1;
 }
+/**
+ * EXTRACTED FROM : 
+ */

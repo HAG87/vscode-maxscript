@@ -2,7 +2,7 @@
     "name": "language-maxscript",
     "displayName": "Language MaxScript",
     "description": "Autodesk 3ds Max MaxScript language support",
-    "version": "1.2.0",
+    "version": "1.8.0",
     "publisher": "atelierbump",
     "icon": "mxs.png",
     "homepage": "https://github.com/HAG87/vscode-maxscript",
@@ -14,10 +14,9 @@
         "vscode": "^1.12.0"
     },
     "categories": [
-        "Languages",
-        "Themes",
-        "Snippets"
+        "Programming Languages"
     ],
+    "license": "MIT",
     "keywords": [
         "MaxScript"
     ],
@@ -69,13 +68,6 @@
                 "language": "maxscript",
                 "path": "./snippets/maxscript.json"
             }
-        ],
-        "themes": [
-            {
-                "label": "One Dark MXS",
-                "uiTheme": "vs-dark",
-                "path": "./theme/OneDark-MXS.json"
-            }
         ]
     },
     "scripts": {
@@ -90,5 +82,8 @@
         "mocha": "^2.3.3",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "tslint": "^5.10.0"
     }
 }
