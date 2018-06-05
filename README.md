@@ -6,7 +6,7 @@ Autodesk 3ds Max Scripting language (MaxScript) support.
 
 - Syntax highlight.
 - Code autocompletion; for keywords, primitives, generic functions, structDefs, interfaces and classes.
-- Go to Symbol in document.
+- Go to Symbol in document (Basic support, somewhat buggy).
 - Snippets for most used code blocks.
 - Customized theme to match MaxScript elements diversity.
 - Help command (*MaxScript help. Accessible from the right-click menu.*): Select a keyword and open related online documentation.

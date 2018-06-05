@@ -25,6 +25,7 @@ export const mxsSymbols: mxsSymbolMatch[] = [
 		kind: vscode.SymbolKind.Function,
 		decl: 2
 	},
+	/*
 	{
 		type: 'localVar',
 		match: /local\s+(\b\w+)/ig,
@@ -43,6 +44,7 @@ export const mxsSymbols: mxsSymbolMatch[] = [
 		kind: vscode.SymbolKind.Variable,
 		decl: 1
 	},
+	*/
 	{
 		type: 'macroscript',
 		match: /macroscript\s+(\b\w+)/ig,
