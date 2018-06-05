@@ -2,6 +2,13 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.8.x] - 2018-06
+
+- Added basic "go to symbol" support
+- Optimized autocompletion
+- fixed some grammar issues
+- **Changed grammar tokens to be more consistent**: See readme.
+
 ## [1.7.3] - 2018-03-20
 
 - Added syntax support for localized string resources.

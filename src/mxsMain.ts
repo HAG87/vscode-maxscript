@@ -2,13 +2,26 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import fs = require('fs');
+
+//import fs = require('fs');
 //import path = require('path');
-//import cp = require('child_process');
+
 import { getTextSel, fileExists } from './utils';
 import mxsCompletion from './mxsAutocomplete';
 
-export const MXS_MODE: vscode.DocumentFilter = { language: 'maxscript', scheme: 'file' };
+import mxsOutline from './mxsOutline';
+
+export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
+
+export const LANG_CFG: vscode.LanguageConfiguration = {
+	indentationRules: {
+		increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b\s*)$/,
+		decreaseIndentPattern: /^\s*\)/
+	}
+	// need to fix this
+	// wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
+}
+
 export const help_addr: string = 'http://help.autodesk.com/view/3DSMAX/2018/ENU/'
 /**
  * MaxScript online help launch at current selected word
@@ -31,18 +44,12 @@ export function msxHelp(help_addr:string)
  * @param context 
  */
 export function activate(context:vscode.ExtensionContext): void {
-    vscode.languages.setLanguageConfiguration(MXS_MODE.language, {
-		indentationRules: {
-            increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b\s*)$/,
-		    decreaseIndentPattern: /^\s*\)/
-		}
-		// need to fix this
-		//wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
-	});
+    vscode.languages.setLanguageConfiguration(MXS_MODE.language, LANG_CFG);
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => {msxHelp(help_addr);}));
 	// code completion -- need to check trigger characters
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE.language, new mxsCompletion(),'.','='));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.','='));
+	context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE,new mxsOutline()));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {}

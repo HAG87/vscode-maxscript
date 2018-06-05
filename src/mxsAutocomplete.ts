@@ -148,8 +148,12 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 	}
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
 		return new Promise((resolve, reject) => {
-			let theCompletionItems = this.provideCompletionItemsInternal(document, position, token);
-			resolve (theCompletionItems);
-		}	);	
+			try {
+				let theCompletionItems = this.provideCompletionItemsInternal(document, position, token);
+				resolve (theCompletionItems);
+			} catch (e) {
+				reject (e);
+			}
+		});	
 	}
 }
