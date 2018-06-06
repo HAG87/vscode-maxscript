@@ -8,8 +8,8 @@ import * as vscode from 'vscode';
 
 import { getTextSel, fileExists } from './utils';
 import mxsCompletion from './mxsAutocomplete';
-
 import mxsOutline from './mxsOutline';
+import msxDefinitions from './mxsDefinitions';
 
 export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
 
@@ -50,6 +50,7 @@ export function activate(context:vscode.ExtensionContext): void {
 	// code completion -- need to check trigger characters
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.','='));
 	context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE,new mxsOutline()));
+	context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new msxDefinitions()));
 }
 // this method is called when your extension is deactivated
 export function deactivate() {}

@@ -81,7 +81,11 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 
 	private getDocumentSymbols(document: vscode.TextDocument, tokens: mxsSymbolMatch[]): vscode.SymbolInformation[] {
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
+
 		let docTxt = document.getText();
+		// remove comments
+		docTxt.replace(/(\/\*[^\*]*\*\/)/ig,'');
+		docTxt.replace(/(--.*)$/igm,'');
 
 		tokens.forEach(type => {
 			let matchSymbols;

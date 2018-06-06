@@ -7,6 +7,7 @@ Autodesk 3ds Max Scripting language (MaxScript) support.
 - Syntax highlight.
 - Code autocompletion; for keywords, primitives, generic functions, structDefs, interfaces and classes.
 - Go to Symbol in document (Basic support, somewhat buggy).
+- Go to Definition and peek definition in document.
 - Snippets for most used code blocks.
 - Customized theme to match MaxScript elements diversity.
 - Help command (*MaxScript help. Accessible from the right-click menu.*): Select a keyword and open related online documentation.
@@ -242,6 +243,7 @@ MXSPyCOM project allow for editing & execution of 3ds Max MaxScript and Python f
       {
         "label": "MXSPyCOM execute Script",
         "type": "process",
+        // Add MXSPyCOM.exe to PATH or use file root, i.e: "C:/MXSPyCOM/MXSPyCOM.exe"
         "command":"MXSPyCOM.exe",
         "args": [
             "-f",
