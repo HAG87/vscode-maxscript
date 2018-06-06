@@ -48,6 +48,7 @@ export function MXScompletionItems(mxsSchema): vscode.CompletionItem[] {
 				// */
 			}
 		});
+		
 		// resultCompletionItems = resultCompletionItems.concat(currentCompletion);
 	});
 	return resultCompletionItems;
@@ -123,9 +124,7 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 			currentWord = word.substr(0, position.character - wordAtPosition.start.character);
 		}
 		// escape numbers
-		if (currentWord.match(/^\d+$/)) {
-			return [];
-		}
+		if (currentWord.match(/^\d+$/)) { return []; }
 		// test if currPos is after dot
 		let dotPattern = /\w+[.]\w*?$/;
 		let notDotPattern = /[^.]\w+$/;

@@ -74,6 +74,12 @@ export const mxsSymbols: mxsSymbolMatch[] = [
 		match: /on\s+(\b\w+)\.+(?=do|return)/ig,
 		kind: vscode.SymbolKind.Event,
 		decl: 1
+	},
+	{
+		type: 'External file',
+		match: /filein\s*\(*(.*)(?=\)|;|\n)/ig,
+		kind: vscode.SymbolKind.Package,
+		decl: 1
 	}
 ]
 
@@ -83,13 +89,26 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 
 		let docTxt = document.getText();
-		// remove comments
-		docTxt.replace(/(\/\*[^\*]*\*\/)/ig,'');
-		docTxt.replace(/(--.*)$/igm,'');
+		// skip comment rules
 
+		let blockComments =  (x: string): RegExp => {
+			return new RegExp('\\/\\*[^\\*\\/]*' + x, 'i');
+		}
+		let singleComments = (x: string):RegExp => { 
+			return (
+				new RegExp('--.*(' + x + ').*$', 'im')
+			);
+		}
+
+		
 		tokens.forEach(type => {
 			let matchSymbols;
 			while (matchSymbols = type.match.exec(docTxt)) {
+
+				let scomment = singleComments(matchSymbols[type.decl]).test(docTxt);
+				let bcomment = blockComments(matchSymbols[type.decl]).test(docTxt);
+				if (scomment || bcomment) continue;
+
 				SymbolInfCol.push(
 					new vscode.SymbolInformation(
 						matchSymbols[type.decl],
