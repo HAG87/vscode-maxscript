@@ -24,7 +24,6 @@ export function MXScompletionItems(mxsSchema): vscode.CompletionItem[] {
 	mxsSchema.maxcompletion.forEach(cat => {
 		let catKind = cat.kind;
 		let catDescription = cat.desc;
-
 		// let currentCompletion = element.api.forEach(item => {
 		cat.api.forEach(item => {
 
@@ -80,14 +79,11 @@ export function componentSchema(mxsSchema, currentWord: string): vscode.Completi
 					if (obj.hasOwnProperty('names')) {
 
 						completionItemCol = obj.names.map(name => {
-
 							let itemName = (name.hasOwnProperty('name')) ? name.name : name;
 							let completionItem = new vscode.CompletionItem(itemName, itemKind);
 							if (name.hasOwnProperty('desc')) { completionItem.detail = name.desc }
-
 							return completionItem;
 						});
-
 						CompletionItems = CompletionItems.concat(completionItemCol);
 					}
 				}
@@ -146,12 +142,16 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 		return Completions;
 	}
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
+		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-			try {
-				let theCompletionItems = this.provideCompletionItemsInternal(document, position, token);
-				resolve (theCompletionItems);
-			} catch (e) {
-				reject (e);
+			if (mxsConfig.get('completions',true)) {
+				try {
+					resolve (this.provideCompletionItemsInternal(document, position, token));
+				} catch (e) {
+					reject (e);
+				}
+			} else {
+				reject('maxScript Completion disabled');
 			}
 		});	
 	}

@@ -4,8 +4,8 @@
 import * as vscode from 'vscode';
 
 export default class MaxscriptDefinitionProvider implements vscode.DefinitionProvider {
-    public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Definition> {
-        return new Promise<vscode.Definition>((resolve, reject) => {
+    private getDocumentDefinitions(document:vscode.TextDocument, position:vscode.Position):Thenable<vscode.Definition> {
+        return new Promise((resolve,reject) => {
             // get current word
             let wordRange = document.getWordRangeAtPosition(position);
             let word = document.getText(wordRange);
@@ -24,7 +24,18 @@ export default class MaxscriptDefinitionProvider implements vscode.DefinitionPro
                     let findSymbol = symbols.find(item => item.name === word)
                     if (findSymbol) resolve(findSymbol.location); else reject(null);
                 }, (reason) => { reject(reason);}
-            );
+            ); 
+        });
+    }
+    public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Definition> {
+        let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
+        return new Promise((resolve, reject) => {
+            if (mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) {
+            // if (mxsConfig.get('gotodefinition',true)) {
+                resolve (this.getDocumentDefinitions(document, position));
+            } else {
+                reject('MaxScript Go to Definition disabled');
+            }
         });
     }
 }

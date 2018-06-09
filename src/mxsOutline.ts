@@ -1,6 +1,6 @@
 /*
 TODO:
-[] Ignore comments
+[x] Ignore comments
 */
 'use strict'
 import * as vscode from 'vscode';
@@ -91,16 +91,15 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		let docTxt = document.getText();
 		// skip comment rules
 
-		let blockComments =  (x: string): RegExp => {
+		let blockComments = (x: string): RegExp => {
 			return new RegExp('\\/\\*[^\\*\\/]*' + x, 'i');
 		}
-		let singleComments = (x: string):RegExp => { 
+		let singleComments = (x: string): RegExp => {
 			return (
 				new RegExp('--.*(' + x + ').*$', 'im')
 			);
 		}
 
-		
 		tokens.forEach(type => {
 			let matchSymbols;
 			while (matchSymbols = type.match.exec(docTxt)) {
@@ -124,12 +123,16 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 	}
 	// Function called from Main !!
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.SymbolInformation[]> {
-		//    document.isDirty()
+		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-			try {
-				resolve(this.getDocumentSymbols(document, mxsSymbols));
-			} catch (e) {
-				reject(e);
+			if (mxsConfig.get('gotosymbol',true)) {
+				try {
+					resolve(this.getDocumentSymbols(document, mxsSymbols));
+				} catch (e) {
+					reject(e);
+				}
+			} else {
+				reject ('MaxScript Go to Symbol disabled');
 			}
 		});
 	}

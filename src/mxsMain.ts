@@ -47,7 +47,8 @@ export function activate(context:vscode.ExtensionContext): void {
     vscode.languages.setLanguageConfiguration(MXS_MODE.language, LANG_CFG);
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => {msxHelp(help_addr);}));
-	// code completion -- need to check trigger characters
+	// if (configs.get('gotosymbol',true)) {context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE,new mxsOutline()));}
+	// if (configs.get('gotosymbol',true) && configs.get('gotodefinition',true)) {context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new msxDefinitions()));}
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.','='));
 	context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE,new mxsOutline()));
 	context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new msxDefinitions()));

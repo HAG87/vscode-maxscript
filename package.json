@@ -68,7 +68,28 @@
                 "language": "maxscript",
                 "path": "./snippets/maxscript.json"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "MaxScript Configuration",
+            "type": "object",
+            "properties": {
+                "maxscript.gotosymbol": {
+                    "type":"boolean",
+                    "default":true,
+                    "description": "Enable Go to Symbol in document"
+                },
+                "maxscript.gotodefinition": {
+                    "type":"boolean",
+                    "default":true,
+                    "description":"Enable ( Go to | Peek )  Dsefinition in document"
+                },
+                "maxscript.completions":{
+                    "type":"boolean",
+                    "default":true,
+                    "description": "Enable suggest completions"
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
@@ -82,6 +103,8 @@
         "mocha": "^2.3.3"
     },
     "dependencies": {
-        "tslint": "^5.10.0"
+        "growl": "^1.10.5",
+        "tslint": "^5.10.0",
+        "vscode": "^1.1.18"
     }
 }
