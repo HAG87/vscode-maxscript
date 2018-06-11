@@ -24,18 +24,21 @@ export default class MaxscriptDefinitionProvider implements vscode.DefinitionPro
                     let findSymbol = symbols.find(item => item.name === word)
                     if (findSymbol) resolve(findSymbol.location); else reject(null);
                 }, (reason) => { reject(reason);}
-            ); 
+            );
+            // let docTxt = document.getText();
+            // docTxt.indexOf(word)
+
         });
     }
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Definition> {
         let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
         return new Promise((resolve, reject) => {
-            if (mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) {
+            // if ((mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) === true) {
             // if (mxsConfig.get('gotodefinition',true)) {
                 resolve (this.getDocumentDefinitions(document, position));
-            } else {
-                reject('MaxScript Go to Definition disabled');
-            }
+            // } else {
+                // reject('MaxScript Go to Definition disabled');
+            // }
         });
     }
 }

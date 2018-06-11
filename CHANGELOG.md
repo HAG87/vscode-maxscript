@@ -9,6 +9,7 @@ All notable changes to the "language-maxscript" extension will be documented in 
 - Optimized autocompletion.
 - fixed some grammar issues.
 - **Changed grammar tokens to be more consistent**: See readme.
+- Added configuration settings to turn off language features.
 
 ## [1.7.3] - 2018-03-20
 
