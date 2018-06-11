@@ -2,7 +2,7 @@
     "name": "language-maxscript",
     "displayName": "Language MaxScript",
     "description": "Autodesk 3ds Max MaxScript language support",
-    "version": "1.9.0",
+    "version": "1.8.1",
     "publisher": "atelierbump",
     "icon": "mxs.png",
     "homepage": "https://github.com/HAG87/vscode-maxscript",
@@ -105,6 +105,7 @@
     "dependencies": {
         "growl": "^1.10.5",
         "tslint": "^5.10.0",
+        "typescript": "^2.9.1",
         "vscode": "^1.1.18"
     }
 }
