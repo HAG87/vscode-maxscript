@@ -26,7 +26,11 @@ None.
 
 ## Extension Settings
 
-None yet.
+```json
+  "maxscript.completions": true | false,
+  "maxscript.gotosymbol": true | false,
+  "maxscript.gotodefinition": true | false,
+```
 
 ## Syntax Highlight
 
