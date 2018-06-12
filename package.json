@@ -2,7 +2,7 @@
     "name": "language-maxscript",
     "displayName": "Language MaxScript",
     "description": "Autodesk 3ds Max MaxScript language support",
-    "version": "1.8.2",
+    "version": "1.8.3",
     "publisher": "atelierbump",
     "icon": "mxs.png",
     "homepage": "https://github.com/HAG87/vscode-maxscript",
