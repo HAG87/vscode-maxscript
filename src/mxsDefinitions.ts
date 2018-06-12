@@ -4,6 +4,16 @@
 import * as vscode from 'vscode';
 
 export default class MaxscriptDefinitionProvider implements vscode.DefinitionProvider {
+    private getDocumentDefinitionMatch(document:vscode.TextDocument, word:string):Thenable<vscode.Definition> {
+        return new Promise((resolve, reject) => {
+            let docTxt = document.getText();
+            let pos = docTxt.indexOf(word);
+            if (pos > -1) {
+                let loc = new vscode.Location(document.uri, document.positionAt(pos));
+                resolve (loc);
+            } else { reject(null); }
+        });
+    }
     private getDocumentDefinitions(document:vscode.TextDocument, position:vscode.Position):Thenable<vscode.Definition> {
         return new Promise((resolve,reject) => {
             // get current word
@@ -22,23 +32,30 @@ export default class MaxscriptDefinitionProvider implements vscode.DefinitionPro
             result.then((symbols:Array<vscode.SymbolInformation>) =>
                 {
                     let findSymbol = symbols.find(item => item.name === word)
-                    if (findSymbol) resolve(findSymbol.location); else reject(null);
-                }, (reason) => { reject(reason);}
+                    if (findSymbol) {
+                        resolve(findSymbol.location);
+                    } else {
+                        // fallback to regex match...
+                        // The drawback is that, it doesn't take in account scope or keywords
+                        (this.getDocumentDefinitionMatch(document, word)).then((loc:vscode.Definition) => {
+                            resolve (loc);
+                        }, (reason) => {reject (reason);});
+                    }
+                }, () => {
+                    // fallback to regex match...
+                    (this.getDocumentDefinitionMatch(document, word)).then((loc:vscode.Definition) => {
+                        resolve (loc);
+                    }, (reason) => {reject (reason);});
+                }
             );
-            // let docTxt = document.getText();
-            // docTxt.indexOf(word)
-
         });
     }
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.Definition> {
-        let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
+        // let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
+
         return new Promise((resolve, reject) => {
-            // if ((mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) === true) {
-            // if (mxsConfig.get('gotodefinition',true)) {
-                resolve (this.getDocumentDefinitions(document, position));
-            // } else {
-                // reject('MaxScript Go to Definition disabled');
-            // }
+            // if ((mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) === true) {reject('MaxScript Go to Definition disabled');}
+            resolve (this.getDocumentDefinitions(document, position));
         });
     }
 }

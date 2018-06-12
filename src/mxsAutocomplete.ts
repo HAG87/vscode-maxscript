@@ -17,7 +17,6 @@ export function precWord(line: string) {
  * @param mxsSchema
  */
 export function MXScompletionItems(mxsSchema): vscode.CompletionItem[] {
-	//export const MXScompletionItems = ((mxsSchema): vscode.CompletionItem[] => {
 	// Array to store results
 	let resultCompletionItems = new Array<vscode.CompletionItem>();
 	// Loop through Types
@@ -26,17 +25,40 @@ export function MXScompletionItems(mxsSchema): vscode.CompletionItem[] {
 		let catDescription = cat.desc;
 		// let currentCompletion = element.api.forEach(item => {
 		cat.api.forEach(item => {
-
+			// failsafe
+			if (!item.hasOwnProperty('name')) return;
+			
 			let itemKind = (item.hasOwnProperty('kind')) ? item.kind : catKind;
 			let itemDescription = (item.hasOwnProperty('desc')) ? item.desc : catDescription;
-
-			if (item.hasOwnProperty('name')) {
+			
+			let nameType = typeof item.name;
+			if (nameType === 'string') {
+				let completionItem = new vscode.CompletionItem(item.name, itemKind);
+				completionItem.detail = itemDescription
+				resultCompletionItems.push(completionItem);
+			} else if (nameType === 'object') {
+				// for array of names
+				if (Array.isArray(item.name)) {
+					let completionItemCol = item.name.map(name => {
+						// can be string or object
+						let nameItemType = typeof name;
+						if (nameItemType === 'string') {
+							let completionItem = new vscode.CompletionItem(name, itemKind);
+							completionItem.detail = itemDescription;
+							return completionItem;
+						}
+					});
+					resultCompletionItems = resultCompletionItems.concat(completionItemCol);
+				} else {
+					// implement for objects
+				}
+			}
+/* 			if (item.hasOwnProperty('name')) {
 				let completionItem = new vscode.CompletionItem(item.name, itemKind);
 				completionItem.detail = itemDescription
 				// return completionItem;
 				resultCompletionItems.push(completionItem);
 			} else if (item.hasOwnProperty('names')) {
-				// /*
 				let completionItemCol = item.names.map((name) => {
 					let completionItem = new vscode.CompletionItem(name, itemKind);
 					completionItem.detail = itemDescription;
@@ -44,8 +66,7 @@ export function MXScompletionItems(mxsSchema): vscode.CompletionItem[] {
 				});
 				// return completionItemCol;
 				resultCompletionItems = resultCompletionItems.concat(completionItemCol);
-				// */
-			}
+			} */		
 		});
 		
 		// resultCompletionItems = resultCompletionItems.concat(currentCompletion);
@@ -64,28 +85,32 @@ export function componentSchema(mxsSchema, currentWord: string): vscode.Completi
 
 	let CompletionItems = new Array<vscode.CompletionItem>();
 
-	mxsSchema.maxcompletion.forEach(elem => {
+	mxsSchema.maxcompletion.forEach(cat => {
 		// Find the entries with name matching declaration
-		let theFoundItem = elem.api.find(item => item.name === currentWord);
+		let theFoundItem = cat.api.find(item => item.name === currentWord);
 		if (theFoundItem) {
 			Object.getOwnPropertyNames(theFoundItem).forEach(key => {
 
-				let obj = theFoundItem[key];
+				let item = theFoundItem[key];
+				// just for properties containing an object
+				// failsafe
+				if (!(item instanceof Object && item.hasOwnProperty('name'))) return;
+				
+				let itemKind = item.hasOwnProperty('kind') ? item.kind : cat.kind;
 
-				if (obj instanceof Object) {
-					let completionItemCol = new Array<vscode.CompletionItem>();
-					let itemKind = (obj.hasOwnProperty('kind') ? obj.kind : elem.kind);
-
-					if (obj.hasOwnProperty('names')) {
-
-						completionItemCol = obj.names.map(name => {
-							let itemName = (name.hasOwnProperty('name')) ? name.name : name;
-							let completionItem = new vscode.CompletionItem(itemName, itemKind);
-							if (name.hasOwnProperty('desc')) { completionItem.detail = name.desc }
-							return completionItem;
-						});
-						CompletionItems = CompletionItems.concat(completionItemCol);
-					}
+				let nameType = typeof item.name;
+				if (nameType === 'string') {
+					let completionItem = new vscode.CompletionItem(item.name, itemKind);
+					CompletionItems.push(completionItem);
+				} else {
+					let completionItemCol = item.name.map(name => {
+						// no need to check if its an array, just try to retrieve the property
+						let itemName = (name.hasOwnProperty('name')) ? name.name : name;
+						let completionItem = new vscode.CompletionItem(itemName, itemKind);
+						if (name.hasOwnProperty('desc')) { completionItem.detail = name.desc }
+						return completionItem;
+					});
+					CompletionItems = CompletionItems.concat(completionItemCol);
 				}
 			});
 		}
@@ -144,14 +169,11 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
 		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-			if (mxsConfig.get('completions',true)) {
-				try {
-					resolve (this.provideCompletionItemsInternal(document, position, token));
-				} catch (e) {
-					reject (e);
-				}
-			} else {
-				reject('maxScript Completion disabled');
+			if (!mxsConfig.get('completions',true)) {reject('maxScript Completion disabled');}
+			try {
+				resolve (this.provideCompletionItemsInternal(document, position, token));
+			} catch (e) {
+				reject (e);
 			}
 		});	
 	}

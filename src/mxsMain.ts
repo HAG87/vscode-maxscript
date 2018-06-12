@@ -43,7 +43,7 @@ export function activate(context:vscode.ExtensionContext): void {
 
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.','='));
 	context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsOutline()));
-
+	// Avoiding the registration of the feature keeps the entries on the context menu to appear
 	let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 	if ((mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) === true) {
 		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new msxDefinitions()));

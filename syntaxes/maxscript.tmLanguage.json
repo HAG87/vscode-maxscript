@@ -198,18 +198,23 @@
 				},
 				{
 					"name":"meta.definition.function.maxscript",
-					"begin":"(?i)\\b(?:(mapped)\\s+)?(f(?:unctio)?n)\\s+(\\w+)((?:\\s*\\w+\\b(?!:))*)",
+					"begin":"(?i)\\b(?:(mapped)\\s+)?(fn|function)\\s+(\\w+)",
 					"end":"=",
 					"beginCaptures": {
 						"1": {"name": "entity.modifier.function.maxscript"},
 						"2": {"name": "entity.type.function.maxscript"},
-						"3": {"name": "entity.name.function.maxscript"},
-						"4": {"name": "entity.parameter.function.maxscript"}
+						"3": {"name": "entity.name.function.maxscript"}						
 					},
 					"endCaptures": {
 						"0": {"name": "keyword.operator.maxscript"}
 					},
 					"patterns": [
+						{
+							"match": "(\\w+\\b)(?!:)",
+							"captures": {
+								"1": {"name": "entity.parameter.function.maxscript"}
+							}
+						},				
 						{"include": "#basic-punctuation"},
 						{"include": "#braces"},
 						{"include": "#constant"},

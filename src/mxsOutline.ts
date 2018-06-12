@@ -125,14 +125,11 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.SymbolInformation[]> {
 		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-			if (mxsConfig.get('gotosymbol',true)) {
-				try {
-					resolve(this.getDocumentSymbols(document, mxsSymbols));
-				} catch (e) {
-					reject(e);
-				}
-			} else {
-				reject ('MaxScript Go to Symbol disabled');
+			if (!mxsConfig.get('gotosymbol',true)) {reject ('MaxScript Go to Symbol disabled');}
+			try {
+				resolve(this.getDocumentSymbols(document, mxsSymbols));
+			} catch (e) {
+				reject(e);
 			}
 		});
 	}
