@@ -210,7 +210,7 @@
 					},
 					"patterns": [
 						{
-							"match": "(\\w+\\b)(?!:)",
+							"match": "(?<=\\w|\\))(?:\\s*\\b([0-9]*[A-Za-z_]+\\w*)\\b(?=\\s*\\w|\\s*\\=))",
 							"captures": {
 								"1": {"name": "entity.parameter.function.maxscript"}
 							}
@@ -227,7 +227,7 @@
 				},
 				{
 					"name":"meta.definition.event.maxscript",
-					"begin": "(?i)\\b(on)\\b",
+					"begin": "(?im)^\\s*\\b(on)\\b",
 					"end": "(?i)\\b(do|return)\\b",
 					"beginCaptures": {
 						"1":{"name":"entity.type.event.maxscript"}
@@ -291,7 +291,7 @@
 				{
 					"name": "variable.other.maxscript",
 					"comment": "Matches keyword assignment in function calls and definitions (e.g., fn add flag:#optional)",
-					"match":   "\\b(\\w+)\\b(?:[:])",
+					"match":   "\\b(\\w+)\\b(?=:)",
 					"captures": {
 						"1":{"name":"variable.other.name.maxscript"}
 					}
@@ -331,7 +331,7 @@
 				},
 				{
 					"name":  "constant.language.boolean.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(true|false|off)(?!\\s*:)\\b"
+					"match": "(?i)\\b(?<![\\.\\$])(true|on|false|off)(?!\\s*:)\\b"
 				},
 				{
 					"name":  "constant.language.math.maxscript",
