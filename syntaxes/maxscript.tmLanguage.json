@@ -227,13 +227,37 @@
 				},
 				{
 					"name":"meta.definition.event.maxscript",
-					"match": "(?i)(on)\\s+(?:(\\w+\\b)?\\s*(\\w+)\\s*(\\w+)?)\\s+(?=do|return)",
-					"captures": {
-						"1":{"name":"entity.type.event.maxscript"},
-						"2":{"name":"entity.target.event.maxscript"},
-						"3":{"name":"entity.name.event.maxscript"},
-						"4":{"name":"entity.argument.event.maxscript"}						
-					}
+					"begin": "(?i)\\b(on)\\b",
+					"end": "(?i)\\b(do|return)\\b",
+					"beginCaptures": {
+						"1":{"name":"entity.type.event.maxscript"}
+					},
+					"endCaptures": {
+						"1": {"name": "keyword.control.maxscript"}
+					},
+					"patterns": [
+						{
+							"match": "(?i)(?<=on)\\s+(\\b\\w+)\\s+(?=\\b(do|return)\\b)",
+							"captures": {
+								"1":{"name":"entity.name.event.maxscript"}
+							}
+						},
+						{
+							"match":"(?i)(?<=on)\\s+(\\b\\w+)\\s+(\\b\\w+)\\s+(?=\\b(do|return)\\b)",
+							"captures":{
+								"1":{"name":"entity.target.event.maxscript"},
+								"2":{"name":"entity.name.event.maxscript"}
+							}
+						},
+						{
+							"match":"(?i)(?<=on)\\s+(\\w+\\b)\\s+(\\w+\\b)((?:\\s+(?!do|return)\\w+)+)",
+							"captures":{
+								"1":{"name":"entity.target.event.maxscript"},
+								"2":{"name":"entity.name.event.maxscript"},
+								"3":{"name":"entity.argument.event.maxscript"}
+							}
+						}
+					]
 				},
 				{
 					"name": "meta.definition.utility.maxscript",
