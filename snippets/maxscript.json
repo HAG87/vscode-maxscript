@@ -54,7 +54,7 @@
     },
     "Function":{
         "prefix":["function", "fn"],
-        "body":"${1|fn,function} ${2:function_name} ${3:params} ${4:optional_param:unsupplied} =\n(\n\t$0\n)",
+        "body":"${1|fn,function|} ${2:function_name} ${3:params} ${4:optional_param:unsupplied} =\n(\n\t$0\n)",
         "description":"Function declaration"
     },
     "Struct":{
