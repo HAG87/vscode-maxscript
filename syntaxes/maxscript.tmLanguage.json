@@ -331,7 +331,7 @@
 				},
 				{
 					"name":  "constant.language.boolean.maxscript",
-					"match": "(?i)\\b(?<![\\.\\$])(true|on|false|off)(?!\\s*:)\\b"
+					"match": "(?i)\\b(?<![\\.\\$])(true|on|false|off|on)(?!\\s*:)\\b"
 				},
 				{
 					"name":  "constant.language.math.maxscript",
