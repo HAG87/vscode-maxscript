@@ -1,12 +1,12 @@
 {   
     "For Loop": {
         "prefix": "for",
-        "body":"for (${1:var} = ${2:value} to ${3:array}.count) ${4:where} ${5:(condition)} ${6|do,collect|} (\n\t$0\n)",
+        "body":"for ${1:var} = ${2:value} to ${3:array.count} ${4:by ${5:-1}} ${6:where (${7:condition})} ${8|do,collect|} (\n\t$0\n)",
         "description": "For loop"
     },
     "For Loop iterate": {
         "prefix": "for",
-        "body": "for (${1:var} in ${3:array}) ${4:where} ${5:(condition)} ${6|do,collect|} (\n\t$0\n)",
+        "body": "for ${1:var} in ${3:array} ${4:where (${5:condition})} ${6|do,collect|} (\n\t$0\n)",
         "description": "For Loop - Iterate"
     },
     "If block": {
@@ -22,7 +22,7 @@
     },
     "While loop":{
         "prefix":"while",
-        "body":"while (${1:var} ${2:!=|==|<|>|<=|>=} ${3:value}) ${4|do,collect|} (\n\t$0\n)",
+        "body":"{1|while,while not|} (${1:var} ${2:!=|==|<|>|<=|>=} ${3:value}) ${4|do,collect|} (\n\t$0\n)",
         "description":"While loop"
     },
     "Do loop":{
@@ -52,8 +52,13 @@
         ],
         "description":"Try-Catch block"
     },
+    "Function short prefix":{
+        "prefix":"fn",
+        "body":"${1|fn,function} ${2:function_name} ${3:params} ${4:optional_param:unsupplied} =\n(\n\t$0\n)",
+        "description":"Function declaration"
+    },
     "Function":{
-        "prefix":["function", "fn"],
+        "prefix":"function",
         "body":"${1|fn,function} ${2:function_name} ${3:params} ${4:optional_param:unsupplied} =\n(\n\t$0\n)",
         "description":"Function declaration"
     },
