@@ -6,7 +6,7 @@ import mxsCompletion from './mxsAutocomplete';
 import mxsOutline from './mxsOutline';
 import msxDefinitions from './mxsDefinitions';
 // Constants
-export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
+export const MXS_MODE: vscode.DocumentFilter = { language: 'maxscript' };
 export const LANG_CFG: vscode.LanguageConfiguration = {
 	indentationRules: {
 		increaseIndentPattern: /^.*(\([^)]*|\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\b\s*)$/,
