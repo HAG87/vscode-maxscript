@@ -99,14 +99,16 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.48",
-		"@types/node": "^6.14.3",
-		"mocha": "^5.2.0"
+		"@types/node": "^6.14.9",
+		"mocha": "^5.2.0",
+		"vscode": "^1.1.36"
 	},
 	"dependencies": {
 		"growl": "^1.10.5",
-		"tslint": "^5.12.1",
-		"typescript": "^2.9.2",
-		"vscode": "^1.1.29"
+		"moo": "^0.5.1",
+		"nearley": "^2.19.0",
+		"tslint": "^5.20.1",
+		"typescript": "^2.9.2"
 	},
 	"__metadata": {
 		"id": "7f2edb68-8e0f-4a8c-9380-24d100650a02",
