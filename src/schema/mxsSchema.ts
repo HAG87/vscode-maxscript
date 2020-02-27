@@ -71,7 +71,7 @@ export const maxcompletion = [
 				property: {
 					kind: CompletionItemKind.Property,
 					name: 'fsAddSide'
-					
+
 				}
 			},
 			{
@@ -20595,6 +20595,7 @@ export const maxcompletion = [
 			{ name: 'colorPickerDlg' },
 			{ name: 'CommitControllerValue' },
 			{ name: 'compareBitmaps' },
+			{ name: 'CompleteRedraw' },
 			{ name: 'composite' },
 			{ name: 'computeAnimation' },
 			{ name: 'ConfigureBitmapPaths' },
@@ -21765,7 +21766,7 @@ export const maxcompletion = [
 			{ name: 'about' },
 			{ name: 'coordsys' },
 			{ name: 'from' },
-			{ 
+			{
 				name: 'global',
 				desc: 'Declare global scope variable'
 			},
