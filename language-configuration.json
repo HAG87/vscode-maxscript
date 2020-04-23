@@ -21,7 +21,8 @@
 		{ "open": "'", "close": "'", "notIn": ["string", "comment"] },
 		{ "open": "\"", "close": "\"", "notIn": ["string"] },
 		{ "open": "`", "close": "`", "notIn": ["string", "comment"] },
-		{ "open": "/**", "close": " */", "notIn": ["string"] }
+		{ "open": "/**", "close": " */", "notIn": ["string"] },
+		{ "open": "~", "close": "~", "notIn": ["string"] }
     ],
 
     // symbols that that can be used to surround a selection
@@ -35,8 +36,10 @@
     ],
 
     "indentationRules": {
-        "increaseIndentPattern": "^\\s*(([(]|\\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\\b))\\s*$",
-        "decreaseIndentPattern": "^\\s*([}\\)](\\s*[,]?)\\s*$"
+        //"increaseIndentPattern": "^\\s*(([(]|\\b(?:[tT]hen|[eE]lse|[wW]ith|[dD]o|[cC]ollect|of)\\b))\\s*$",
+        //"decreaseIndentPattern": "^\\s*([})])(\\s*[,])\\s*$"
+        "increaseIndentPattern": "[({]\\s*$",
+        "decreaseIndentPattern": "[})]\\s*$"
     },
 
     "wordPattern": "(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\'\\\"\\,\\.\\<\\>\\/\\?\\s]+)"
