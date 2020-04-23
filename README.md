@@ -42,15 +42,16 @@ Default settings for **Custom highlighting**
   */
   "editor.tokenColorCustomizations": {
     "textMateRules": [
+      // changed: punctuation.definition.name >>> string.other.name
       {
         "name": "mxs name values",
-        "scope": "punctuation.definition.name",
+        "scope": "string.other.name",
         "settings": { "foreground": "#c678dd" }
       },
-      // Changed: punctuation.definition.verbatim.string.begin.maxscript >> punctuation.definition.string.verbatim.begin.maxscript
+      // Changed: punctuation.definition.string.verbatim.begin.maxscript >> string.quoted.double.verbatim.maxscript
       {
         "name": "mxs verbatim string",
-        "scope": "punctuation.definition.string.verbatim.begin.maxscript",
+        "scope": "string.quoted.double.verbatim.maxscript",
         "settings": { "foreground": "#78BEC2" }
       },
       {
@@ -60,7 +61,7 @@ Default settings for **Custom highlighting**
       },
       {
         "name": "mxs localized resources",
-        "scope": "punctuation.definition.localized",
+        "scope": "punctuation.definition.localized.maxscript",
         "settings": { "foreground": "#8f724a" }
       },
       {

@@ -2,10 +2,17 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.9.1] - 2020-04-23
+
+- Syntax highlighr rules simplification
+- Small Syntax fixes
+- Changed indentation rules
+- Cleanup
+
 ## [1.8.4] - 2019-03
 
 - Optimized syntax
-  
+
 ## [1.8.x] - 2018-06
 
 - Added basic "go to symbol" support.
