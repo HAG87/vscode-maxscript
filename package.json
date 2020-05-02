@@ -2,7 +2,7 @@
 	"name": "language-maxscript",
 	"displayName": "Language MaxScript",
 	"description": "Autodesk 3ds Max MaxScript language support",
-	"version": "1.9.1",
+	"version": "1.9.2",
 	"publisher": "atelierbump",
 	"icon": "mxs.png",
 	"homepage": "https://github.com/HAG87/vscode-maxscript",
@@ -88,7 +88,7 @@
 					"default": true,
 					"description": "Enable suggest completions"
 				},
-				"maxscript.helpprovider" : {
+				"maxscript.helpprovider": {
 					"type": "string",
 					"default": "http://help.autodesk.com/view/3DSMAX/2018/ENU/",
 					"description": "maxScript help source"
