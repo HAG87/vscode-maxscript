@@ -95,7 +95,7 @@
 				},
 				{
 					"name": "keyword.control.maxscript",
-					"match": "(?i)\\b(case|catch|collect|continue|do|of|else|exit|for|if|return|set|then|throw|try|undo|when|where|while|with)\\b"
+					"match": "(?i)\\b(case|catch|collect|continue|do|of|else|exit|for|if|return|set|then|throw|try|undo|when|where|while|with|dontcollect)\\b"
 				},
 				{
 					"name":  "keyword.other.maxscript",
@@ -189,7 +189,7 @@
 				},
 				{
 					"name":"meta.definition.function.maxscript",
-					"begin":"(?i)\\b(?:(mapped)\\s+)?(fn|function)\\s+(\\w+)",
+					"begin":"(?i)\\b((mapped\\s+)?fn|function)\\s+(\\w+)",
 					"end":"=",
 					"beginCaptures": {
 						"1": {"name": "entity.modifier.function.maxscript"},
@@ -200,12 +200,7 @@
 						"0": {"name": "keyword.operator.maxscript"}
 					},
 					"patterns": [
-						{
-							"match": "(?<=\\w|\\))(?:\\s*\\b([0-9]*[A-Za-z_]+\\w*)\\b(?=\\s*\\w|\\s*\\=))",
-							"captures": {
-								"1": {"name": "entity.parameter.function.maxscript"}
-							}
-						},
+						{"include": "#variable"},
 						{"include": "$self"}
 					]
 				},
@@ -258,15 +253,13 @@
 			"patterns": [
 				{
 					"name":"variable.property.maxscript",
-					"match": "(?<=\\.)([0-9]*[A-Za-z_]+\\w*)(?=\\s*\\=)"
+					"match": "(?<=\\.)([0-9]*[A-Za-z_]+\\w*)\\b"
 				},
 				{
-					"name":"variable.parameter.maxscript",
-					"match": "(?<=\\.)([0-9]*[A-Za-z_]+\\w*)(?!\\s*\\=)"
-				},
-				{
-					"name":"variable.reference.maxscript",
-					"match":"(?<!\\.)([0-9]*[A-Za-z_]+\\w*)(?=\\.)"
+					"match": "\\b([0-9]*[A-Za-z_]+\\w*)(?:[:])\\s*",
+					"captures": {
+						"1":{"name":"variable.parameter.maxscript"}
+					}
 				},
 				{
 					"name":"variable.language.maxscript",
@@ -290,11 +283,11 @@
 			"patterns": [
 				{
 					"name": "constant.numeric.integer.maxscript",
-					"match": "(?<!\\.)\\b[+-]?\\d+(?!\\.)\\b"
+					"match": "(?<!\\.)\\b[+-]?\\d+[lLpP]?(?!\\.)\\b"
 				},
 				{
 					"name":"constant.numeric.float.maxscript",
-					"match": "\\b(\\d+)(\\.\\d+([Ee]([+-])?\\d+)?)\\b"
+					"match": "\\b\\d+\\.\\d+([EeDd][+-]?\\d+)?"
 				},
 				{
 					"name":"constant.numeric.float.no-trailing.maxscript",
@@ -302,7 +295,7 @@
 				},
 				{
 					"name":  "constant.numeric.float.no-leading.maxscript",
-					"match": "(?<!\\w)(\\.)(\\d+([eE]([+-])?\\d+)?)"
+					"match": "(?<!\\w)(\\.\\d+([EeDd][+-]?\\d+)?)"
 				},
 				{
 					"name":  "constant.numeric.time.maxscript",
@@ -330,19 +323,11 @@
 				},
 				{
 					"name":  "constant.language.axis.maxscript",
-					"match": "(?i)\\b[xyz]_axis\\b"
-				},
-				{
-					"name":  "constant.language.ok.maxscript",
-					"match": "(?i)\\bok\\b"
+					"match": "(?i)\\b([xyz]_axis)\\b"
 				},
 				{
 					"name":  "constant.language.null.maxscript",
-					"match": "(?i)\\b(undefined|unsupplied)\\b"
-				},
-				{
-					"name":  "constant.language.dontcollect.maxscript",
-					"match": "(?i)\\bdontcollect\\b"
+					"match": "(?i)\\b(undefined|unsupplied|silentvalue|ok)\\b"
 				},
 				{
 					"name": "constant.other.hex.maxscript",
@@ -354,7 +339,7 @@
 			"patterns": [
 				{
 					"name": "storage.modifier.maxscript",
-					"match": "(?i)\\b(about|coordsys|global|local|mapped|private|public|persistent)\\b"
+					"match": "(?i)\\b(about|coordsys|global|local|private|public|persistent)\\b"
 				},
 				{
 					"name": "storage.type.array.maxscript",
@@ -395,16 +380,8 @@
 					}
 				},
 				{
-					"name":"storage.type.number.maxscript",
-					"match": "(?i)\\b(Float|Integer|Time|Double|Integer64|IntegerPtr)\\b"
-				},
-				{
-					"name":"storage.type.string.maxscript",
-					"match": "(?i)\\b(String|StringStream|Name)\\b"
-				},
-				{
 					"name": "storage.type.primitive.maxscript",
-					"match": "(?i)\\b(Point3|Point2|Ray|Quat|AngleAxis|EulerAngles|Matrix3|BigMatrix|BigMatrixRowArray|Box2|Box3|Bitmap|FileStream|WindowStream|BinStream|MAXKey|DataPair)\\b"
+					"match": "(?i)\\b(Float|Integer|Time|Double|Integer64|IntegerPtr|String|StringStream|Name|Point3|Point2|Ray|Quat|AngleAxis|EulerAngles|Matrix3|BigMatrix|BigMatrixRowArray|Box2|Box3|Bitmap|FileStream|WindowStream|BinStream|MAXKey|DataPair)\\b"
 				}
 			]
 		},
