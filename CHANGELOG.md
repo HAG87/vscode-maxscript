@@ -2,6 +2,12 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.9.2] - 2020-05-02
+
+- Fixed float values highlight and other improvements
+- Work on a more optimized Completions feature
+- General fixes and cleanup.
+
 ## [1.9.1] - 2020-04-23
 
 - Syntax highlighr rules simplification
