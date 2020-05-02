@@ -87,6 +87,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable suggest completions"
+				},
+				"maxscript.helpprovider" : {
+					"type": "string",
+					"default": "http://help.autodesk.com/view/3DSMAX/2018/ENU/",
+					"description": "maxScript help source"
 				}
 			}
 		}

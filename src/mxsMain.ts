@@ -2,6 +2,7 @@
 // Imports
 import * as vscode from 'vscode';
 import { getTextSel, fileExists } from './utils';
+// Features
 import mxsCompletion from './mxsAutocomplete';
 import mxsOutline from './mxsOutline';
 import msxDefinitions from './mxsDefinitions';
@@ -16,8 +17,13 @@ export const LANG_CFG: vscode.LanguageConfiguration = {
 	}
 	// wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
 }
+/**
+ * Acces extension settings
+ */
+let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
+
 // Commands
-export const help_addr: string = 'http://help.autodesk.com/view/3DSMAX/2018/ENU/'
+let help_addr: string = mxsConfig.get('helpprovider','http://help.autodesk.com/view/3DSMAX/2018/ENU/');
 /**
  * MaxScript online help launch at current selected word
  * @param help_addr
@@ -32,6 +38,7 @@ export function msxHelp(help_addr:string)
 
 	}
 }
+
 // language extensions
 /**
  * This method is called when your extension is activated
@@ -39,17 +46,25 @@ export function msxHelp(help_addr:string)
  * @param context
  */
 export function activate(context:vscode.ExtensionContext): void {
-    vscode.languages.setLanguageConfiguration(MXS_MODE.language, LANG_CFG);
+
+	vscode.languages.setLanguageConfiguration(MXS_MODE.language, LANG_CFG);
+
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => {msxHelp(help_addr);}));
 
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.','='));
+	// completion provider
+	if (mxsConfig.get('completions',true)) {
+		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(),'.'));
+	}
+
+	// symbol provider
 	context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsOutline()));
-	// Avoiding the registration of the feature keeps the entries on the context menu to appear
-	let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
-	if ((mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true)) === true) {
+
+	// definition provider
+	if (mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true) ) {
 		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new msxDefinitions()));
 	}
+
 }
 // this method is called when your extension is deactivated
 export function deactivate() {}
