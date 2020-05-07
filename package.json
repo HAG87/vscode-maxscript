@@ -70,7 +70,7 @@
 			}
 		],
 		"configuration": {
-			"title": "MaxScript Configuration",
+			"title": "Language MaxScript",
 			"type": "object",
 			"properties": {
 				"maxscript.gotosymbol": {

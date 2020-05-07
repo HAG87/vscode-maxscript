@@ -42,15 +42,21 @@ export const mxsSymbols: mxsSymbolMatch[] = [
 	},
 	*/
 	{
+		type: 'plugin',
+		match: /plugin\s+(\b\w+)/ig,
+		kind: vscode.SymbolKind.Module,
+		decl: 1
+	},
+	{
 		type: 'macroscript',
 		match: /macroscript\s+(\b\w+)/ig,
-		kind: vscode.SymbolKind.Object,
+		kind: vscode.SymbolKind.Module,
 		decl: 1
 	},
 	{
 		type: 'rollout',
 		match: /rollout\s+(\b\w+)/ig,
-		kind: vscode.SymbolKind.Constructor,
+		kind: vscode.SymbolKind.Object,
 		decl: 1
 	},
 	{
