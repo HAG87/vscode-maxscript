@@ -11,6 +11,7 @@ import { mxsSymbols } from './mxsSymbolDef';
 export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 	private getDocumentSymbols(document: vscode.TextDocument, tokens: mxsSymbolMatch[]): vscode.SymbolInformation[] {
+
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 
 		let docTxt = document.getText();
@@ -26,6 +27,8 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		}
 
 		tokens.forEach(type => {
+			// token[type.match] contains a regex for matching
+			// type.decl is a workaround for regexpExecArray index match
 			let matchSymbols;
 			while (matchSymbols = type.match.exec(docTxt)) {
 
@@ -50,7 +53,7 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.SymbolInformation[]> {
 		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-			if (!mxsConfig.get('gotosymbol',true)) {reject ('MaxScript Go to Symbol disabled');}
+			//if (!mxsConfig.get('gotosymbol',true)) {reject ('MaxScript Go to Symbol disabled');}
 			try {
 				resolve(this.getDocumentSymbols(document, mxsSymbols));
 			} catch (e) {

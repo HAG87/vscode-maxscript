@@ -15,7 +15,7 @@ export default class MaxscriptDefinitionProvider implements vscode.DefinitionPro
             } else { reject(null); }
         });
     }
-
+    // This doesn't care about the symbols, just the location of them....
     private getDocumentDefinitions(document:vscode.TextDocument, position:vscode.Position):Thenable<vscode.Definition> {
         return new Promise((resolve,reject) => {
             // get current word at position
@@ -31,13 +31,18 @@ export default class MaxscriptDefinitionProvider implements vscode.DefinitionPro
             * Direct implementation: find definition in the array of document symbols (how?) executeDocumentSymbolProvider seems inneficient
             * We could just do a regex search for the keyword, since maxscript has an ordered flow and we dont be looking for workspace symbols...
             */
+
+            // -- wotkaround force the SymbolProvider to be executed. It must be another way to get the symbols.... maybe store them in a variable?
             let result = vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', document.uri);
 
             result.then((symbols:Array<vscode.SymbolInformation>) =>
                 {
-                    // Uses the document SymbolInformation first...
+                    // word: the current word in the document
+
+                    // check if there is any symbol that matches that word
                     let findSymbol = symbols.find(item => item.name === word)
                     if (findSymbol) {
+                        // symbol found: return the location
                         resolve(findSymbol.location);
                     } else {
                         // fallback to regex match...
