@@ -2,6 +2,10 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.9.3] - 2020-05-13
+
+- Pathnames highlight
+
 ## [1.9.2] - 2020-05-02
 
 - Fixed float values highlight and other improvements
