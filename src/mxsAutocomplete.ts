@@ -21,7 +21,7 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 	 * @param document
 	 * @param position
 	 */
-	private provideCompletionItemsInternal(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
+	private _provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
 
 		let lineText = document.lineAt(position.line).text;
 		let lineTillCurrentPosition = lineText.substr(0, position.character);
@@ -51,30 +51,35 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 
 		let notDotTest = notDotPattern.test(lineTillCurrentPosition);
 
+		let result: vscode.CompletionItem[] = [];
+
 		if (!dotTest) {
 			if (notDotTest) {
-				return this.mxCompletions;
+				result = this.mxCompletions;
 			}
 		} else {
 			let theFoundItem = this.mxCompletions.find(item => item.label === util.precWord(lineTillCurrentPosition));
-
-			if (theFoundItem && theFoundItem.hasOwnProperty('kind')) {
-				switch (theFoundItem.kind) {
+			// if (theFoundItem && theFoundItem.hasOwnProperty('kind')) {
+				switch (theFoundItem?.kind) {
 					case vscode.CompletionItemKind.Class:
 						//console.log(mxClassMembers[theFoundItem.label]);
-						return mxClassMembers[theFoundItem.label];
+						result = mxClassMembers?.[theFoundItem.label];
+						break;
 					case vscode.CompletionItemKind.Struct:
 						//console.log(mxStructsMembers[theFoundItem.label]);
-						return mxStructsMembers[theFoundItem.label];
+						result = mxStructsMembers?.[theFoundItem.label];
+						break;
 					case vscode.CompletionItemKind.Interface:
 						//console.log(mxInterfaceMembers[theFoundItem.label]);
-						return mxInterfaceMembers[theFoundItem.label];
-					default:
+						result = mxInterfaceMembers?.[theFoundItem.label];
+						break;
+					//default:
 						// exit
-						return undefined;
-				}
-			};
+					//	result = [];
+				};
+			// };
 		}
+		return result;
 	}
 	/**
 	 * provideCompletionItems
@@ -83,16 +88,15 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 	 * @param token
 	 * @param context
 	 */
-	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position,
-		token: vscode.CancellationToken, context: vscode.CompletionContext): Thenable<vscode.CompletionItem[]> {
+	public provideCompletionItems(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		token: vscode.CancellationToken,
+		context: vscode.CompletionContext): Promise<vscode.CompletionItem[]> {
 
-		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 		return new Promise((resolve, reject) => {
-
-			if (!mxsConfig.get('completions', true)) { reject('maxScript Completion disabled'); }
-
 			try {
-				resolve(this.provideCompletionItemsInternal(document, position));
+				resolve(this._provideCompletionItems(document, position));
 			} catch (e) {
 				reject(e);
 			}

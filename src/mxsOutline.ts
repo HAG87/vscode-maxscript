@@ -5,12 +5,12 @@ TODO:
 'use strict'
 import * as vscode from 'vscode';
 
-import { mxsSymbolMatch } from './mxsSymbolDef';
-import { mxsSymbols } from './mxsSymbolDef';
+import { mxsSymbolMatch } from './schema/mxsSymbolDef';
+import { mxsSymbols } from './schema/mxsSymbolDef';
 
 export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
-	private getDocumentSymbols(document: vscode.TextDocument, tokens: mxsSymbolMatch[]): vscode.SymbolInformation[] {
+	private _getDocumentSymbols(document: vscode.TextDocument, tokens: mxsSymbolMatch[]): vscode.SymbolInformation[] {
 
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 
@@ -50,14 +50,12 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		return SymbolInfCol;
 	}
 	// Function called from Main !!
-	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.SymbolInformation[]> {
-		let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
+	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
 		return new Promise((resolve, reject) => {
-			//if (!mxsConfig.get('gotosymbol',true)) {reject ('MaxScript Go to Symbol disabled');}
 			try {
-				resolve(this.getDocumentSymbols(document, mxsSymbols));
-			} catch (e) {
-				reject(e);
+				resolve(this._getDocumentSymbols(document, mxsSymbols));
+			} catch (err) {
+				reject(err);
 			}
 		});
 	}

@@ -1,25 +1,20 @@
-import vscode = require('vscode');
-import fs = require('fs');
+import {window} from 'vscode';
+import * as fs from 'fs';
 
-export function getTextSel() {
-	let editor = vscode.window.activeTextEditor;
+export function getTextSel(editor = window.activeTextEditor) {
 	if(!editor) {
-		vscode.window.showInformationMessage('No editor is active');
+		window.showInformationMessage('No editor is active');
 		return;
 	}
-	let selection = editor.selection;
-	let seltext = editor.document.getText(selection);
-	if (!seltext) {
-		return;
-	}
+	let seltext = editor.document.getText(editor.selection);
 	return seltext;
 }
 
 export function fileExists(filePath: string): boolean {
 	try {
 		return fs.statSync(filePath).isFile();
-	} catch (e) {
-		return false;
+	} catch (err) {
+		throw err;
 	}
 }
 
@@ -39,8 +34,8 @@ export function isPositionInString(feed: string): boolean {
  * find word before dot character, if any
  * @param line
  */
-export function precWord(line: string) {
+export function precWord(line: string):string | undefined {
 	let pattern = /(\w+)\.$/g;
 	let wordmatches = pattern.exec(line);
-	if (!wordmatches) { return; } else { return (wordmatches[wordmatches.length - 1]); }
+	return (wordmatches?.[wordmatches.length - 1]);
 }
