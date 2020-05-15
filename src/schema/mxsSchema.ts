@@ -1,28 +1,492 @@
 import { CompletionItemKind } from 'vscode';
 //-----------------------------------------------------------------------------------------------------------------
-const maxConstant = [
+const maxVariable = [
     {
         label: 'activegrid',
-        kind: CompletionItemKind.Constant,
+        kind: CompletionItemKind.Variable,
         detail: 'Active work plane'
     },
     {
         label: 'subObjectLevel',
-        kind: CompletionItemKind.Constant,
+        kind: CompletionItemKind.Variable,
         detail: 'active subObject level [0:Object|1:Vertex|2:Edge|3:Border|4:Face|5:Element]'
     },
     {
-        label: 'localTime',
-        kind: CompletionItemKind.Constant,
+        label: 'activeMeditSlot',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'ambientColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'ambientColorController',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'animateMode',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'animationRange',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'animButtonEnabled',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'animButtonState',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'backgroundColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'backgroundImageFileName',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'currentMaterialLibrary',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
     },
     {
         label: 'currentTime',
-        kind: CompletionItemKind.Constant,
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'displaySafeFrames',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'enableAccelerators',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'environmentMap',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'escapeEnable',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'flyOffTime',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'frameRate',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'globalTracks',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'hardwareLockID',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'heapFree',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'heapSize',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'inputTextColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'lightLevelController',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'lightTintColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'listener',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'localPreRendScript',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'localTime',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'lyricDirectory',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'macroRecorder',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'manipulateMode',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'maxFilePath',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'messageTextColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'numAtmospherics',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'numEffects',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'numSubObjectLevels',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'outputTextColor',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'playActiveOnly',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'playbackLoop',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'postRendScript',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'preRendScript',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'productAppID',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'realTimePlayback',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendAtmosphere',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendCamNode',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendColorCheck',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendDither256',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendDitherTrue',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendEnd',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'renderDisplacements',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'RenderEffects',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
     },
     {
         label: 'renderer',
-        kind: CompletionItemKind.Constant,
-    }
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'renderHeight',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'renderWidth',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendFieldOrder',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendFieldRender',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendFileNumberBase',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendForce2Side',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendHidden',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendImgSeqType',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendLockImageAspectRatio',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendLockPixelAspectRatio',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendMultiThread',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendNThFrame',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendNThSerial',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendNTSC_PAL',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendOutputFilename',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendPickupFrames',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendSaveFile',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendShowVFB',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendSimplifyAreaLights',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendStart',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendSuperBlack',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendSuperBlackThresh',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendTimeType',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendUseActiveView',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendUseDevice',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendUseImgSeq',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendUseNet',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendVidCorrectMethod',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendViewID',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rendViewIndex',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rootNode',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'rootScene',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'sceneMaterials',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'scriptsPath',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'showEndResult',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'skipRenderedFrames',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'sliderTime',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'stackLimit',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'ticksPerFrame',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'timeDisplayMode',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'trackViewNodes',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'useEnvironmentMap',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'usePreRendScript',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+    {
+        label: 'videoPostTracks',
+        detail: 'System variable',
+        kind: CompletionItemKind.Variable
+    },
+
 ]
 const maxGenericFn = [
     {
@@ -13028,19 +13492,19 @@ const maxStructs = [
 ]
 //-----------------------------------------------------------------------------------------------------------------
 export const maxCompletions =
-[
-    ...maxConstant,
-    ...maxGeneric,
-    ...maxObjectSet,
-    ...maxKeywords1,
-    ...maxUIcontrols,
-    ...maxPrimitives,
-    ...maxScopes,
-    ...maxGenericFn,
-    ...maxColors,
-    ...maxClasses,
-    ...maxSuperClass,
-    ...maxInterfaces,
-    ...maxStructs
-]
-//# sourceMappingURL=mxsSchema-simple.js.map
+    [
+        ...maxVariable,
+        ...maxGeneric,
+        ...maxObjectSet,
+        ...maxKeywords1,
+        ...maxUIcontrols,
+        ...maxPrimitives,
+        ...maxScopes,
+        ...maxGenericFn,
+        ...maxColors,
+        ...maxClasses,
+        ...maxSuperClass,
+        ...maxInterfaces,
+        ...maxStructs
+    ]
+//# sourceMappingURL=mxsSchema.js.map

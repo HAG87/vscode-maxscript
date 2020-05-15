@@ -2656,4 +2656,4 @@ export const mxStructsMembers = {
     ],
 
 }
-//# sourceMappingURL=mxsSchema-simple.js.map
+//# sourceMappingURL=mxsSchema-structs.js.map

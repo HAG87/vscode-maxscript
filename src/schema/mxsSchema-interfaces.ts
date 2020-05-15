@@ -848,4 +848,4 @@ export const mxInterfaceMembers = {
         { label: 'writeString', kind: CompletionItemKind.Method, detail: '<void>writeString <string>message' }
     ]
 }
-//# sourceMappingURL=mxsSchema-simple.js.map
+//# sourceMappingURL=mxsSchema-interfaces.js.map
