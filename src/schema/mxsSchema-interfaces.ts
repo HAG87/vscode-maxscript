@@ -1,5 +1,5 @@
 import { CompletionItemKind } from 'vscode';
-export const mxInterfaceMembers = {
+export const mxInterfaceMembers:any = {
     'ActionItemOverrideManager': [
         { label: 'overridesActive', kind: CompletionItemKind.Property, detail: 'boolean : Read|Write' },
         { label: 'timeToStartOverride', kind: CompletionItemKind.Property, detail: 'float : Read|Write' }

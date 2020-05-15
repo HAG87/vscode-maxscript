@@ -1,6 +1,6 @@
 import { CompletionItemKind } from 'vscode';
 //-----------------------------------------------------------------------------------------------------------------
-const maxVariable = [
+const maxVariable:any = [
     {
         label: 'activegrid',
         kind: CompletionItemKind.Variable,

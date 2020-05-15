@@ -1,5 +1,5 @@
 import { CompletionItemKind } from 'vscode';
-export const mxStructsMembers = {
+export const mxStructsMembers:any = {
     'gw': [
         { label: 'dualPlane', kind: CompletionItemKind.Property },
         { label: 'GetCPDisp', kind: CompletionItemKind.Method },
