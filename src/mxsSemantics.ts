@@ -9,8 +9,8 @@ const caseInsensitiveKeywords = (map: { [k: string]: string | string[]; }) => {
 }
 let lexer = moo.compile({
     // the comments
-    comment_SL: { match: /--.*$/, lineBreaks: false, },
-    comment_BLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true },
+    commentSL: { match: /--.*$/, lineBreaks: false, },
+    commentBLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true },
     // there is a problem with the strings
     string: { match: /[@]?"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true },
     //WS:      /[ \t]+/,
@@ -24,9 +24,9 @@ let lexer = moo.compile({
     // parameter <param_name>:
     params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*[:]/ },
     // param: {match: /\:{1}/},
-    global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
+    globalTyped: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
     // a mounstrosity
-    typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/ },
+    typedIden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/ },
     // strings ~RESOURCE~
     locale: { match: /~[A-Za-z0-9_]+~/ },
     // WHITESPACE -- Should go higher on the chain??
@@ -81,9 +81,10 @@ const tokenTypesSet = new Set<string>();
 
 export const legend = (function () {
     const tokenTypesLegend = [
-        'comment', 'keyword', 'number', 'regexp', 'operator', 'namespace',
+        'comment', 'keyword', 'regexp', 'operator', 'namespace',
         'string', 'type', 'struct', 'class', 'interface', 'enum', 'typeParameter', 'function',
         'member', 'macro', 'variable', 'parameter', 'property', 'label',
+        //'string', 'number',
     ];
 
 	tokenTypesLegend.forEach((tokenType, index) => tokenTypes.set(tokenType, index));
@@ -146,13 +147,17 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 
         let getTokens = this._tokenize(text);
 
-        getTokens.forEach(token => r.push({
-            line: token.line - 1,
-            startCharacter: token.col - 1,
-            length: (token.text.length),
-            tokenType: token.type,
-            tokenModifiers: []
-        }));
+        getTokens.forEach(token => {
+            let typing = token.type.split('_');
+            console.log(typing);
+            r.push({
+                line: token.line - 1,
+                startCharacter: token.col - 1,
+                length: (token.text.length),
+                tokenType: typing[0],
+                tokenModifiers: typing.slice(1)
+            })
+        });
         return r;
 	}
 
@@ -166,7 +171,7 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 
             while (_token = lexer.next()) {
                 // filter tokens here
-                if (tokenTypesSet.has(_token.type!)) {
+                if (tokenTypesSet.has(_token.type?.split('_')[0]!)) {
                     toks.push(_token);
                 }
             }
