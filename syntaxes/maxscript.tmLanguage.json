@@ -1,66 +1,142 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "maxscript",
+	"name": "mxs",
 	"fileTypes": [ "ms", "mse", "mcr" ],
 	"foldingStartMarker": "(-{2})?\\(\\s*$",
 	"foldingStopMarker": "^\\s*(-{2})?\\s*\\)",
 
 	"patterns": [
-		{ "include": "#braces"},
+		{ "include": "#parens"},
+		{ "include": "#brackets"},
+		{ "include": "#cur_braces"},
 		{ "include": "#variable"},
 		{ "include": "#comment" },
 		{ "include": "#keywords" },
 		{ "include": "#strings" },
-		{ "include": "#numeric" },
 		{ "include": "#constant" },
+		{ "include": "#numeric" },
+		{ "include": "#storage" },
 		{ "include": "#meta" },
-		{ "include": "#storage" }
+		{ "include": "#support" }
 	],
 	"repository": {
-		"braces":{
+		"balanced_parens":
+				{
+					"name" : "section.parens.mxs",
+					"begin": "\\(",
+					"end": "\\)",
+					"beginCaptures": {"0": {"name": "punctuation.section.parens.begin.mxs"}},
+					"endCaptures": {"0": {"name": "punctuation.section.parens.end.mxs"}},
+					"patterns": [
+						{"include": "#balanced_parens"}
+					]
+				},
+		"parens": {
 			"patterns": [
 				{
-					"name": "punctuation.section.brackets.begin",
-					"match": "\\["
-				},
-				{
-					"name": "punctuation.section.brackets.end",
-					"match": "\\]"
-				},
-				{
-					"name": "punctuation.section.braces.begin",
-					"match": "\\{"
-				},
-				{
-					"name": "punctuation.section.braces.end",
-					"match": "\\}"
-				},
-				{
-					"name": "punctuation.section.block.begin",
+					"name": "punctuation.section.parens.begin.mxs",
 					"match": "\\("
 				},
 				{
-					"name": "punctuation.section.block.end",
+					"name": "punctuation.section.parens.end.mxs",
 					"match": "\\)"
+				}
+			]
+		},
+		"brackets":{
+			"patterns": [
+				{
+					"name": "punctuation.section.brackets.begin.mxs",
+					"match": "\\["
+				},
+				{
+					"name": "punctuation.section.brackets.end.mxs",
+					"match": "\\]"
+				}
+			]
+		},
+		"cur_braces": {
+			"patterns": [
+				{
+					"name": "punctuation.section.braces.begin.mxs",
+					"match": "\\{"
+				},
+				{
+					"name": "punctuation.section.braces.end.mxs",
+					"match": "\\}"
+				}
+			]
+		},
+		"notes": {
+			"patterns": [
+				{
+					"match":"(@param)\\s+(\\w+)",
+					"captures": {
+						"1":{"name": "storage.type.class"},
+						"2":{"name": "variable.other"}
+					}
+				},
+				{
+					"name": "documentation.todo.mxs",
+					"match": "(?i)todo:"
+				},
+				{
+					"name": "documentation.fixme.mxs",
+					"match": "(?i)fixme:"
+				},
+				{
+					"name": "documentation.plain.mxs",
+					"begin": "\\|",
+					"end": "\\|",
+					"patterns": [
+						{ "include": "#numeric" },
+						{ "include": "#strings" },
+						{ "include": "#storage" },
+						{ "include": "#support" },
+						{ "include": "#notes" }
+					]
+				},
+				{
+					"name": "documentation.bold.mxs",
+					"match": "\\b_[^_]([\\w\\s])+?_\\b"
+				},
+				{
+					"name": "documentation.underline.mxs",
+					"match": "\\b__[^_]([\\w\\s])+?__\\b"
 				}
 			]
 		},
 		"comment": {
 			"patterns": [
 				{
-					"name": "comment.line.maxscript",
+					"name": "comment.line.mxs",
 					"begin":"--",
 					"end":"$",
 					"captures": {
-						"1":{"name":"punctuation.definition.comment.maxscript"}
+						"0":{"name":"punctuation.definition.comment.mxs"}
 					}
 				},
 				{
-					"name":"comment.block.maxscript",
+					"name":"comment.block.documentation.mxs",
+					"begin": "(?m)/\\*\\*",
+					"end":"(?m)\\*/",
+					"captures":{
+						"0":{"name":"punctuation.definition.comment.mxs"}
+					},
+					"patterns": [
+						{ "include": "#numeric" },
+						{ "include": "#strings" },
+						{ "include": "#storage" },
+						{ "include": "#support" },
+						{ "include": "#notes" }
+					]
+				},
+				{
+					"name":"comment.block.mxs",
 					"begin": "/\\*",
 					"end":"\\*/",
 					"captures":{
-						"1":{"name":"punctuation.definition.comment.maxscript"}
+						"0":{"name":"punctuation.definition.comment.mxs"}
 					}
 				}
 			]
@@ -68,39 +144,43 @@
 		"keywords": {
 			"patterns": [
 				{
-					"name":"keyword.operator.maxscript",
+					"name":"keyword.operator.mxs",
 					"match": "(?i)(?:(\\+=?|\\*=?|-=?|\\/=?|\\^|!?=|={1,2}|<=?|>=?))"
 				},
 				{
-					"name":"keyword.operator.linebreak.maxscript",
-					"match": "(?i)(\\\\)"
+					"name":"keyword.operator.linebreak.mxs",
+					"match": "\\\\"
 				},
 				{
-					"name": "keyword.operator.statement.maxscript",
+					"name": "keyword.operator.statement.mxs",
 					"match": ";"
 				},
 				{
-					"name": "keyword.operator.delimiter.maxscript",
-					"match": "[,\\.](?!\\d)"
+					"name": "keyword.operator.delimiter.mxs",
+					"match": ","
 				},
 				{
-					"name":"keyword.control.assign.maxscript",
+					"name": "keyword.operator.period.mxs",
+					"match": "[\\.](?!\\d)"
+				},
+				{
+					"name":"keyword.control.assign.mxs",
 					"match": "(?<!:):(?=[^:]|:{2}[^:])"
 				},
 				{
-					"name":"keyword.operator.word.maxscript",
-					"match": "(?i)(?<![.$])\\b(and|at|as|by|in|not|or|to)\\b"
+					"name":"keyword.operator.word.mxs",
+					"match": "(?i)(?<![.$])\\b(and|or|as|not)\\b"
 				},
 				{
-					"name": "keyword.control.maxscript",
-					"match": "(?i)\\b(case|catch|collect|continue|do|of|else|exit|for|if|return|set|then|throw|try|undo|when|where|while|with|dontcollect)\\b"
+					"name": "keyword.control.mxs",
+					"match": "(?i)\\b(?>case|catch|collect|continue|do|else|exit|for|if|return|then|throw|try|when|where|while|with|dontcollect|of|at|by|in|to)\\b"
 				},
 				{
-					"name":  "keyword.other.maxscript",
-					"match": "(?i)\\b(max|animate|from)\\b"
+					"name":  "keyword.other.mxs",
+					"match": "(?i)\\b(?>about|coordsys|max|animate|from|undo|set)\\b"
 				},
 				{
-					"name":"keyword.operator.definition.byref.maxscript",
+					"name":"keyword.operator.byref.mxs",
 					"match": "(&)(?=\\w)"
 				}
 			]
@@ -108,140 +188,155 @@
 		"strings": {
 			"patterns": [
 				{
-					"name":"string.localized.maxscript",
+					"name":"string.quoted.other.mxs",
 					"begin": "~",
 					"end": "~",
-					"captures": {
-						"0": {"name":"punctuation.definition.localized.maxscript"}
-					},
 					"patterns": [
 						{
-							"name":  "constant.character.escape.maxscript",
+							"name":  "constant.character.escape.mxs",
 							"match": "\\\\(\\*|\\?|\\\\|\\')"
 						}
 					]
 				},
 				{
-					"name": "string.quoted.double.maxscript",
+					"name": "string.quoted.double.mxs",
 					"begin": "(?<!@)\"",
 					"end": "\"",
-					"beginCaptures": {
-						"0": {"name":"string.begin.maxscript" }
-					},
-					"endCaptures": {
-						"0": {"name":"string.end.maxscript"}
-					},
 					"patterns": [
 						{
-							"name": "constant.character.escape.maxscript",
+							"name": "constant.character.escape.mxs",
 							"match": "\\\\(\"|n|r|t|\\*|\\?|\\\\|%|x[A-Fa-f0-9]+)"
 						}
 					]
 				},
 				{
-				"name":  "string.quoted.double.verbatim.maxscript",
-				"begin": "(@)(\")",
-				"end":   "\"",
-				"beginCaptures": {
-					"1": {"name": "string.verbatim.operator.maxscript" },
-					"2": {"name": "string.begin.maxscript"}
-				},
-				"endCaptures":   {"0": {"name": "string.end.maxscript" }}
+					"name":  "string.quoted.double.verbatim.mxs",
+					"begin": "(@)(\")",
+					"end":   "\"",
+					"beginCaptures": {
+						"1": {"name": "string.verbatim.operator.mxs" }
+					}
 				},
 				{
-					"name":  "string.quoted.single.maxscript",
+					"name":  "string.quoted.single.mxs",
 					"begin": "'",
 					"end":   "'",
-					"beginCaptures": {
-						"0": {"name":"string.begin.maxscript" }
-					},
-					"endCaptures": {
-						"0": {"name": "string.end.maxscript"}
-					},
 					"patterns": [{
-						"name":  "constant.character.escape.maxscript",
+						"name":  "constant.character.escape.mxs",
 						"match": "\\\\(\\*|\\?|\\\\|\\')"
 					}]
 
 				},
 				{
-					"name":  "string.other.name.maxscript",
-					"match": "(#)(?:('[^']*')|(\\w+))",
-					"captures": {
-						"1": {"name": "string.other.name.begin.maxscript"},
-						"2": {"name": "string.other.name.quoted.maxscript"},
-						"3": {"name": "string.other.name.unquoted.maxscript"}
-					}
+					"name":  "string.unquoted.name.mxs",
+					"match": "(#)(\\w+)\\b"
+				},
+				{
+					"name":  "string.quoted.name.mxs",
+					"match": "(#)(?:('[^']*')|(\\w+))\\b"
+				}
+			]
+		},
+		"numeric":{
+			"patterns": [
+				{
+					"name": "constant.numeric.mxs",
+					"match": "(?<!\\.)\\b[+-]?\\d+[lLpP]?(?!\\.)\\b"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "\\b\\d+\\.\\d+([EeDd][+-]?\\d+)?"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "\\b(\\d+)(\\.)(?!\\w)"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "(?<!\\w)(\\.\\d+([EeDd][+-]?\\d+)?)"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "(?<!\\w|\\.)(?:\\d*\\.\\d+|\\d+\\.?\\d*)[msft](?:(?:\\d+|\\d*\\.\\d*)[msft])*"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "(?<!\\w)\\d+:\\d*\\.\\d*(?!\\w)"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "(?<!\\w|\\.)(?:\\d*\\.\\d+|\\d+\\.?\\d*)n(?!\\w)"
+				},
+				{
+					"name": "constant.numeric.mxs",
+					"match": "\\b(0x\\w+)\\b"
+				},
+				{
+					"name":  "contant.numeric.bit-range.mxs",
+					"match": "(?<!\\$)\\b(\\d+)(\\.{2})(\\d+)\\b"
 				}
 			]
 		},
 		"meta": {
 			"patterns":[
 				{
-					"name":"meta.definition.struct.maxscript",
-					"match": "(?i)\\b(struct)\\b\\s+(\\w+)",
+					"name":"meta.definition.struct.mxs",
+					"match": "(?i)(?:\\b(struct)\\b\\s+(\\w+))",
 					"captures": {
-						"1":{"name":"entity.type.struct.maxscript"},
-						"2":{"name":"entity.name.struct.maxscript"}
+						"1":{"name":"storage.type.mxs"},
+						"2":{"name":"entity.name.struct.mxs"}
 					}
 				},
 				{
-					"name":"meta.definition.function.maxscript",
-					"begin":"(?i)\\b((mapped\\s+)?fn|function)\\s+(\\w+)",
+					"name":"meta.definition.function.mxs",
+					"begin":"(?i)\\b((?:mapped\\s+)?(?:fn|function))\\s+(\\w+)",
 					"end":"=",
 					"beginCaptures": {
-						"1": {"name": "entity.modifier.function.maxscript"},
-						"2": {"name": "entity.type.function.maxscript"},
-						"3": {"name": "entity.name.function.maxscript"}
-					},
-					"endCaptures": {
-						"0": {"name": "keyword.operator.maxscript"}
+						"1": {"name": "storage.type.mxs"},
+						"2": {"name": "entity.name.function.mxs"}
 					},
 					"patterns": [
 						{"include": "#variable"},
 						{"include": "$self"}
-					]
+					],
+					"endCaptures": {
+						"0": {"name": "keyword.operator.mxs"}
+					}
 				},
 				{
-					"name":"meta.definition.event.maxscript",
-					"begin": "(?im)^\\s*\\b(on)\\b",
+					"name":"meta.definition.event.mxs",
+					"begin": "(?im)^(?:[ \\t]|;)*(on)\\b",
 					"end": "(?i)\\b(do|return)\\b",
 					"beginCaptures": {
-						"1":{"name":"entity.type.event.maxscript"}
+						"1":{"name":"storage.type.mxs"}
 					},
 					"endCaptures": {
-						"1": {"name": "keyword.control.maxscript"}
+						"1": {"name": "keyword.control.mxs"}
 					},
 					"patterns": [
 						{
-							"match": "(?i)(?<=on)\\s+(\\b\\w+)\\s+(?=\\b(do|return)\\b)",
-							"captures": {
-								"1":{"name":"entity.name.event.maxscript"}
+							"match":"(?i)(?:\\s+(\\w+))?\\s+(\\w+)\\s+(?=do|return)",
+							"captures":{
+								"1":{"name":"entity.target.event.mxs"},
+								"2":{"name":"entity.name.event.mxs"}
 							}
 						},
 						{
-							"match":"(?i)(?<=on)\\s+(\\b\\w+)\\s+(\\b\\w+)\\s+(?=\\b(do|return)\\b)",
+							"match":"(?i)\\s+(\\w+)\\s+(\\w+)\\s+(\\w+)(?:\\s+(\\w+))?\\s+(?=do|return)",
 							"captures":{
-								"1":{"name":"entity.target.event.maxscript"},
-								"2":{"name":"entity.name.event.maxscript"}
-							}
-						},
-						{
-							"match":"(?i)(?<=on)\\s+(\\w+\\b)\\s+(\\w+\\b)((?:\\s+(?!do|return)\\w+)+)",
-							"captures":{
-								"1":{"name":"entity.target.event.maxscript"},
-								"2":{"name":"entity.name.event.maxscript"},
-								"3":{"name":"entity.argument.event.maxscript"}
+								"1":{"name":"entity.target.event.mxs"},
+								"2":{"name":"entity.name.mxs"},
+								"3":{"name":"entity.argument.mxs"},
+								"4":{"name":"entity.argument.mxs"}
 							}
 						}
 					]
 				},
 				{
-					"name": "meta.definition.utility.maxscript",
-					"match": "(?i)\\b(macroscript|parameters|plugin|rcmenu|rollout|tool|utility)\\b\\s+(\\w+)",
+					"match": "(?i)\\b(macroscript|parameters|plugin|rcmenu|rollout|tool|utility)\\b\\s+(\\w+)\\b",
 					"captures": {
-						"1":{"name":"entity.type.utility.maxscript"},
-						"2":{"name":"entity.name.utility.maxscript"}
+						"1":{"name":"storage.type.mxs"},
+						"2":{"name":"entity.name.utility.mxs"}
 					}
 				}
 
@@ -250,156 +345,126 @@
 		"variable":{
 			"patterns": [
 				{
-					"name":"variable.property.maxscript",
+					"name":"variable.property.mxs",
 					"match": "(?<=\\.)([0-9]*[A-Za-z_]+\\w*)\\b"
 				},
 				{
-					"match": "\\b([0-9]*[A-Za-z_]+\\w*)(?:[:])\\s*",
-					"captures": {
-						"1":{"name":"variable.parameter.maxscript"}
-					}
+					"name":"variable.parameter.mxs",
+					"match": "\\b([0-9]*[A-Za-z_]+\\w*)(?=\\s*:[^:])",
+					"comment": "Matches keyword assignment in function calls and definitions (e.g., fn add flag:#optional)"
 				},
 				{
-					"name":"variable.language.maxscript",
+					"name":"variable.language.mxs",
 					"match": "(?i)\\b(this)\\b"
 				},
 				{
-					"name": "variable.other.maxscript",
-					"comment": "Matches keyword assignment in function calls and definitions (e.g., fn add flag:#optional)",
-					"match":   "\\b(\\w+)\\b\\s*(?=:[^:])",
-					"captures": {
-						"1":{"name":"variable.other.name.maxscript"}
-					}
+					"name": "variable.other.global.mxs",
+					"match": "(:{2})(\\w+)\\b"
 				},
 				{
-					"name": "variable.definition.global.maxscript",
-					"match": "(:{2})(\\w+)"
+					"name":"variable.other.pathname.mxs",
+					"match": "\\b\\$\\b|\\$[^ \\t\\r\\n]+"
 				}
 			]
 		},
 		"constant":{
 			"patterns": [
 				{
-					"name": "constant.numeric.integer.maxscript",
-					"match": "(?<!\\.)\\b[+-]?\\d+[lLpP]?(?!\\.)\\b"
+					"name":  "constant.language.boolean.mxs",
+					"match": "(?i)\\b(?>true|on|false|off)\\b"
 				},
 				{
-					"name":"constant.numeric.float.maxscript",
-					"match": "\\b\\d+\\.\\d+([EeDd][+-]?\\d+)?"
-				},
-				{
-					"name":"constant.numeric.float.no-trailing.maxscript",
-					"match": "\\b(\\d+)(\\.)(?!\\w)"
-				},
-				{
-					"name":  "constant.numeric.float.no-leading.maxscript",
-					"match": "(?<!\\w)(\\.\\d+([EeDd][+-]?\\d+)?)"
-				},
-				{
-					"name":  "constant.numeric.time.maxscript",
-					"match": "(?<!\\w|\\.)(?:\\d*\\.\\d+|\\d+\\.?\\d*)[msft](?:(?:\\d+|\\d*\\.\\d*)[msft])*"
-				},
-				{
-					"name":  "constant.numeric.time.smpte.maxscript",
-					"match": "(?<!\\w)\\d+:\\d*\\.\\d*(?!\\w)"
-				},
-				{
-					"name":  "constant.numeric.time.normalised.maxscript",
-					"match": "(?<!\\w|\\.)(?:\\d*\\.\\d+|\\d+\\.?\\d*)n(?!\\w)"
-				},
-				{
-					"name":  "constant.language.boolean.maxscript",
-					"match": "(?i)\\b(true|on|false|off)\\b"
-				},
-				{
-					"name":  "constant.language.math.maxscript",
+					"name":  "constant.language.math.mxs",
 					"match": "(?i)\\b(pi|e)\\b"
 				},
 				{
-					"name":  "constant.language.colour.maxscript",
-					"match": "(?i)\\b(red|green|blue|white|black|orange|yellow|brown|gray)\\b"
+					"name":  "constant.language.colour.mxs",
+					"match": "(?i)\\b(?>red|green|blue|white|black|orange|yellow|brown|gray)\\b"
 				},
 				{
-					"name":  "constant.language.axis.maxscript",
+					"name":  "constant.language.axis.mxs",
 					"match": "(?i)\\b([xyz]_axis)\\b"
 				},
 				{
-					"name":  "constant.language.null.maxscript",
-					"match": "(?i)\\b(undefined|unsupplied|silentvalue|ok)\\b"
-				},
-				{
-					"name": "constant.other.hex.maxscript",
-					"match": "\\b(0x\\w+)\\b"
-				},
-				{
-					"name":"constant.language.pathname.maxscript",
-					"begin": "\\$",
-					"end": "$",
-					"patterns": [{
-						"match": "[^ \t\r\n]+"
-					}]
+					"name":  "constant.language.null.mxs",
+					"match": "(?i)\\b(?>undefined|unsupplied|silentvalue|ok)\\b"
 				}
 			]
 		},
 		"storage":{
 			"patterns": [
 				{
-					"name": "storage.modifier.maxscript",
-					"match": "(?i)\\b(about|coordsys|global|local|private|public|persistent)\\b"
+					"name": "storage.type.mxs",
+					"match": "(?i)\\b(?>global|local|private|public|persistent)\\b"
 				},
 				{
-					"name": "storage.type.array.maxscript",
+					"name": "storage.type.array.mxs",
 					"begin": "(#)\\s*(\\()",
 					"end": "\\)",
 					"beginCaptures":{
-						"1": {"name": "keyword.definition.array.begin.maxscript"},
-						"2": {"name": "punctuation.section.block.begin"}
+						"1": {"name": "keyword.definition.array.begin.mxs"},
+						"2": {"name": "punctuation.section.parens.begin.mxs"}
 					},
 					"endCaptures":{
-						"0": {"name": "punctuation.section.block.end"}
+						"0": {"name": "punctuation.section.parens.end.mxs"}
 					},
 					"patterns": [
-						{"include": "$self"},
-						{"include": "#braces"}
+						{ "include": "#brackets"},
+						{ "include": "#cur_braces"},
+						{ "include": "#variable"},
+						{ "include": "#comment" },
+						{ "include": "#keywords" },
+						{ "include": "#strings" },
+						{ "include": "#constant" },
+						{ "include": "#numeric" },
+						{ "include": "#storage" },
+						{ "include": "#meta" },
+						{"include": "#balanced_parens"}
 					]
 				},
 				{
-					"name": "storage.type.bitarray.maxscript",
-					"patterns": [{"include": "$self"}],
+					"name": "storage.type.bitarray.mxs",
 					"begin": "(#)\\s*(\\{)",
 					"end": "\\}",
 					"beginCaptures":{
-						"1": {"name": "keyword.definition.bit.array.begin.maxscript"},
-						"2": {"name": "punctuation.section.braces.begin"}
+						"1": {"name": "keyword.definition.bit.array.begin.mxs"},
+						"2": {"name": "punctuation.section.braces.begin.mxs"}
 					},
 					"endCaptures":{
-						"0": {"name": "punctuation.section.braces.end"}
-					}
+						"0": {"name": "punctuation.section.braces.end.mxs"}
+					},
+					"patterns": [
+						{ "include": "#parens"},
+						{ "include": "#brackets"},
+						{ "include": "#variable"},
+						{ "include": "#comment" },
+						{ "include": "#keywords" },
+						{ "include": "#strings" },
+						{ "include": "#constant" },
+						{ "include": "#numeric" },
+						{ "include": "#storage" },
+						{ "include": "#meta" }
+					]
+				}
+			]
+		},
+		"support":{
+			"patterns": [
+				{
+					"name": "support.type.primitive.mxs",
+					"match": "(?i)\\b(?>AngleAxis|Array|BigMatrix|BigMatrixRowArray|BinStream|BitArray|Bitmap|Box2|Box3|color|DataPair|Dictionary|Double|EulerAngles|FileStream|Float|HKey|Integer|Integer64|IntegerPtr|Matrix3|MAXKey|mesh|Name|PathName|Point2|Point3|Point4|Quat|Ray|String|StringStream|Time|Timer|TriMesh)\\b"
 				},
 				{
-					"name":  "storage.type.bit-range.maxscript",
-					"match": "(?<!\\$)\\b(\\d+)(\\.{2})(\\d+)\\b",
-					"captures": {
-						"1": {"name": "storage.type.bit-range.begin.maxscript"},
-						"2": {"name": "storage.type.bit-range.middle.maxscript"},
-						"3": {"name": "storage.type.bit-range.end.maxscript"}
-					}
+					"name": "support.variable.objectset.mxs",
+					"match": "(?i)\\b(?>cameras|geometry|helpers|lights|object|objects|objectSet|primitive|selection|shapes|spacewarps|systems)\\b"
 				},
 				{
-					"name": "storage.type.primitive.maxscript",
-					"match": "(?i)\\b(AngleAxis|Array|BigMatrix|BigMatrixRowArray|BinStream|BitArray|Bitmap|Box2|Box3|color|DataPair|Dictionary|Double|EulerAngles|FileStream|Float|HKey|Integer|Integer64|IntegerPtr|Matrix3|MAXKey|mesh|Name|PathName|Point2|Point3|Point4|Quat|Ray|String|StringStream|Time|Timer|TriMesh)\\b"
+					"name": "support.constant.mxs",
+					"match": "(?i)\\b(?>\\?|assetUser|Constant|emptyVal|HKEY_CLASSES_ROOT|HKEY_CURRENT_CONFIG|HKEY_CURRENT_USER|HKEY_LOCAL_MACHINE|HKEY_PERFORMANCE_DATA|HKEY_USERS|meditMaterials|selectionSets)\\b"
 				},
 				{
-					"name": "support.variable.ObjectSet.maxscript",
-					"match": "(?i)\\b(cameras|geometry|helpers|lights|object|objects|objectSet|primitive|selection|shapes|spacewarps|systems)\\b"
-				},
-				{
-					"name": "support.constant.maxscript",
-					"match": "(?i)\\b(\\?|assetUser|Constant|emptyVal|HKEY_CLASSES_ROOT|HKEY_CURRENT_CONFIG|HKEY_CURRENT_USER|HKEY_LOCAL_MACHINE|HKEY_PERFORMANCE_DATA|HKEY_USERS|meditMaterials|selectionSets)\\b"
-				},
-				{
-					"name": "support.class.rollout-control.maxscript",
-					"match": "(?i)\\b(angle|button|checkbox|checkbutton|colorpicker|comboBox|curveControl|dotNetControl|dropdownList|editText|group|groupBox|hyperLink|imgTag|label|listBox|mapbutton|materialbutton|menuitem|multilistBox|pickbutton|popUpMenu|progressbar|radiobuttons|SchematicControl|slider|spinner|SubRollout|timer)\\b"
+					"name": "support.type.rolloutcontrol.mxs",
+					"match": "(?i)\\b(?>angle|button|checkbox|checkbutton|colorpicker|comboBox|curveControl|dotNetControl|dropdownList|editText|group|groupBox|hyperLink|imgTag|label|listBox|mapbutton|materialbutton|menuitem|multilistBox|pickbutton|popUpMenu|progressbar|radiobuttons|SchematicControl|slider|spinner|SubRollout|timer)\\b"
 				}
 			]
 		}

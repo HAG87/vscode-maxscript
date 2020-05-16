@@ -48,6 +48,21 @@
 				"path": "./syntaxes/maxscript.tmLanguage.json"
 			}
 		],
+		"semanticTokenScopes": [{
+			"language": "maxscript",
+			"scopes": {
+				"class": ["support.class.mxs"],
+				"classclass.defaultLibrary": ["support.class.mxs"],
+				"function.defaultLibrary": ["support.function.mxs"],
+				"interface": ["support.type.interface.mxs"],
+				"namespace": ["support.superclass.mxs"],
+				"struct": ["storage.type.struct.mxs"],
+				"type.defaultLibrary": ["support.type.primitive.mxs"],
+				"type": ["support.type.primitive.mxs"],
+				"variable": ["support.variable.system.mxs"],
+				"variable.other.readwrite": ["support.variable.system.mxs"]
+			}
+		}],
 		"commands": [
 			{
 				"command": "mxs.help",
@@ -69,6 +84,11 @@
 				"path": "./snippets/maxscript.json"
 			}
 		],
+		"configurationDefaults": {
+			"[maxscript]":{
+				"editor.semanticHighlighting.enabled": true
+			}
+		},
 		"configuration": {
 			"title": "Language MaxScript",
 			"type": "object",
