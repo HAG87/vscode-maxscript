@@ -60,23 +60,23 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 		} else {
 			let theFoundItem = this.mxCompletions.find(item => item.label === util.precWord(lineTillCurrentPosition));
 			// if (theFoundItem && theFoundItem.hasOwnProperty('kind')) {
-				switch (theFoundItem?.kind) {
-					case vscode.CompletionItemKind.Class:
-						//console.log(mxClassMembers[theFoundItem.label]);
-						result = mxClassMembers?.[theFoundItem.label];
-						break;
-					case vscode.CompletionItemKind.Struct:
-						//console.log(mxStructsMembers[theFoundItem.label]);
-						result = mxStructsMembers?.[theFoundItem.label];
-						break;
-					case vscode.CompletionItemKind.Interface:
-						//console.log(mxInterfaceMembers[theFoundItem.label]);
-						result = mxInterfaceMembers?.[theFoundItem.label];
-						break;
+			switch (theFoundItem?.kind) {
+				case vscode.CompletionItemKind.Class:
+					//console.log(mxClassMembers[theFoundItem.label]);
+					result = mxClassMembers?.[theFoundItem.label];
+					break;
+				case vscode.CompletionItemKind.Struct:
+					//console.log(mxStructsMembers[theFoundItem.label]);
+					result = mxStructsMembers?.[theFoundItem.label];
+					break;
+				case vscode.CompletionItemKind.Interface:
+					//console.log(mxInterfaceMembers[theFoundItem.label]);
+					result = mxInterfaceMembers?.[theFoundItem.label];
+					break;
 					//default:
 						// exit
 					//	result = [];
-				};
+			};
 			// };
 		}
 		return result;

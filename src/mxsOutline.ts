@@ -2,7 +2,7 @@
 TODO:
 [x] Ignore comments
 */
-'use strict'
+'use strict';
 import * as vscode from 'vscode';
 
 import { mxsSymbolMatch } from './schema/mxsSymbolDef';
@@ -19,12 +19,12 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 
 		let blockComments = (x: string): RegExp => {
 			return new RegExp('\\/\\*[^\\*\\/]*' + x, 'i');
-		}
+		};
 		let singleComments = (x: string): RegExp => {
 			return (
 				new RegExp('--.*(' + x + ').*$', 'im')
 			);
-		}
+		};
 
 		tokens.forEach(type => {
 			// token[type.match] contains a regex for matching

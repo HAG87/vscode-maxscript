@@ -13,7 +13,7 @@ export const LANG_CFG: vscode.LanguageConfiguration = {
 		increaseIndentPattern: /\(\[/,
 		decreaseIndentPattern: /\)\]/
 	}
-}
+};
 /**
  * Acces extension settings
  */
@@ -28,8 +28,8 @@ let help_addr: string = mxsConfig.get('helpprovider', 'http://help.autodesk.com/
 export async function msxHelp(help_addr: string) {
 	let query = getTextSel();
 	// if (query) {
-		let uri = vscode.Uri.parse(encodeURI(`${help_addr}?query=${query!}&cg=Scripting%20%26%20Customization`));
-		await vscode.commands.executeCommand('vscode.open', uri);
+	let uri = vscode.Uri.parse(encodeURI(`${help_addr}?query=${query!}&cg=Scripting%20%26%20Customization`));
+	await vscode.commands.executeCommand('vscode.open', uri);
 	// }
 }
 
@@ -44,19 +44,19 @@ export function activate(context: vscode.ExtensionContext) {
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => { msxHelp(help_addr); }));
 	// completions
-	if (mxsConfig.get('completions',true)) {
+	if (mxsConfig.get('completions', true)) {
 		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(), '.'));
 	}
 	// outliner
-	if (mxsConfig.get('gotosymbol',true)) {
+	if (mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsOutline()));
 	}
 	// definition provider
-	if (mxsConfig.get('gotodefinition',true) && mxsConfig.get('gotosymbol',true) ) {
+	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new mxsDefinitions()));
 	}
 	// semantics
-	if (mxsConfig.get('semantics',true)) {
+	if (mxsConfig.get('semantics', true)) {
 		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_MODE, new DocumentSemanticTokensProvider(), legend));
 	}
 }

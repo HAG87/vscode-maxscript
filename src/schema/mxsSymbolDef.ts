@@ -1,11 +1,11 @@
-'use strict'
+'use strict';
 import * as vscode from 'vscode';
 
 export interface mxsSymbolMatch {
-	type: string,
-	match: RegExp,
-	kind: vscode.SymbolKind,
-	decl: number
+	type: string;
+	match: RegExp;
+	kind: vscode.SymbolKind;
+	decl: number;
 }
 
 export const mxsSymbols: mxsSymbolMatch[] = [
@@ -83,4 +83,4 @@ export const mxsSymbols: mxsSymbolMatch[] = [
 		kind: vscode.SymbolKind.Package,
 		decl: 1
 	}
-]
+];
