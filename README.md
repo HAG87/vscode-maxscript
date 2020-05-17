@@ -5,20 +5,20 @@ Autodesk 3ds Max Scripting language (MaxScript) support.
 ## Features
 
 - Syntax highlight.
-- Code autocompletion; for keywords, primitives, generic functions, structDefs, interfaces and classes.
+- Semantic syntax highlight
+- Code autocompletion for keywords, primitives, generic functions, structs, interfaces and classes.
 - Go to Symbol in document (Basic support, somewhat buggy).
 - Go to Definition and peek definition in document.
 - Snippets for most used code blocks.
-- Customized theme to match MaxScript elements diversity.
 - Help command (*MaxScript help. Accessible from the right-click menu.*): Select a keyword and open related online documentation.
 
-![feature X](https://github.com/HAG87/vscode-maxscript/raw/master/images/feature-1.png)
+![feature X](./images/feature-1.png)
 
-![feature X](https://github.com/HAG87/vscode-maxscript/raw/master/images/feature-2.gif)
+![feature X](./images/feature-2.gif)
 
 ## Release Notes
 
-[Changelog](https://github.com/HAG87/vscode-maxscript/blob/master/./CHANGELOG.md)
+[Changelog](./CHANGELOG.md)
 
 ## Requirements
 
@@ -30,11 +30,17 @@ None.
   "maxscript.completions": true | false,
   "maxscript.gotosymbol": true | false,
   "maxscript.gotodefinition": true | false,
+  "maxscript.semantics": true | false,
+  "maxscript.helpprovider": string,
 ```
+
+## Syntax Highlight inside comments
+
+![feature X](./images/comment-decor.png)
 
 ## Syntax Highlight
 
-Default settings for **Custom highlighting**
+Suggested settings for **Custom highlighting**. List of available scopes [here](./TextMate-scopes.md)
 
 ```json
   /*
@@ -42,193 +48,135 @@ Default settings for **Custom highlighting**
   */
   "editor.tokenColorCustomizations": {
     "textMateRules": [
-      // changed: punctuation.definition.name >>> string.other.name
+      // Extras
       {
-        "name": "mxs name values",
-        "scope": "string.other.name",
-        "settings": { "foreground": "#c678dd" }
-      },
-      // Changed: punctuation.definition.string.verbatim.begin.maxscript >> string.quoted.double.verbatim.maxscript
-      {
-        "name": "mxs verbatim string",
-        "scope": "string.quoted.double.verbatim.maxscript",
-        "settings": { "foreground": "#78BEC2" }
+        "name": "Todo",
+        "scope": "documentation.todo.mxs",
+        "settings": { "foreground": "#4bd621", "fontStyle": "bold" }
       },
       {
-        "name": "mxs localized resources - var name",
-        "scope": "string.localized.maxscript",
-        "settings": { "foreground": "#6b6b6b" }
+        "name": "Fixme",
+        "scope": "documentation.fixme.mxs",
+        "settings": { "foreground": "#ce55d3", "fontStyle": "bold" }
       },
       {
-        "name": "mxs localized resources",
-        "scope": "punctuation.definition.localized.maxscript",
+        "name": "Plain text",
+        "scope": "documentation.plain.mxs",
+        "settings": { "foreground": "#cecece", "fontStyle": ""}
+      },
+      // Characters
+      {
+        "name": "Linebreak",
+        "scope": "keyword.operator.linebreak.mxs",
+        "settings": { "foreground": "#6d6d6d", "fontStyle": "bold" }
+      },
+      {
+        "name": "byReference keyword",
+        "scope": "keyword.operator.byref.mxs",
+        "settings": { "foreground": "#78C28E", "fontStyle": "italic" }
+      },
+      // Values
+      // {
+      //   "name": "Name values",
+      //   "scope": "string.unquoted.name.mxs",
+      //   "settings": { "foreground": "#c678dd" }
+      // },
+      {
+        "name": "Verbatim string",
+        "scope": "string.quoted.double.verbatim.mxs",
+        "settings": { "fontStyle": "italic" }
+      },
+      {
+        "name": "Localized resources",
+        "scope": "string.quoted.other.mxs",
         "settings": { "foreground": "#8f724a" }
       },
+      // Misc
       {
-        "name": "mxs hex value",
-        "scope": "constant.other.hex.maxscript",
-        "settings": { "foreground": "#e0ad6b" }
+        "name": "Properties",
+        "scope": "variable.property.mxs",
+        "settings": { "foreground": "#ce9b3d", }
       },
-      // Code blocks
-      /**
-      * Removed: entity.event.type.maxscript
-      * Changed:
-      * entity.function.modifier.maxscript, entity.struct.type.maxscript entity.function.type.maxscript
-      * For: entity.modifier, entity.type
-      */
-      {
-        "name": "mxs meta type",
-        "scope": "entity.modifier, entity.type",
-        "settings": { "foreground": "#E06B74", "fontStyle": "bold" }
-      },
-      /**
-      * Changed:
-      * entity.function.name.maxscript, entity.struct.name.maxscript, entity.utility.name.maxscript
-      * For: entity.name
-      */
-      {
-        "name": "msx meta name",
-        "scope": "entity.name",
-        "settings": { "foreground": "#61AFEF" }
-      },
-      // Changed: entity.utility.type.maxscript >> entity.type.utility.maxscript
-      {
-        "name": "mxs utility type",
-        "scope": "entity.type.utility.maxscript",
-        "settings": { "foreground": "#c678dd", "fontStyle": "bold" }
-      },
-      {
-        "name": "mxs rollout",
-        "scope": "support.class.rollout-control.maxscript",
-        "settings": { "foreground": "#E06C92" }
-      },
-      // Calls
-            {
-        "name": "mxs function call",
-        "scope": "variable.parameter.maxscript",
-        "settings": { "foreground": "#78BEC2" }
-      },
-      {
-        "name": "mxs property member",
-        "scope": "variable.property.maxscript",
-        "settings": { "foreground": "#A46CCD" }
-      },
-      {
-        "name": "mxs function parameter",
-        "scope": "variable.other.name.maxscript",
-        "settings": { "foreground": "#4C9FB2", "fontStyle": "italic" }
-      },
-      {
-        "name": "msx object reference",
-        "scope": "variable.reference.maxscript",
-        "settings": { "foreground": "#61AFEF" }
-      },
-      // Changed: entity.event.target.maxscript >> entity.target
-      {
-        "name": "mxs target",
+     {
+        "name": "Event target",
         "scope": "entity.target",
         "settings": { "foreground": "#E6B52E", "fontStyle": "italic" }
       },
-      // Changed: entity.event.argument.maxscript >> entity.argument
+      // Variables
       {
-        "name": "mxs args",
-        "scope": "entity.argument",
-        "settings": { "foreground": "#898989" }
+        "name": "Path names",
+        "scope": "variable.other.pathname.mxs",
+        "settings": { "foreground": "#7A9F4D" }
       },
-      // Changed: entity.event.action.maxscript >> entity.action
+      // Declaration
       {
-        "name": "mxs action",
-        "scope": "entity.action",
-        "settings": { "foreground": "#7EB33D" }
+        "name": "Declaration",
+        "scope": "storage.type.mxs",
+        "settings": { "fontStyle": "" }
       },
       // Keywords
       {
-        "name": "mxs storage modifier",
-        "scope": "storage.modifier.maxscript",
-        "settings": { "foreground": "#7A9F4D" }
-      },
-      {
-        "name": "mxs storage primitive",
-        "scope": "storage.type.primitive.maxscript",
-        "settings": { "foreground": "#477FB0" }
-      },
-      {
         "name": "mxs keyword operator",
-        "scope": "keyword.operator.maxscript, keyword.operator.word.maxscript",
+        "scope": "keyword.operator.mxs, keyword.operator.word.mxs",
         "settings": { "foreground": "#78BEC2" }
       },
       {
-        "name": "mxs definition variable",
-        "scope": "punctuation.definition.variable.maxscript",
-        "settings": { "foreground": "#E6B52E" },
-      },
-      {
-        "name": "mxs keyword other",
-        "scope": "keyword.other.maxscript",
+        "name": "Keyword other",
+        "scope": "keyword.other.mxs",
         "settings": { "foreground": "#78C28E" }
       },
       {
-        "name": "mxs keyword other - reserved",
-        "scope": "keyword.reserved.maxscript",
-        "settings": { "foreground": "#E6B52E", "fontStyle": "italic" }
-      },
-      {
-        "name": "mxs byReference keyword",
-        "scope": "punctuation.definition.byref.keyword.maxscript",
-        "settings": { "foreground": "#7EB33D", "fontStyle": "italic" }
-      },
-      {
         "name": "mxs constant",
-        "scope": "constant.language, variable.language.maxscript",
+        "scope": "constant.language, variable.language.mxs",
         "settings": { "foreground": "#528BFF" }
       },
-      {
-        "name": "mxs constant null",
-        "scope": "constant.language.null.maxscript",
-        "settings": { "foreground": "#C45968" }
-      },
-      // Arrays
+      // Types
       {
         "name": "mxs array",
-        "scope": "storage.type.array.maxscript, storage.type.bitarray.maxscript",
-        "settings": { "foreground": "#E5CB82" }
-      },
-      {
-        "name": "mxs array def",
-        "scope": "keyword.definition.array.begin.maxscript",
-        "settings": { "foreground": "#676a70" }
+        "scope": "storage.type.array.mxs, storage.type.bitarray.mxs",
+        "settings": { "foreground": "#E5CB82", "fontStyle": "" }
       },
       // support
       {
-        "name": "mxs support objectset",
-        "scope": "support.variable.ObjectSet.maxscript",
+        "name": "Types",
+        "scope": "support.type.primitive.mxs",
+        "settings": { "foreground": "#477FB0" }
+      },
+      {
+        "name": "Objectset",
+        "scope": "support.variable.objectset.mxs",
         "settings": { "foreground": "#E6B52E" }
       },
       {
-        "name": "mxs support interface",
-        "scope": "support.type.interface.maxscript",
+        "name": "Interfaces",
+        "scope": "support.type.interface.mxs",
         "settings": { "foreground": "#759FD1" }
       },
       {
-        "name": "mxs support structDef",
-        "scope": "support.type.StructDef.maxscript",
-        "settings": { "foreground": "#59A7C8" }
-      },
-      {
-        "name": "mxs support class",
-        "scope": "support.class",
+        "name": "Class",
+        "scope": "support.class.mxs",
         "settings": { "foreground": "#A875D1" }
       },
       {
-        "name": "mxs support primitive",
-        "scope": " support.other.primitive.maxscript",
-        "settings": { "foreground": "#61AFEF" }
+        "name": "Structs",
+        "scope": "storage.type.struct.mxs",
+        "settings": { "foreground": "#7b6ccd" }
       },
       {
-        "name": "mxs support other",
-        "scope": "support.constant, support.type, support.variable",
-        "settings": { "foreground": "#CDA06C" }
-      }
+        "name": "Constant",
+        "scope": "support.constant.mxs",
+        "settings": { "foreground": "#c56038" }
+      },
+      {
+        "name": "Superclass",
+        "scope": "support.superclass.mxs",
+        "settings": { "foreground": "#6c7bcd" }
+      },
+      {
+        "name": "Variables",
+        "scope": "support.variable.system.mxs",
+        "settings": { "foreground": "#cda06c" }
+      },
     ]
   },
 ```
@@ -247,11 +195,11 @@ MXSPyCOM project allow for editing & execution of 3ds Max MaxScript and Python f
     "tasks": [
       {
         "label": "MXSPyCOM execute Script",
-        "type": "process",
+        "type": "shell",
         // Add MXSPyCOM.exe to PATH or use file root, i.e: "C:/MXSPyCOM/MXSPyCOM.exe"
-        "command":"MXSPyCOM.exe",
+        "command":".\\MXSPyCOM.exe",
         "args": [
-            "-f",
+            "-s",
             { "value": "${file}", "quoting": "strong" }
         ],
         "group": "test",

@@ -2,6 +2,12 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
+## [1.9.4]
+
+- Added Semantic Syntax for 3ds Max classes, structs...
+- Changed TexMate scopes to a more standard format. Fixed several rules.
+- Added "decorated" comments
+
 ## [1.9.3] - 2020-05-13
 
 - Pathnames highlight
@@ -14,7 +20,7 @@ All notable changes to the "language-maxscript" extension will be documented in 
 
 ## [1.9.1] - 2020-04-23
 
-- Syntax highlighr rules simplification
+- Syntax highlight rules simplification
 - Small Syntax fixes
 - Changed indentation rules
 - Cleanup
