@@ -23,7 +23,7 @@ let mxsConfig = (vscode.workspace.getConfiguration('maxscript'));
 let help_addr: string = mxsConfig.get('helpprovider', 'http://help.autodesk.com/view/3DSMAX/2018/ENU/');
 /**
  * MaxScript online help launch at current selected word
- * @param help_addr
+ * @param help_addr Addess of the help page
  */
 export async function msxHelp(help_addr: string) {
 	let query = getTextSel();

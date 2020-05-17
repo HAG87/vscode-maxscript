@@ -82,7 +82,7 @@ const tokenTypesSet = new Set<string>();
 export const legend = (function () {
     const tokenTypesLegend = [
         'comment', 'keyword', 'regexp', 'operator', 'namespace',
-        'string', 'type', 'struct', 'class', 'interface', 'enum', 'typeParameter', 'function',
+        'type', 'struct', 'class', 'interface', 'enum', 'typeParameter', 'function',
         'member', 'macro', 'variable', 'parameter', 'property', 'label',
         //'string', 'number',
     ];
