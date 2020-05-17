@@ -2,7 +2,7 @@
 
 All notable changes to the "language-maxscript" extension will be documented in this file.
 
-## [1.9.4]
+## [1.10.0]
 
 - Added Semantic Syntax for 3ds Max classes, structs...
 - Changed TexMate scopes to a more standard format. Fixed several rules.
