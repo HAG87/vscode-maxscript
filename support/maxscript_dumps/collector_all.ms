@@ -1,4 +1,25 @@
 (
+/**
+	Start the comment with two **
+	for a decorated comment
+
+	Some values and keywords will be highlighted:
+	local var
+	12345.6
+	"a string"
+
+	Decorations:
+	_bold text_
+	__underline text__
+
+	This text | has escaped _comment_ style | on it.
+	#name
+	anotate _function_ parameters: @param valuename
+
+	todo: point here things to do
+	fixme: point here things to fix
+*/
+
 	local PROPS = "" as stringstream
 	apropos "" to:PROPS
 	local structs = #()
@@ -15,19 +36,19 @@
 	local _constant = #("Constant")
 	local _MAXScriptFunction = #("MAXScriptFunction")
 	local _internal = #("\\<internal\\>")
-	
+
 	local _system = #()
-	
+
 	local SystemValues = #("SystemValues")
-	
+
 	local other = #()
 	local other_fn = #()
 	local other_primitive = #()
 	local the_rest = #()
-	
+
 	local ops = #()
-	
-	seek PROPS 0 
+
+	seek PROPS 0
 	while not eof PROPS do (
 		local theLine = readLine PROPS
 		if (matchPattern theLine pattern:"*#struct*") then (
@@ -79,9 +100,11 @@
 			)
 		)
 	)
+	struct hola ()
+
 	for i=1 to other.count do (
 		local current = other[i]
-		
+
 		if (matchPattern current pattern:"*(*)*") and not (matchPattern current pattern:"*=*") then (
 			local f = filterString current " "
 			local theK = ""
@@ -101,11 +124,23 @@
 			append other_fn (filterString current " ")[1]
 		) else append the_rest current
 	)
+	undefined
+	1..2
+	50.5
+	true
+	false
+	red
+	green
+	about
+	&something
+	$box
+
+
 	------------------------------------------------------------------------------------------------- GENERATE KEYWORDS PATTERN
 	fn nested_nameParser col formatpattern:@"(?i)\\b(%)(?!\\s*:)\\b"  =
 	(
 		local res = #()	--"" as stringstream
-		for i=1 to col.count do ( 
+		for i=1 to col.count do (
 -- 			format "%\n" col[i]
 			local curr_s = col[i]
 			local s = curr_s[1]
@@ -188,8 +223,8 @@
 -- 		_system
 	)
 -- 	print _MAXClass
-	
-	
+
+
 /*
 	local dump_result = "" as stringstream
 	keywordpattern _names[5] (nameParser theKeywords[5]) dump_result
@@ -210,20 +245,20 @@
 		else 0
 	)
 
-	
+
  	for i=1 to _names.count do (
-		
+
 		local dump_result = "" as stringstream
-		
+
 -- 		keywordpattern _names[i] (nameParser theKeywords[i]) dump_result
 		qsort theKeywords[i] LookupTableComparator
 		for t=1 to theKeywords[i].count do format "%\n" theKeywords[i][t] to:dump_result
-		
+
 		dump_file  = createFile ("D:/" + _names[i] + ".txt")
 -- 		dump_file  = createFile ("D:\maxscript-terms-dump_" +  _names[i] + ".json")
-		
+
 		format "%" (dump_result as string) to:dump_file
-		close dump_file		
+		close dump_file
 	)
 -- 	*/
 )
