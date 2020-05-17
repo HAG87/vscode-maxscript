@@ -5,7 +5,8 @@
 		"outDir": "out",
 		"sourceMap": true,
 		"rootDir": "src",
-		"strict": true
+		// "allowJs": true,
+		"strict": true,
 	},
-	"exclude": ["node_modules", ".vscode-test"]
+	"exclude": ["node_modules", ".vscode-test", "support"]
 }

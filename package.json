@@ -48,21 +48,43 @@
 				"path": "./syntaxes/maxscript.tmLanguage.json"
 			}
 		],
-		"semanticTokenScopes": [{
-			"language": "maxscript",
-			"scopes": {
-				"class": ["support.class.mxs"],
-				"classclass.defaultLibrary": ["support.class.mxs"],
-				"function.defaultLibrary": ["support.function.mxs"],
-				"interface": ["support.type.interface.mxs"],
-				"namespace": ["support.superclass.mxs"],
-				"struct": ["storage.type.struct.mxs"],
-				"type.defaultLibrary": ["support.type.primitive.mxs"],
-				"type": ["support.type.primitive.mxs"],
-				"variable": ["support.variable.system.mxs"],
-				"variable.other.readwrite": ["support.variable.system.mxs"]
+		"semanticTokenScopes": [
+			{
+				"language": "maxscript",
+				"scopes": {
+					"class": [
+						"support.class.mxs"
+					],
+					"classclass.defaultLibrary": [
+						"support.class.mxs"
+					],
+					"function.defaultLibrary": [
+						"support.function.mxs"
+					],
+					"interface": [
+						"support.type.interface.mxs"
+					],
+					"namespace": [
+						"support.superclass.mxs"
+					],
+					"struct": [
+						"storage.type.struct.mxs"
+					],
+					"type.defaultLibrary": [
+						"support.type.primitive.mxs"
+					],
+					"type": [
+						"support.type.primitive.mxs"
+					],
+					"variable": [
+						"support.variable.system.mxs"
+					],
+					"variable.other.readwrite": [
+						"support.variable.system.mxs"
+					]
+				}
 			}
-		}],
+		],
 		"commands": [
 			{
 				"command": "mxs.help",
@@ -85,7 +107,7 @@
 			}
 		],
 		"configurationDefaults": {
-			"[maxscript]":{
+			"[maxscript]": {
 				"editor.semanticHighlighting.enabled": true
 			}
 		},
@@ -124,13 +146,23 @@
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"lint": "tslint -p ./",
-		"watch": "tsc -watch -p ./"
+		"watch": "tsc -watch -p ./",
+		"test": "node ./out/test/runTest.js",
+		"lint": "eslint -c .eslintrc.js --ext .ts ./",
+		"fix": "eslint --fix -c .eslintrc.js --ext .ts ./"
 	},
 	"devDependencies": {
+		"@types/eslint": "^6.8.1",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^7.0.2",
 		"@types/node": "^12.12.0",
 		"@types/vscode": "^1.45.0",
-		"tslint": "^6.1.2",
+		"@typescript-eslint/eslint-plugin": "^2.33.0",
+		"@typescript-eslint/parser": "^2.33.0",
+		"eslint": "^6.8.0",
+		"eslint-config-prettier": "^6.11.0",
+		"glob": "^7.1.6",
+		"mocha": "^7.1.2",
 		"typescript": "^3.9.2",
 		"vscode-test": "^1.3.0"
 	},
