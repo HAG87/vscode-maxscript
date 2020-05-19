@@ -519,6 +519,8 @@ export const mxStructsMembers: any = {
 		{ label: 'removeEventHandlers', kind: CompletionItemKind.Method },
 		{ label: 'setLifetimeControl', kind: CompletionItemKind.Method },
 		{ label: 'showConstructors', kind: CompletionItemKind.Method },
+		{ label: 'DotNetArrayToValue', detail: '<value> dotnet.DotNetArrayToValue <dotNetObject> <Matrix3 | Point2 | Point3 | Point4 | Quat | EulerAngles>', kind: CompletionItemKind.Method },
+		{ label: 'DotNetObjectToValue', detail: '<value> dotnet.DotNetObjectToValue <dotNetObject>', kind: CompletionItemKind.Method },
 	],
 	'envEffectsDialog': [
 		{ label: 'close', kind: CompletionItemKind.Method },
