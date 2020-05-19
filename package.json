@@ -155,6 +155,7 @@
 		"@types/eslint": "^6.8.1",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
+		"@types/moo": "^0.5.3",
 		"@types/node": "^12.12.0",
 		"@types/vscode": "^1.45.0",
 		"@typescript-eslint/eslint-plugin": "^2.33.0",
@@ -167,9 +168,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
-		"@types/moo": "^0.5.3",
-		"moo": "^0.5.1",
-		"nearley": "^2.19.3"
+		"moo": "^0.5.1"
 	},
 	"__metadata": {
 		"id": "7f2edb68-8e0f-4a8c-9380-24d100650a02",

@@ -12,6 +12,5 @@ tsconfig.json
 tslint.json
 .eslintrc.js
 vsc-extension-quickstart.md
-node_modules/**
 support/**
 !file.ts
