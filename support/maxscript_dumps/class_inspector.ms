@@ -2,13 +2,13 @@
 	local rx = dotNetClass "System.Text.RegularExpressions.Regex"
 	local props_pattern = "(?sx)(?:[.])(\w+)\s*(?:[:])\s*(\w+)"
 	local props_desc_pattern = "(?sx)(?:[:])\s*(\w+)"
-	
+
 	local super = superclasses
 	local superclass_collection = #()
-	
+
 	for i=1 to super.count do (
 		local classes = super[i].classes
-		
+
 		local _superclass = super[i] as string
 		local _class = #()
 
@@ -31,20 +31,18 @@
 		)
 		append superclass_collection #(_superclass, _class)
 	)
-	
-	
-	
+
 	fn LookupTableComparator a b = (
 		if (toLower a[1]) > (toLower b[1]) then 1
 		else if (toLower a[1]) < (toLower b[1]) then -1
 		else 0
-	)	
-	
-	local elem_schema = 
+	)
+
+	local elem_schema =
 	"{
 	\"name\":\"%\",
 	\"desc\":\"%\"
-}"	
+}"
 	local formatPattern =
 	"{
 		\"name\":\"%\",
@@ -59,9 +57,9 @@
 	local schema_pattern = "\"api\":[\n\t%\n\r]"
 
 	qsort superclass_collection LookupTableComparator
-	
+
 	local output_string = ""
-	
+
 	for i in superclass_collection do (
 		local curr_sup = i
 		local sup_name = i[1]
@@ -85,14 +83,14 @@
 				format formatPattern class_name sup_name class_props_str to:class_str
 				output_string += (class_str as string) + ",\n"
 			)
-			
-			
+
+
 		)
-		
+
 	)
-	
+
 	dump_file  = createFile ("D:\maxscript-classes-autocomp_2.json")
 	format "%" (output_string as string) to:dump_file
 	close dump_file
-	
+
 )

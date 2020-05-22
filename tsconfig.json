@@ -5,13 +5,16 @@
 		"outDir": "out",
 		"sourceMap": true,
 		"rootDir": "src",
-		// "allowJs": true,
+		"allowJs": true,
 		"strict": true,
+		//"esModuleInterop": true
 	},
 	"exclude": [
+		"out",
 		"node_modules",
 		".vscode-test",
 		".vs",
 		"support"
-	]
+	],
+	"include": [ "./src/**/*" ]
 }

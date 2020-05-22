@@ -10,13 +10,7 @@ export function getTextSel(editor = window.activeTextEditor) {
 	return seltext;
 }
 
-export function fileExists(filePath: string): boolean {
-	try {
-		return fs.statSync(filePath).isFile();
-	} catch (err) {
-		throw err;
-	}
-}
+export const fileExists = (filePath: string): boolean => fs.statSync(filePath).isFile();
 
 /**
  * Check if the current Document position line is inside a "string" object
