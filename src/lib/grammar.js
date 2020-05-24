@@ -249,7 +249,6 @@ var grammar = {
     {"name": "item_group$ebnf$1", "symbols": ["item_group$ebnf$1", "item_group$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "item_group", "symbols": ["item_group$subexpression$1", "string", "_", "LPAREN", "rollout_item", "item_group$ebnf$1", "RPAREN"], "postprocess":  d => ({
             type: 'EntityRolloutGroup',
-            type: 'EntityRolloutGroup',
             id:   d[1],
             body: merge(d[4], d[5]),
             loc:getLoc(d[0][0], d[6])
@@ -675,6 +674,7 @@ var grammar = {
     {"name": "factor", "symbols": [{"literal":"-"}, "expr"], "postprocess": d => ({type: 'UnaryExpression', operand: d[1], })},
     {"name": "factor", "symbols": [{"literal":"?"}], "postprocess": d => ({type: 'Keyword', value: d[0]})},
     {"name": "factor", "symbols": ["expr_seq"], "postprocess": id},
+    {"name": "factor", "symbols": [(mxLexer.has("error") ? {type: "error"} : error)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_uicontrols") ? {type: "kw_uicontrols"} : kw_uicontrols)]},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_objectset") ? {type: "kw_objectset"} : kw_objectset)]},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_time") ? {type: "kw_time"} : kw_time)]},

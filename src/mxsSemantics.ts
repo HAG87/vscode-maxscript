@@ -1,3 +1,4 @@
+'use strict';
 import * as vscode from 'vscode';
 
 import * as moo from 'moo';
@@ -66,13 +67,19 @@ let lexer = moo.compile({
 	// IDENTIFIERS
 	// includes special alphanumeric chars
 	identity: {
-		match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*\b/,
+		match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
 		type: caseInsensitiveKeywords(maxAPI)
 	},
 
 	NL: { match: /(?:\r|\r\n|\n)+/, lineBreaks: true },
 	// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
-	error: { match: /[¿¡!`]/, error: true },
+	error: [
+		{ match: /[¿¡!`´]/, /* error: true  */},
+		{ match: /[?\\]{2,}/},
+		// { match: /[?]{2,}/},
+	],
+	// This contains the rest of the stack in case of error.
+	fatalError : moo.error
 });
 //-------------------------------------------------------------------------------------------------------------
 const tokenTypes = new Map<string, number>();
@@ -111,8 +118,6 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 	async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
 		const allTokens = this._parseText(document.getText());
 
-		//console.log(allTokens);
-
 		const builder = new vscode.SemanticTokensBuilder();
 		allTokens.forEach((token) => {
 			builder.push(token.line, token.startCharacter, token.length, this._encodeTokenType(token.tokenType), this._encodeTokenModifiers(token.tokenModifiers));
@@ -149,7 +154,6 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 
 		getTokens.forEach(token => {
 			let typing = token.type.split('_');
-			//console.log(typing);
 			r.push({
 				line: token.line - 1,
 				startCharacter: token.col - 1,
@@ -160,25 +164,21 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 		});
 		return r;
 	}
-
+	// this will need to catch errors. currentry it tryes to dump all errors to a token and skip them.
 	private _tokenize(text: string): any[] {
-		try {
-			// feed the tokenizer
-			lexer.reset(text);
+		let toks = [];
+		let save_state;
+		// feed the tokenizer
+		lexer.reset(text);
+		let _token;
 
-			let _token;
-			let toks = [];
-
-			while (_token = lexer.next()) {
-				// filter tokens here
-				if (tokenTypesSet.has(_token.type?.split('_')[0]!)) {
-					toks.push(_token);
-				}
+		while (_token = lexer.next()) {
+			// filter tokens here
+			if (tokenTypesSet.has(_token.type?.split('_')[0]!)) {
+				toks.push(_token);
 			}
-			return toks;
-		} catch (err) {
-			// just rethrow...
-			throw err;
 		}
+		// console.log(toks);
+		return toks;
 	}
 }

@@ -1,3 +1,4 @@
+'use strict';
 import * as vscode from 'vscode';
 import { getTextSel } from './utils';
 
@@ -5,6 +6,7 @@ import mxsCompletion from './mxsAutocomplete';
 import mxsOutline from './mxsOutline';
 import mxsDefinitions from './mxsDefinitions';
 import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
+import { DiagnosticCollection }  from './mxsDiagnostics';
 
 export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
 // this is implemented in contributes languaje-configuration.json
@@ -50,6 +52,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsOutline()));
+		// diagnostics
+		context.subscriptions.push(DiagnosticCollection);
 	}
 	// definition provider
 	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {

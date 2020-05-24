@@ -224,7 +224,13 @@ var mxLexer = moo.compile(
 		newline: { match: /(?:\r|\r\n|\n)+/, lineBreaks: true },
 		statement: { match: /;/ },
 		// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
-		error: { match: /[¿¡!`]/, error: true },
+		error: [
+			{ match: /[¿¡!`´]/, /* error: true  */},
+			{ match: /[/?\\]{2,}/},
+			// { match: /[?]{2,}/},
+		],
+		// This contains the rest of the stack in case of error.
+		fatalError : moo.error
 		// ---- MOO RULES END-----
 	});
 //-----------------------------------------------------------------------------------

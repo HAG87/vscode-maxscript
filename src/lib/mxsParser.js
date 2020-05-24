@@ -19,8 +19,10 @@ class mxsParseSource {
 	constructor(source) {
 		this._declareParser();
 		this.__source = source;
-		this.parsedAST = this.ParseSource();
-		this.SourceHash = mxsParseSource.HashSource(source);
+		this.__parsedAST = [];
+		this.__SourceHash();
+		// this.SourceHash = mxsParseSource.HashSource(source);
+		this.ParseSource();
 	}
 
 	get source() {
@@ -29,9 +31,20 @@ class mxsParseSource {
 
 	set source(newSource) {
 		this.__source = newSource;
-		this.parsedAST = this.ParseSource();
+		// this.SourceHash = mxsParseSource.HashSource(newSource);
+		this.reset();
+		this.__SourceHash();
+		this.ParseSource();
+		// this.__parsedAST = this.ParseSource();
+	}
+
+	get parsedAST() {
+		return this.__parsedAST;
 	}
 	//-----------------------------------------------------------------------------------
+	reset () {
+		this._declareParser()
+	}
 	/**
 	 * Tokenize mxs string
 	 * @param {moo.lexer} lexer
@@ -79,6 +92,7 @@ class mxsParseSource {
 		*/
 		// let parserState = null;
 		try {
+			// this.parserInstance.finish();
 			// save parser state
 			// parserState = this.parserInstance.save();
 			// feed the parser
@@ -92,8 +106,9 @@ class mxsParseSource {
 			//*/
 			// Resolve. the ATS
 			// console.log('results');
-			return (this.parserInstance.results[tree]);
-
+			// return (this.parserInstance.results[tree]);
+			this.__parsedAST = (this.parserInstance.results[tree]);
+			return;
 		} catch (err) {
 			// offending token is err.token
 			// Reject. This returns the offending token and a list of possible solutions
@@ -107,6 +122,24 @@ class mxsParseSource {
 			// restore the parser... and now?
 			// this.parserInstance.restore(parserState);
 
+			throw err;
+		}
+	}
+
+	feed(str, tree = 0) {
+		try {
+			this.parserInstance.feed(str);
+			this.__parsedAST = (this.parserInstance.results[tree]);
+			return;
+		} catch (err) {
+			// offending token is err.token
+			// Reject. This returns the offending token and a list of possible solutions
+			// offset is useless bc indicates the token index, not the char in source. token.offset is what I want
+			//TODO: Implement some error skip. I could save the parser change the offending token for one of the spected,
+			// and try my luck parsing the rest. OR parse all again changing that token in the input stream.
+			// let heyhey = this.parserInstance.lexer.next()
+
+			err.alternatives = this._PossibleTokens();
 			throw err;
 		}
 	}
@@ -135,6 +168,10 @@ class mxsParseSource {
 			possibleTokens.push(nextSymbol);
 		}, this);
 		return possibleTokens;
+	}
+
+	__SourceHash () {
+		mxsParseSource.HashSource(this.__source);
 	}
 
 	static HashSource(source) {
