@@ -3,3 +3,4 @@ node_modules
 .vs
 *.vsix
 /tslint.json
+support/HAG_*
