@@ -100,8 +100,6 @@
 			)
 		)
 	)
-	struct hola ()
-
 	for i=1 to other.count do (
 		local current = other[i]
 
@@ -124,18 +122,6 @@
 			append other_fn (filterString current " ")[1]
 		) else append the_rest current
 	)
-	undefined
-	1..2
-	50.5
-	true
-	false
-	red
-	green
-	about
-	&something
-	$box
-
-
 	------------------------------------------------------------------------------------------------- GENERATE KEYWORDS PATTERN
 	fn nested_nameParser col formatpattern:@"(?i)\\b(%)(?!\\s*:)\\b"  =
 	(
