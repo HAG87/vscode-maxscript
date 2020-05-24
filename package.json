@@ -118,12 +118,12 @@
 				"maxscript.gotosymbol": {
 					"type": "boolean",
 					"default": true,
-					"description": "Enable Go to Symbol in document"
+					"description": "Enable Document Symbols & Diagnostics."
 				},
 				"maxscript.gotodefinition": {
 					"type": "boolean",
 					"default": true,
-					"description": "Enable ( Go to | Peek )  Definition in document"
+					"description": "Enable Document Definitions."
 				},
 				"maxscript.completions": {
 					"type": "boolean",
