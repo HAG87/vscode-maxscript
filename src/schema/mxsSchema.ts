@@ -1,7 +1,15 @@
 'use strict';
 import { CompletionItemKind } from 'vscode';
+interface IcompletionItem {
+	label: string;
+	kind: CompletionItemKind;
+	detail?: string;
+}
+interface IcompletionCollection {
+	[key:string] : IcompletionItem[];
+}
 //-----------------------------------------------------------------------------------------------------------------
-const maxVariable: any = [
+const maxVariable: IcompletionItem[] = [
 	{label: 'activegrid', kind: CompletionItemKind.Variable, detail: 'Active work plane'},
 	{label: 'subObjectLevel', kind: CompletionItemKind.Variable, detail: 'active subObject level [0:Object|1:Vertex|2:Edge|3:Border|4:Face|5:Element]'},
 	{label: 'activeMeditSlot', detail: 'System variable', kind: CompletionItemKind.Variable},
@@ -101,7 +109,7 @@ const maxVariable: any = [
 	{label: 'videoPostTracks', detail: 'System variable', kind: CompletionItemKind.Variable},
 
 ];
-const maxGenericFn = [
+const maxGenericFn: IcompletionItem[] = [
 	{label: 'abs', detail: 'Generic function', kind: CompletionItemKind.Function,},
 	{label: 'acos', detail: 'Generic function', kind: CompletionItemKind.Function,},
 	{label: 'ActivateTimeWarp', detail: 'Generic function', kind: CompletionItemKind.Function,},
@@ -1300,7 +1308,7 @@ const maxGenericFn = [
 	{label: 'Zero', detail: 'Generic function', kind: CompletionItemKind.Function,},
 	{label: 'Zoom', detail: 'Generic function', kind: CompletionItemKind.Function,}
 ];
-const maxObjectSet = [
+const maxObjectSet: IcompletionItem[] = [
 	{label: 'cameras', detail: 'ObjectSet collection', kind: CompletionItemKind.Value,},
 	{label: 'geometry', detail: 'ObjectSet collection', kind: CompletionItemKind.Value,},
 	{label: 'helpers', detail: 'ObjectSet collection', kind: CompletionItemKind.Value,},
@@ -1312,7 +1320,7 @@ const maxObjectSet = [
 	{label: 'spacewarps', detail: 'ObjectSet collection', kind: CompletionItemKind.Value,},
 	{label: 'systems', detail: 'ObjectSet collection', kind: CompletionItemKind.Value,}
 ];
-const maxKeywords1 = [
+const maxKeywords1: IcompletionItem[] = [
 	{label: 'function', detail: 'Function definition', kind: CompletionItemKind.Keyword},
 	{label: 'fn', detail: 'Function definition', kind: CompletionItemKind.Keyword},
 	{label: 'Struct', detail: 'Struct definition', kind: CompletionItemKind.Keyword},
@@ -1322,7 +1330,7 @@ const maxKeywords1 = [
 	{label: 'tool', detail: 'tool code-block definition', kind: CompletionItemKind.Keyword},
 	{label: 'utility', detail: 'utility code-block definition', kind: CompletionItemKind.Keyword}
 ];
-const maxUIcontrols = [
+const maxUIcontrols: IcompletionItem[] = [
 	{label: 'angle', detail: 'Rollout UI control', kind: CompletionItemKind.Keyword},
 	{label: 'button', detail: 'Rollout UI control', kind: CompletionItemKind.Keyword},
 	{label: 'checkbox', detail: 'Rollout UI control', kind: CompletionItemKind.Keyword},
@@ -1352,7 +1360,7 @@ const maxUIcontrols = [
 	{label: 'SubRollout', detail: 'Rollout UI control', kind: CompletionItemKind.Keyword},
 	{label: 'timer', detail: 'Rollout UI control', kind: CompletionItemKind.Keyword}
 ];
-const maxPrimitives = [
+const maxPrimitives: IcompletionItem[] = [
 	{label: 'ActionPredicate', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'ActiveXControl', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'AngleAxis', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
@@ -1577,11 +1585,10 @@ const maxPrimitives = [
 	{label: 'WindowStream', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'XRefScene', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,}
 ];
-const maxScopes = [
+const maxScopes: IcompletionItem[] = [
 	{label: 'about', kind: CompletionItemKind.Field, detail: 'about context expression'},
 	{label: 'coordsys', kind: CompletionItemKind.Field, detail: 'coordsys context expression'},
-	{label: 'from', kind: CompletionItemKind.Field,},
-
+	{label: 'from', kind: CompletionItemKind.Field},
 	{label: 'global', kind: CompletionItemKind.Field, detail: 'Declare global scope variable'},
 	{label: 'local', kind: CompletionItemKind.Field, detail: 'Declare local scope variable'},
 	{label: 'mapped', kind: CompletionItemKind.Field, detail: 'Mapped function'},
@@ -1589,7 +1596,7 @@ const maxScopes = [
 	{label: 'public', kind: CompletionItemKind.Field, detail: 'Struct public memembers'},
 	{label: 'persistent global', kind: CompletionItemKind.Field, detail: 'Persisten global varialbe'}
 ];
-const maxGeneric = [
+const maxGeneric: IcompletionItem[] = [
 	{label: 'emptyVal', detail: 'Generic', kind: CompletionItemKind.Constant},
 	{label: 'HKEY_CLASSES_ROOT', detail: 'Registry key', kind: CompletionItemKind.Constant},
 	{label: 'HKEY_CURRENT_CONFIG', detail: 'Registry key', kind: CompletionItemKind.Constant},
@@ -1610,7 +1617,7 @@ const maxGeneric = [
 	{label: 'y_axis', detail: 'Axis constant', kind: CompletionItemKind.Constant},
 	{label: 'z_axis', detail: 'Axis constant', kind: CompletionItemKind.Constant}
 ];
-const maxColors = [
+const maxColors: IcompletionItem[] = [
 	{label: 'Color', detail: 'Color <r> <g> <b> [<a>]', kind: CompletionItemKind.Color},
 	{label: 'black', detail: 'Default color constants', kind: CompletionItemKind.Color,},
 	{label: 'blue', detail: 'Default color constants', kind: CompletionItemKind.Color,},
@@ -1622,7 +1629,7 @@ const maxColors = [
 	{label: 'white', detail: 'Default color constants', kind: CompletionItemKind.Color,},
 	{label: 'yellow', detail: 'Default color constants', kind: CompletionItemKind.Color,},
 ];
-const maxClasses = [
+const maxClasses: IcompletionItem[] = [
 	{label: 'BlendMap', detail: 'MAXSuperClass: BakeElement', kind: CompletionItemKind.Class},
 	{label: 'CompleteMap', detail: 'MAXSuperClass: BakeElement', kind: CompletionItemKind.Class},
 	{label: 'diffuseMap', detail: 'MAXSuperClass: BakeElement', kind: CompletionItemKind.Class},
@@ -2364,7 +2371,7 @@ const maxClasses = [
 	{label: 'PopRefUtil', detail: 'MAXSuperClass: UtilityPlugin', kind: CompletionItemKind.Class},
 	{label: 'StandardUVGen', detail: 'MAXSuperClass: UVGenClass', kind: CompletionItemKind.Class,}
 ];
-const maxSuperClass = [
+const maxSuperClass: IcompletionItem[] = [
 	{label: 'BakeElement', detail: 'max SuperClass', kind: CompletionItemKind.Module},
 	{label: 'camera', detail: 'max SuperClass', kind: CompletionItemKind.Module},
 	{label: 'CtrlUserDataTypeClass', detail: 'max SuperClass', kind: CompletionItemKind.Module},
@@ -2404,7 +2411,7 @@ const maxSuperClass = [
 	{label: 'UVGenClassBakeElement', detail: 'max SuperClass', kind: CompletionItemKind.Module},
 	{label: 'UVGenClass', detail: 'max SuperClass', kind: CompletionItemKind.Module},
 ];
-const maxInterfaces = [
+const maxInterfaces: IcompletionItem[] = [
 	{label: 'ActionItemOverrideManager', detail: 'Max Interface', kind: CompletionItemKind.Interface},
 	{label: 'AnimLayerManager', detail: 'Max Interface', kind: CompletionItemKind.Interface},
 	{label: 'assemblyMgr', detail: 'Max Interface', kind: CompletionItemKind.Interface},
@@ -2498,7 +2505,7 @@ const maxInterfaces = [
 	{label: 'WorkingPivot', detail: 'Max Interface', kind: CompletionItemKind.Interface},
 	{label: 'WorkspaceManager', detail: 'Max Interface', kind: CompletionItemKind.Interface}
 ];
-const maxStructs = [
+const maxStructs: IcompletionItem[] = [
 	{label: 'AssertReporter', detail: 'Max StructDef', kind: CompletionItemKind.Struct},
 	{label: 'assetBrowser', detail: 'Max StructDef', kind: CompletionItemKind.Struct},
 	{label: 'AssetMetadata_StructDef', detail: 'Max StructDef', kind: CompletionItemKind.Struct},
