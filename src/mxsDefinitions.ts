@@ -1,6 +1,7 @@
 /**
  * Adaptation from https://github.com/usakhelo/VSC_Maxscript
  */
+'use strict';
 import * as vscode from 'vscode';
 
 export default class MaxscriptDefinitionProvider implements vscode.DefinitionProvider {
