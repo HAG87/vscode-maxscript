@@ -3,10 +3,16 @@ import * as vscode from 'vscode';
 // const mxsParseSource = require('./lib/mxsParser');
 // import * as msxParser from './mxsParseTree';
 import {msxParser} from './mxsParseTree';
-import { provideParserDiagnostic, setDiagnostics, provideTokenDiagnostic, parsingErrorMessage } from './mxsDiagnostics';
+import {
+	provideParserDiagnostic,
+	setDiagnostics,
+	provideTokenDiagnostic,
+	ParserError,
+	ParserFatalError,
+	parsingErrorMessage
+} from './mxsDiagnostics';
 
-// const { collectStatementsFromAST, collectSymbols } = require('./lib/mxsProvideSymbols');
-import { collectStatementsFromAST, collectSymbols } from './mxsProvideSymbols';
+import { collectStatementsFromAST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 
 type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
 const SymbolKindMap: tSymbolKindMap = {
@@ -22,9 +28,11 @@ const SymbolKindMap: tSymbolKindMap = {
 	23: vscode.SymbolKind.Event,
 };
 
+
 export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 	private _getDocumentSymbols(document: vscode.TextDocument/*, tokens: mxsSymbolMatch[]*/): vscode.SymbolInformation[] {
+
 
 		let docTxt = document.getText();
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
@@ -37,12 +45,40 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		// */
 		// feed the parser
 		// msxParser.source(docTxt);
-		msxParser.source = docTxt;
+		try {
+			msxParser.source = docTxt;
+
+		} catch (err) {
+			console.log(err);
+			throw err;
+			/*
+			switch (err.name) {
+				case 'ERR_RECOVER': {
+					provideParserDiagnostic(document, err);
+					// console.log('parsed with errors!');
+					// recoverable error
+					//setDiagnostics(document, provideTokenDiagnostic(document, AST));
+					// setDiagnostics(document, provideParserDiagnostic(document, <ParserError>err));
+					break;
+				}
+				case 'ERR_FATAL': {
+					// fatal error - No AST
+					throw err;
+				}
+				default:
+					break;
+			}
+			*/
+		}
+		/*
 		// try {
 		let AST = msxParser.parsedAST;
+
+
 		// let AST = msxParser.ast();
 		let ASTstatements = collectStatementsFromAST(AST);
 		let Symbols = collectSymbols(AST, ASTstatements);
+
 		SymbolInfCol = Symbols.map((item) => {
 			// console.log(item.name + '  ' + item.location.start);
 			return new vscode.SymbolInformation(
@@ -56,8 +92,11 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 					))
 			);
 		});
+		*/
+		// let tokens = collectTokens(AST, 'type', 'error');
+		// console.log( tokens );
 		// Token diagnostics. this will replace current diagnostics collection, erase it if no errors.
-		setDiagnostics(document, provideTokenDiagnostic(document, AST));
+		// setDiagnostics(document, provideTokenDiagnostic(document, collectTokens(AST, 'type', 'error')));
 		// } catch (err) {
 		// throw err;
 		// }
@@ -71,11 +110,12 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 				//setDiagnostics(document);
 				resolve(this._getDocumentSymbols(document/*, mxsSymbols*/));
 			} catch (err) {
+				console.log('rejected!');
 				// parser diagnostics. Token diagnostics and parser diagnostics cannot currently cohexist. parser error will mean that no error tokens where provided
 				// rewind thge parser on error, and feed text skipping tokens can overcome this limitation when there is valid syntax ahead.
 				// another option is just recover the parser with the backtracking the source until the error position, and discard text ahead of it.
-				reject (setDiagnostics(document, provideParserDiagnostic(document, err)));
-				// reject(err);
+				// reject (setDiagnostics(document, provideParserDiagnostic(document, <ParserFatalError>err)));
+				reject(err);
 			}
 		});
 	}

@@ -156,31 +156,31 @@ export function collectSymbols(AST: any[], paths: string[]) {
  * Return errorSymbol from invalid tokens
  * @param {object} AST the AST
  */
-export function collectErrors(AST: object) {
+export function collectTokens(AST: any, key:string = 'type', value?:any) {
 
-	let theSymbols = [];
-	let errTokens: any[] = [];
+	let Tokens: any[] = [];
 
 	traverse2(AST, (key1: string, val1: string | null, innerObj: { parent: any }, stop: any) => {
 		const current = val1 != null ? val1 : key1;
-		if (key1 === 'type' && val1 === 'error') errTokens.push(innerObj.parent);
+		if (key1 === key ) {
+			// console.log(innerObj.parent);
+			if (value) {
+				if (val1 === value) {
+					Tokens.push(innerObj.parent);
+				}
+			} else {
+				Tokens.push(innerObj.parent);
+			}
+		}
+		// if (filter[key1] === val1) Tokens.push(innerObj.parent);
 		return current;
 	});
-	// return if no errors
-	if (errTokens.length === 0) { return; }
-
-	theSymbols = errTokens.map(node => {
-		let err: IerrSymbolInformation = {
-			message: `Unexpected token: ${node.text}`,
-			range: range.fromOffset(node.offset, node.text),
-			source: 'MaxScript',
-			code: 'ERR_TOKEN',
-			severity: 1
-		};
-		return err;
-	});
-	return theSymbols;
+	return Tokens;
 }
 //-----------------------------------------------------------------------------------
 // IMPLEMENTATIONS
 //-----------------------------------------------------------------------------------
+function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+	return key in obj;
+}
+type Dictionary = { [index: string]: string };

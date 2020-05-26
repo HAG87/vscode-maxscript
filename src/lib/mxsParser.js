@@ -5,46 +5,46 @@ const nearley = require('nearley');
 const grammar = require('./grammar.js');
 const mxLexer = require('./mooTokenize.js');
 //-----------------------------------------------------------------------------------
-class mxsParseSource {
 
+//We want to find the location of substr within src.
+
+function trimString(src, substr) {
+	var start = src.indexOf(substr);
+	var end = start + substr.length;
+	return src.substring(0, start - 1) + src.substring(end);
+}
+
+class mxsParseSource {
+	constructor(source) {
+		this._declareParser();
+		this.__source = source || '';
+		this.hash = mxsParseSource.HashSource(this.__source);
+		this.ParseSource();
+	}
+	/** Declare a new parser isntance */
 	_declareParser() {
 		this.parserInstance = new nearley.Parser(
 			nearley.Grammar.fromCompiled(grammar),
 			{
-				//keepHistory: true,
-				lexer: mxLexer
+				keepHistory: true,
+				// lexer: mxLexer
 			});
+		// this.parserInstance.feed('');
+		this.__parserState = this.parserInstance.save();
 	}
-
-	constructor(source) {
-		this._declareParser();
-		this.__source = source;
-		this.__parsedAST = [];
-		this.__SourceHash();
-		// this.SourceHash = mxsParseSource.HashSource(source);
-		this.ParseSource();
-	}
-
-	get source() {
-		return this.__source;
-	}
-
+	/** get the source Stream */
+	get source() { return this.__source; }
+	/**	Set new source, and re-parse */
 	set source(newSource) {
 		this.__source = newSource;
-		// this.SourceHash = mxsParseSource.HashSource(newSource);
 		this.reset();
-		this.__SourceHash();
+		this.hash = mxsParseSource.HashSource(this.__source);
 		this.ParseSource();
-		// this.__parsedAST = this.ParseSource();
 	}
-
-	get parsedAST() {
-		return this.__parsedAST;
-	}
-	//-----------------------------------------------------------------------------------
-	reset () {
-		this._declareParser()
-	}
+	/** Get the parsed AST, if any */
+	get parsedAST() { return this.parserInstance.results[0]; }
+	/** Reset the parser * */
+	reset() { this._declareParser(); }
 	/**
 	 * Tokenize mxs string
 	 * @param {moo.lexer} lexer
@@ -80,70 +80,144 @@ class mxsParseSource {
 	 * @param {nearley.parser} parserInstance Instance of initialized parser
 	 * @param {Integer} tree Index of the parsed tree I want in return, results are multiple when the parser finds and ambiguity
 	 */
-	ParseSource(tree = 0) {
-		/*
-		let parserState = null;
+	ParseSource() {
+		// Set a clean state
+		// this.parserInstance.feed('');
+		// this.__parserState = this.parserInstance.save();
 		try {
-		parserState = parser.save();
-		parser.feed(...);
-		} catch (e) {
-		parser.restore(parserState);
-		}
-		*/
-		// let parserState = null;
-		try {
-			// this.parserInstance.finish();
-			// save parser state
-			// parserState = this.parserInstance.save();
-			// feed the parser
+			// console.log('parsing!');
 			this.parserInstance.feed(this.__source);
-
-			/*// TODO: implement parser re-feed after error.
-			I could replace the offending token with possible alternatives until the parser takes in.
-			This could provide wrong results, so I must mark as invalid this branch/leaf
-			let savedParse;
-			//savedParse = parser.save()
-			//*/
-			// Resolve. the ATS
-			// console.log('results');
-			// return (this.parserInstance.results[tree]);
-			this.__parsedAST = (this.parserInstance.results[tree]);
-			return;
 		} catch (err) {
-			// offending token is err.token
-			// Reject. This returns the offending token and a list of possible solutions
-			// offset is useless bc indicates the token index, not the char in source. token.offset is what I want
-			//TODO: Implement some error skip. I could save the parser change the offending token for one of the spected,
-			// and try my luck parsing the rest. OR parse all again changing that token in the input stream.
-			// let heyhey = this.parserInstance.lexer.next()
-
-			err.alternatives = this._PossibleTokens();
-			// console.log(heyhey);
-			// restore the parser... and now?
-			// this.parserInstance.restore(parserState);
-
-			throw err;
+			// console.log('-->error REPARSE');
+			// this.next = this.__source;
+			this.__setStore();
+			// this.parserInstance.restore(this.__parserState);
+			this.__parseWhitErrors();
+			return;
+			// throw err;
 		}
+		// this.__parserState = this.parserInstance.save();
 	}
-
-	feed(str, tree = 0) {
+	/** feed Stream to active parser */
+	feed(str) {
+		this.__parserState = this.parserInstance.save();
 		try {
 			this.parserInstance.feed(str);
-			this.__parsedAST = (this.parserInstance.results[tree]);
-			return;
 		} catch (err) {
-			// offending token is err.token
-			// Reject. This returns the offending token and a list of possible solutions
-			// offset is useless bc indicates the token index, not the char in source. token.offset is what I want
-			//TODO: Implement some error skip. I could save the parser change the offending token for one of the spected,
-			// and try my luck parsing the rest. OR parse all again changing that token in the input stream.
-			// let heyhey = this.parserInstance.lexer.next()
-
-			err.alternatives = this._PossibleTokens();
+			err.expected = this._PossibleTokens();
+			this.parserInstance.restore(this.__parserState);
 			throw err;
 		}
 	}
+	/**
+	 *	Store values for error checking
+	 */
+	__setStore() {
+		this.pass = [];
 
+		this.next = [];
+		this.remain = this.__source;
+
+		this.badTokens = [];
+		this.errorReport = [];
+		this.Offset = 0;
+		this.counter = 20;
+	}
+	/**
+	 * Parser with error recovery
+	 */
+	__parseWhitErrors() {
+		let proccess = this.__source;
+		let remain = this.__source;
+
+		let skipToken = 0;
+		let srcOffset = 0;
+		// let counter = 25;
+		// let _test = this.__source;
+		// reset the parser
+		this.parserInstance.restore(this.__parserState);
+		// save the parser state, locally
+		let state = this.parserInstance.save();
+
+		let badTokens = [];
+		let errorReport = [];
+
+		// let  execute = true;
+
+		let test = () => {
+			// do {
+			try {
+				// console.log('-->ATTEMP');
+				this.parserInstance.feed(proccess);
+				// console.log('passed');
+				if (skipToken !== 0) {
+					remain = remain.slice(skipToken);
+				} else {
+					remain = remain.replace(proccess, '');
+				}
+				proccess = remain;
+				// console.log('REMAIN: '+remain);
+				// save the parser
+				state = this.parserInstance.save();
+			} catch (err) {
+				// console.log(err.name);
+				// console.log('Error: '+ err.token.text);
+				// token Info
+				var errToken = err.token;
+				var currPos  = errToken.offset;
+				var nextPos  = errToken.offset + (errToken.text.length || 0);
+				srcOffset    = this.__source.length - proccess.length + currPos;
+				// collect the token
+				let cloneToken = {...errToken};
+				cloneToken.offset = srcOffset;
+				delete cloneToken.line;
+				delete cloneToken.col;
+				badTokens.push(cloneToken);
+				// errorReport.push({token:cloneToken, expected:this._PossibleTokens()});
+				// reached the last token, and is bad
+				if (!this.parserInstance.lexer.next()) {
+					console.log('--------EOF--------');
+					// break;
+					this.parserInstance.restore(state);
+					return;
+				}
+				// throw err;
+				// skip the bad token, reduce the remain
+				// split proccess, push to remain
+				// remain = proccess.slice(nextPos);
+				// bad token
+				skipToken = nextPos;
+				// skipToken = proccess[currPos];
+				// console.log('Error: '+ skipToken);
+				// parse again the good lines
+				proccess = proccess.slice(0, currPos);
+				// console.log('PASSED:');
+				// console.log(proccess);
+				// console.log('REMAIN:');
+				// console.log(remain);
+				// restore the parser
+				this.parserInstance.restore(state);
+				// return;
+				// execute = true;
+			}
+			// Passed, save the parser state & feed the rest
+			// state = this.parserInstance.save();
+			// proccess = remain;
+			// console.log('COUNTER: '+counter);
+			// if (counter-- <= 0) {return;}
+			// repeat
+			if (remain.length > 0) {test();}
+		// } while (remain.length > 0);
+		};
+		//--------------------------------
+		test();
+		console.log('PASSED!!!');
+		console.log(this.parserInstance.results[0]);
+
+	}
+	/**
+	 * List of possible tokens to overcome the error
+	 */
 	_PossibleTokens() {
 		var possibleTokens = [];
 		var lastColumnIndex = this.parserInstance.table.length - 2;
@@ -169,11 +243,7 @@ class mxsParseSource {
 		}, this);
 		return possibleTokens;
 	}
-
-	__SourceHash () {
-		mxsParseSource.HashSource(this.__source);
-	}
-
+	/** MD5 hash */
 	static HashSource(source) {
 		return crypto.createHash('md5').update(source).digest('hex');
 	}
