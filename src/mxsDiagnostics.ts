@@ -39,7 +39,7 @@ export interface ParserError extends Error {
 export interface ParserFatalError extends Error {
 	token: moo.Token;
 	offset: number;
-	expected: Dictionary<string>[];
+	details: Dictionary<string>[];
 }
 function isFatalError (error: ParserError | ParserFatalError): error is ParserFatalError {
 	return (error as ParserFatalError).token ? true : false;
@@ -83,7 +83,7 @@ const correctionList = (tokenList: Dictionary<string>[]): string => {
  * @param error Error throw from parser
  */
 export function parsingErrorMessage(error: ParserFatalError): string {
-	return ([basicDiagnostics(error.token)].concat(correctionList(error.expected)).join('\n'));
+	return ([basicDiagnostics(error.token)].concat(correctionList(error.details)).join('\n'));
 }
 /**
  * Provides a basic syntax error diagnostic.
@@ -92,21 +92,20 @@ export function parsingErrorMessage(error: ParserFatalError): string {
  */
 export function provideParserDiagnostic(document: vscode.TextDocument, error: ParserError | ParserFatalError): vscode.Diagnostic[] | undefined {
 
-	console.log('parsing diag');
+	// console.log('parsing diag');
 	if (!document) { return; }
-	// /*
-	// let diagnostic;
 	let tokenList = [];
-
+	let diagnostics: vscode.Diagnostic[];
 	if (isFatalError(error)) {
 		tokenList.push(error.token);
-		// tokenList.push( <ErrorDetail>{token:error.token, expected:error.expected} );
+		// tokenList.push( <ErrorDetail>{token:error.token, expected:error.details} );
 	} else {
+		// console.log('recovered!');
 		tokenList = [...error.tokens];
 		// tokenList = error.details;
 	}
-
-	let diagnostics: vscode.Diagnostic[] = tokenList.map( t => {
+	// /*
+	diagnostics = tokenList.map( t => {
 		let diag = new vscode.Diagnostic(
 			vsRangeFromToken(document, t),
 			`Unexpected \"${t}\".`,
@@ -116,6 +115,7 @@ export function provideParserDiagnostic(document: vscode.TextDocument, error: Pa
 		diag.code = error.name;
 		return diag;
 	});
+	//*/
 	return diagnostics;
 	// */
 	// DISABLED: List of possible tokens
