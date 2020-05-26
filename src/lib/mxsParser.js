@@ -5,15 +5,6 @@ const nearley = require('nearley');
 const grammar = require('./grammar.js');
 const mxLexer = require('./mooTokenize.js');
 //-----------------------------------------------------------------------------------
-
-//We want to find the location of substr within src.
-
-function trimString(src, substr) {
-	var start = src.indexOf(substr);
-	var end = start + substr.length;
-	return src.substring(0, start - 1) + src.substring(end);
-}
-
 class mxsParseSource {
 	constructor(source) {
 		this._declareParser();
@@ -38,7 +29,10 @@ class mxsParseSource {
 		this.ParseSource();
 	}
 	/** Get the parsed AST, if any */
-	get parsedAST() { return this.parserInstance.results[0]; }
+	get parsedAST() {
+		return this.__parsedAST || this.parserInstance.results[0];
+		// return this.parserInstance.results[0];
+	}
 	/** Reset the parser * */
 	reset() { this._declareParser(); }
 	/**
@@ -78,42 +72,71 @@ class mxsParseSource {
 	 */
 	ParseSource() {
 		// Set a clean state
-		// this.parserInstance.feed('');
-		// this.__parserState = this.parserInstance.save();
+		this.__parserState = this.parserInstance.save();
 
 		try {
 			this.parserInstance.feed(this.__source);
+			this.__parsedAST = this.parserInstance.results[0];
 		} catch (err) {
-			// this.__setStore();
-			// this.parserInstance.restore(this.__parserState);
+			this.parserInstance.restore(this.__parserState);
 			this.__parseWhitErrors();
-			return;
 			// throw err;
 		}
+		return;
 		// this.__parserState = this.parserInstance.save();
 	}
 	/** feed Stream to active parser */
 	feed(str) {
-		this.__parserState = this.parserInstance.save();
 		try {
 			this.parserInstance.feed(str);
 		} catch (err) {
-			err.expected = this._PossibleTokens();
+			err.details = [{ token: err.token, expected: this._PossibleTokens() }];
 			this.parserInstance.restore(this.__parserState);
 			throw err;
 		}
-	}
-	/**
-	 *	Store values for error checking
-	 */
-	__setStore() {
-		this.badTokens = [];
-		this.errorReport = [];
+		this.__parserState = this.parserInstance.save();
+		this.__parsedAST = this.parserInstance.results[0];
 	}
 	/**
 	 * Parser with error recovery
 	 */
 	__parseWhitErrors() {
+		// console.log( 'ERRORS!');
+		//-------------------------------------------------
+		// NEW METHOD TOKENIZING THE INPUT, COULD BE A WAY TO FEED TOKENS TO THE PARSER?
+		let src = this.TokenizeSource();
+		let state = this.parserInstance.save();
+
+		let badTokens = [];
+		let errorReport = [];
+
+		let next = 0;
+		let remain = src.length - 1;
+		let parsings = () => {
+			// for (var tok = 0; tok < src.length; tok++) {
+			// console.log(src[tok]);
+			try {
+				// this.parserInstance.feed(src[tok].text);
+				this.parserInstance.feed(src[next].text);
+				// console.log(src[next].text);
+			} catch (err) {
+				// catch non parsing related errors.
+				if (!err.token) { throw err; }
+				// console.log(src[next]);
+				badTokens.push(src[next]);
+				errorReport.push({ token: src[next], expected: this._PossibleTokens() });
+				this.parserInstance.restore(state);
+				// continue;
+			}
+			state = this.parserInstance.save();
+			// console.log(next);
+			if (next < remain) {
+				next += 1;
+				parsings();
+			}
+		}; parsings();
+		//-------------------------------------------------
+		/* DEPRECATED METHOD
 		// recursion storage
 		let proccess = this.__source;
 		let remain = this.__source;
@@ -181,29 +204,35 @@ class mxsParseSource {
 			}
 			if (remain.length > 0) {test();}
 		// } while (remain.length > 0);
-		};
-		//--------------------------------
-		test();
+		}; test();
+		*/
 		// console.log('PASSED!!!');
 		// return values
 		let newErr;
 		if (this.parserInstance.results[0]) {
 			// console.log(this.parserInstance.results[0]);
+			this.__parsedAST = this.parserInstance.results[0];
 			// parsing passed
-			newErr = new Error('Parser finished with errors');
+			newErr = new Error('Parser finished with errors.');
 			newErr.name = 'ERR_RECOVER';
 			newErr.tokens = badTokens;
 			newErr.details = errorReport;
 			// newErr.parsedAST = this.parserInstance.results[0];
 		} else {
-			// parsing exited with fatal error
 			// console.log('unrecoverable error');
-			newErr = lastError;
+			newErr = new Error('Parser failed. unrecoverable errors.');
 			newErr.name = 'ERR_FATAL';
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			// newErr = lastError;
+			// newErr.name = 'ERR_FATAL';
 			// newErr.expected = this._PossibleTokens();
 			// newErr.tokens = badTokens;
-			newErr.details = errorReport;
+			// newErr.details = errorReport;
 		}
+		this.badTokens = [];
+		this.errorReport = [];
+		// exit with error
 		throw newErr;
 	}
 	/**

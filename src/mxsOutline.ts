@@ -1,7 +1,5 @@
 'use strict';
 import * as vscode from 'vscode';
-// const mxsParseSource = require('./lib/mxsParser');
-// import * as msxParser from './mxsParseTree';
 // import {msxParser} from './mxsParseTree';
 
 import {
@@ -9,15 +7,15 @@ import {
 	setDiagnostics,
 	provideTokenDiagnostic,
 	ParserError,
-	ParserFatalError,
-	parsingErrorMessage
+	// ParserFatalError,
+	// parsingErrorMessage
 } from './mxsDiagnostics';
 
 import { collectStatementsFromAST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 const mxsParseSource = require('./lib/mxsParser');
 
-type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
-const SymbolKindMap: tSymbolKindMap = {
+// type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
+const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
 	1: vscode.SymbolKind.Module,
 	5: vscode.SymbolKind.Method,
 	6: vscode.SymbolKind.Property,
@@ -29,18 +27,19 @@ const SymbolKindMap: tSymbolKindMap = {
 	22: vscode.SymbolKind.Struct,
 	23: vscode.SymbolKind.Event,
 };
-
-
-const msxParser = new mxsParseSource('');
-
-
-export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+//--------------------------------------------------------------------------------
+/**
+ * Parser initialization
+ */
+export const msxParser = new mxsParseSource('');
+//--------------------------------------------------------------------------------
+export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 	private _getDocumentSymbols(document: vscode.TextDocument/*, tokens: mxsSymbolMatch[]*/): vscode.SymbolInformation[] {
-
-
 		let docTxt = document.getText();
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
+		let refSource;
+		let diagnostics: vscode.Diagnostic[] = []; // NOT WORKING WITH CONCAT ?
 		/*
 		try {
 			var msxParser = new mxsParseSource(docTxt);
@@ -54,44 +53,33 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 			msxParser.source = docTxt;
 
 		} catch (err) {
-
+			// console.log(err.name);
 			// throw err;
 			// /*
 			switch (err.name) {
 				case 'ERR_RECOVER': {
-					console.log(err.name);
-					// provideParserDiagnostic(document, <ParserError>err);
-					// console.log('parsed with errors!');
-					// recoverable error
-					setDiagnostics(document, provideParserDiagnostic(document, <ParserError>err));
-					// setDiagnostics(document, provideTokenDiagnostic(document, AST));
+					// console.log(err.name);
+					// token offsets are broken for this!!! // no valid locations!!! // must use line-col
+					refSource = docTxt;
+					diagnostics = diagnostics.concat(provideParserDiagnostic(document, <ParserError>err));
 					break;
 				}
 				case 'ERR_FATAL': {
-					console.log(err.name);
 					// fatal error - No AST
 					throw err;
 					// break;
 				}
 				default:
-					break;
+					// console.log(err.name);
+					throw err;
 			}
 			// */
 		}
-		console.log('CONTINUE');
 		// /*
-		// try {
 		let AST = msxParser.parsedAST;
-
-
-		// let AST = msxParser.ast();
 		let ASTstatements = collectStatementsFromAST(AST);
-		let Symbols = collectSymbols(AST, ASTstatements);
-
-		console.log(AST);
-		// console.log(Symbols);
+		let Symbols = collectSymbols(AST, ASTstatements, refSource);
 		SymbolInfCol = Symbols.map((item) => {
-			// console.log(item.name + '  ' + item.location.start);
 			return new vscode.SymbolInformation(
 				item.name,
 				SymbolKindMap[item.kind],
@@ -104,13 +92,10 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 			);
 		});
 		// */
-		// let tokens = collectTokens(AST, 'type', 'error');
-		// console.log( tokens );
-		// Token diagnostics. this will replace current diagnostics collection, erase it if no errors.
-		// setDiagnostics(document, provideTokenDiagnostic(document, collectTokens(AST, 'type', 'error')));
-		// } catch (err) {
-		// throw err;
-		// }
+		// set Diagnostics
+		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(AST, 'type', refSource, 'error')));
+		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
+		// Return
 		return SymbolInfCol;
 	}
 	// Function called from Main !!
@@ -118,16 +103,15 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
 		return new Promise((resolve, reject) => {
 			try {
-				setDiagnostics(document);
+				// setDiagnostics(document);
 				resolve(this._getDocumentSymbols(document/*, mxsSymbols*/));
 			} catch (err) {
-				console.log('rejected!');
-				console.log(err.name);
-				// parser diagnostics. Token diagnostics and parser diagnostics cannot currently cohexist. parser error will mean that no error tokens where provided
-				// rewind thge parser on error, and feed text skipping tokens can overcome this limitation when there is valid syntax ahead.
-				// another option is just recover the parser with the backtracking the source until the error position, and discard text ahead of it.
-				reject (setDiagnostics(document, provideParserDiagnostic(document, <ParserFatalError>err)));
-				// reject(err);
+				// console{}.log(err);
+				if (err.name === 'ERR_FATAL') {
+					reject(setDiagnostics(document, provideParserDiagnostic(document, <ParserError>err)));
+				} else {
+					reject(err);
+				}
 			}
 		});
 	}

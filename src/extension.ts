@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { getTextSel } from './utils';
 
 import mxsCompletion from './mxsAutocomplete';
-import mxsOutline from './mxsOutline';
+import { mxsDocumentSymbolProvider } from './mxsOutline';
 import mxsDefinitions from './mxsDefinitions';
 import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
 import { DiagnosticCollection }  from './mxsDiagnostics';
@@ -73,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsOutline()));
+		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsDocumentSymbolProvider()));
 		// diagnostics
 		context.subscriptions.push(DiagnosticCollection);
 		/*

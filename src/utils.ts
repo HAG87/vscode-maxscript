@@ -33,3 +33,9 @@ export function precWord(line: string):string | undefined {
 	let wordmatches = pattern.exec(line);
 	return (wordmatches?.[wordmatches.length - 1]);
 }
+
+function trimString(src: string, substr: string) {
+	var start = src.indexOf(substr);
+	var end = start + substr.length;
+	return src.substring(0, start - 1) + src.substring(end);
+}
