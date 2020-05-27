@@ -13,13 +13,15 @@ import {
 
 import { collectStatementsFromAST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 const mxsParseSource = require('./lib/mxsParser');
+// import { mxsParseSource } from './mxsParser';
+//--------------------------------------------------------------------------------
 
 // type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
 const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
-	1: vscode.SymbolKind.Module,
-	5: vscode.SymbolKind.Method,
-	6: vscode.SymbolKind.Property,
-	8: vscode.SymbolKind.Constructor,
+	1:  vscode.SymbolKind.Module,
+	5:  vscode.SymbolKind.Method,
+	6:  vscode.SymbolKind.Property,
+	8:  vscode.SymbolKind.Constructor,
 	11: vscode.SymbolKind.Function,
 	12: vscode.SymbolKind.Variable,
 	13: vscode.SymbolKind.Constant,

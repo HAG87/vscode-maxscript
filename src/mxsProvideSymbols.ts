@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 const traverse2 = require('ast-monkey-traverse-with-lookahead');
 const objectPath = require("object-path");
 //-----------------------------------------------------------------------------------
+// import { parentPath, findParentName } from './astUtils';
 const { parentPath, findParentName } = require('./lib/astUtils.js');
 //-----------------------------------------------------------------------------------
 function hasKey<O>(obj: O, key: keyof any): key is keyof O {

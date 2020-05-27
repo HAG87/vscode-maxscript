@@ -20,10 +20,21 @@ type ErrorDetail = {
 	expected: Dictionary<string>[];
 
 };
-export interface ParserError extends Error {
+export class ParserError extends Error {
+	constructor(message?: string) {
+	  // 'Error' breaks prototype chain here
+	  super(message);
+	  // restore prototype chain
+	  const actualProto = new.target.prototype;
+	  Object.setPrototypeOf(this, actualProto);
+	}
+	tokens: moo.Token[] = [];
+	details: ErrorDetail[] = [];
+}
+/* export interface ParserError extends Error {
 	tokens: moo.Token[];
 	details: ErrorDetail[];
-}
+} */
 export interface ParserFatalError extends Error {
 	token: moo.Token;
 	offset: number;
