@@ -60,11 +60,12 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 			// /*
 			switch (err.name) {
 				case 'ERR_RECOVER': {
-					// console.log(err.name);
+					// DISABLED: Can't get a working AST, token locations are wrong
 					// token offsets are broken for this!!! // no valid locations!!! // must use line-col
 					refSource = docTxt;
 					diagnostics = diagnostics.concat(provideParserDiagnostic(document, <ParserError>err));
-					break;
+					// break;
+					throw err;
 				}
 				case 'ERR_FATAL': {
 					// fatal error - No AST
@@ -94,7 +95,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 			);
 		});
 		// */
-		// set Diagnostics
+		// set Diagnostics for tokens
 		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(AST, 'type', refSource, 'error')));
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
 		// Return
