@@ -556,13 +556,17 @@ var grammar = {
     {"name": "destination", "symbols": ["var_name"], "postprocess": id},
     {"name": "destination", "symbols": ["property"], "postprocess": id},
     {"name": "destination", "symbols": ["index"], "postprocess": id},
-    {"name": "math_expr", "symbols": ["math_operand", "_S", "mathSym", "_", "math_operand"], "postprocess":  d => ({
+    {"name": "math_expr$subexpression$1", "symbols": ["math_operand"]},
+    {"name": "math_expr$subexpression$1", "symbols": ["math_unary"]},
+    {"name": "math_expr", "symbols": ["math_operand", "_S", "mathSym", "_", "math_expr$subexpression$1"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
             right:    d[4]
         })},
-    {"name": "math_expr", "symbols": ["math_expr", "_S", "mathSym", "_", "math_operand"], "postprocess":  d => ({
+    {"name": "math_expr$subexpression$2", "symbols": ["math_operand"]},
+    {"name": "math_expr$subexpression$2", "symbols": ["math_unary"]},
+    {"name": "math_expr", "symbols": ["math_expr", "_S", "mathSym", "_", "math_expr$subexpression$2"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
@@ -580,7 +584,13 @@ var grammar = {
             left:     d[0],
             right:    d[4]}
         )},
+    {"name": "math_expr", "symbols": ["math_unary"], "postprocess": id},
     {"name": "mathSym", "symbols": [(mxLexer.has("math") ? {type: "math"} : math)]},
+    {"name": "math_unary", "symbols": [{"literal":"-"}, "math_operand"], "postprocess":  d => ({
+            type: 'UnaryExpression',
+            operator: d[0],
+            operand: d[1]
+        }) },
     {"name": "math_operand", "symbols": ["operand"], "postprocess": id},
     {"name": "math_operand", "symbols": ["fn_call"], "postprocess": id},
     {"name": "conversion", "symbols": ["operand", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
@@ -671,7 +681,6 @@ var grammar = {
     {"name": "factor", "symbols": ["time"], "postprocess": id},
     {"name": "factor", "symbols": ["bool"], "postprocess": id},
     {"name": "factor", "symbols": ["void"], "postprocess": id},
-    {"name": "factor", "symbols": [{"literal":"-"}, "expr"], "postprocess": d => ({type: 'UnaryExpression', operand: d[1], })},
     {"name": "factor", "symbols": [{"literal":"?"}], "postprocess": d => ({type: 'Keyword', value: d[0]})},
     {"name": "factor", "symbols": ["expr_seq"], "postprocess": id},
     {"name": "factor", "symbols": [(mxLexer.has("error") ? {type: "error"} : error)], "postprocess": id},

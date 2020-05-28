@@ -115,7 +115,9 @@ var mxLexer = moo.compile(
 				// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
 			],
 		// whitespace -  also matches line continuations
-		ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
+		// ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
+		newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
+		ws: { match: /[ \t]+/, lineBreaks: false },
 		// path_name $mounstrosity*/_?
 		path: [
 			{ match: /[$](?:[A-Za-z0-9_*?.\\]*)/ },
@@ -221,7 +223,6 @@ var mxLexer = moo.compile(
 		delimiter: { match: /\./ },
 		sep: { match: /,/ },
 		// NEWLINES
-		newline: { match: /(?:\r|\r\n|\n)+/, lineBreaks: true },
 		statement: { match: /;/ },
 		// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
 		error: [
