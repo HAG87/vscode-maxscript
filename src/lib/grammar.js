@@ -6,8 +6,16 @@ function id(x) { return x[0]; }
 	const mxLexer = require('./mooTokenize.js');
     // utilities
     const flatten = arr => arr !== null ? [].concat(...arr).filter(e => e != null ) : null;
-    const merge = (a, b) => a !== null && b != null ? [].concat(a, ...b).filter(e => e != null ) : null;
-    const filterNull = (arr) => arr !== null ? arr.filter(e => e != null ) : null;
+    
+    const merge = (a, b) => {
+        if (a !== null && b != null) {
+            return ([].concat(a, ...b).filter(e => e != null));
+        } else if (a !== null) {
+            return (a instanceof Array ? a.filter(e => e != null) : a);
+        } else return null;
+    };
+
+    const filterNull = arr => arr !== null ? arr.filter(e => e != null ) : null;
 
     const tokenType = (t, newytpe) => {t.type = newytpe; return t};
 
@@ -64,8 +72,8 @@ var grammar = {
     {"name": "_expr_seq$ebnf$1", "symbols": ["_expr_seq$ebnf$1", "_expr_seq$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "_expr_seq", "symbols": ["expr", "_expr_seq$ebnf$1"], "postprocess":  d => ({
             type: 'BlockStatement',
-            body: merge(...d)}
-        ) },
+            body: merge(...d)
+        })},
     {"name": "expr", "symbols": ["simple_expr"], "postprocess": id},
     {"name": "expr", "symbols": ["variable_decl"], "postprocess": id},
     {"name": "expr", "symbols": ["assignment"], "postprocess": id},
@@ -385,41 +393,83 @@ var grammar = {
     {"name": "context_expr$ebnf$1", "symbols": []},
     {"name": "context_expr$ebnf$1$subexpression$1", "symbols": ["_S", {"literal":","}, "_", "context"]},
     {"name": "context_expr$ebnf$1", "symbols": ["context_expr$ebnf$1", "context_expr$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "context_expr", "symbols": ["context", "context_expr$ebnf$1", "_", "expr"]},
+    {"name": "context_expr", "symbols": ["context", "context_expr$ebnf$1", "_", "expr"], "postprocess":  d => ({
+            type: 'ContextStatement',
+            context: flatten(d[1]),
+        })},
     {"name": "context$subexpression$1", "symbols": [(mxLexer.has("kw_level") ? {type: "kw_level"} : kw_level)]},
     {"name": "context$subexpression$1", "symbols": [(mxLexer.has("kw_time") ? {type: "kw_time"} : kw_time)]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_at") ? {type: "kw_at"} : kw_at), "__", "context$subexpression$1", "__", "operand"]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_in") ? {type: "kw_in"} : kw_in), "__", "operand"]},
+    {"name": "context", "symbols": [(mxLexer.has("kw_at") ? {type: "kw_at"} : kw_at), "__", "context$subexpression$1", "__", "operand"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : null,
+            context: d[0],
+            arguments: [d[2], d[4]]
+        })},
+    {"name": "context", "symbols": [(mxLexer.has("kw_in") ? {type: "kw_in"} : kw_in), "__", "operand"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : null,
+            context: d[0],
+            arguments: d[2]
+        })},
     {"name": "context$ebnf$1$subexpression$1", "symbols": [(mxLexer.has("kw_in") ? {type: "kw_in"} : kw_in), "__"]},
     {"name": "context$ebnf$1", "symbols": ["context$ebnf$1$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "context$subexpression$2", "symbols": ["__", (mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)]},
-    {"name": "context$subexpression$2", "symbols": ["__", "operand"]},
-    {"name": "context", "symbols": ["context$ebnf$1", (mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys), "context$subexpression$2"]},
-    {"name": "context$subexpression$3", "symbols": ["__", (mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys)]},
-    {"name": "context$subexpression$3", "symbols": ["__", "operand"]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_about") ? {type: "kw_about"} : kw_about), "context$subexpression$3"]},
+    {"name": "context$subexpression$2", "symbols": [(mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)]},
+    {"name": "context$subexpression$2", "symbols": ["operand"]},
+    {"name": "context", "symbols": ["context$ebnf$1", (mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys), "__", "context$subexpression$2"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : (d[0] != null ? d[0][0] : null),
+            context: d[1],
+            arguments: d[3]
+        })},
+    {"name": "context$subexpression$3", "symbols": [(mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys)]},
+    {"name": "context$subexpression$3", "symbols": ["operand"]},
+    {"name": "context", "symbols": [(mxLexer.has("kw_about") ? {type: "kw_about"} : kw_about), "__", "context$subexpression$3"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : null,
+            context: d[0],
+            arguments: d[2]
+        })},
     {"name": "context$ebnf$2$subexpression$1", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__"]},
     {"name": "context$ebnf$2", "symbols": ["context$ebnf$2$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "context$subexpression$4", "symbols": ["logical_expr"]},
     {"name": "context$subexpression$4", "symbols": ["bool"]},
-    {"name": "context", "symbols": ["context$ebnf$2", (mxLexer.has("kw_context") ? {type: "kw_context"} : kw_context), "__", "context$subexpression$4"]},
+    {"name": "context", "symbols": ["context$ebnf$2", (mxLexer.has("kw_context") ? {type: "kw_context"} : kw_context), "__", "context$subexpression$4"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : (d[0] != null ? d[0][0] : null),
+            context: d[1],
+            arguments: ''
+        })},
     {"name": "context$subexpression$5", "symbols": [{"literal":"#logmsg"}]},
     {"name": "context$subexpression$5", "symbols": [{"literal":"#logToFile"}]},
     {"name": "context$subexpression$5", "symbols": [{"literal":"#abort"}]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__", (mxLexer.has("kw_defaultAction") ? {type: "kw_defaultAction"} : kw_defaultAction), "__", "context$subexpression$5"]},
+    {"name": "context", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__", (mxLexer.has("kw_defaultAction") ? {type: "kw_defaultAction"} : kw_defaultAction), "__", "context$subexpression$5"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : d[0],
+            context: d[2],
+            arguments: d[4]
+        })},
     {"name": "context$ebnf$3$subexpression$1", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__"]},
     {"name": "context$ebnf$3", "symbols": ["context$ebnf$3$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "context$ebnf$4$subexpression$1", "symbols": ["_", "string", "_"]},
-    {"name": "context$ebnf$4$subexpression$1", "symbols": ["__", "param_name", "_", "expr", "_"]},
-    {"name": "context$ebnf$4$subexpression$1", "symbols": ["__", "var_name", "_"]},
+    {"name": "context$ebnf$4$subexpression$1$subexpression$1", "symbols": ["string"]},
+    {"name": "context$ebnf$4$subexpression$1$subexpression$1", "symbols": ["param_name", "_", "expr"]},
+    {"name": "context$ebnf$4$subexpression$1$subexpression$1", "symbols": ["var_name"]},
+    {"name": "context$ebnf$4$subexpression$1", "symbols": ["context$ebnf$4$subexpression$1$subexpression$1", "__"]},
     {"name": "context$ebnf$4", "symbols": ["context$ebnf$4$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$4", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "context$subexpression$6", "symbols": ["_", "logical_expr"]},
-    {"name": "context$subexpression$6", "symbols": ["__", "bool"]},
-    {"name": "context", "symbols": ["context$ebnf$3", (mxLexer.has("kw_undo") ? {type: "kw_undo"} : kw_undo), "context$ebnf$4", "context$subexpression$6"]},
+    {"name": "context$subexpression$6", "symbols": ["logical_expr"]},
+    {"name": "context$subexpression$6", "symbols": ["bool"]},
+    {"name": "context", "symbols": ["context$ebnf$3", (mxLexer.has("kw_undo") ? {type: "kw_undo"} : kw_undo), "__", "context$ebnf$4", "context$subexpression$6"], "postprocess":  d => ({
+            type: 'ContextExpression',
+            prefix : (d[0] != null ? d[0][0] : null),
+            context: d[1],
+            arguments: [
+                (d[3] != null ? d[3][0] : null),
+                d[4]
+            ]
+        })},
     {"name": "case_expr$subexpression$1", "symbols": [(mxLexer.has("kw_case") ? {type: "kw_case"} : kw_case), "_"]},
     {"name": "case_expr$ebnf$1", "symbols": []},
     {"name": "case_expr$ebnf$1$subexpression$1", "symbols": ["EOL", "case_item"]},
