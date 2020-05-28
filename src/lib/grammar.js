@@ -11,7 +11,7 @@ function id(x) { return x[0]; }
         if (a !== null && b != null) {
             return ([].concat(a, ...b).filter(e => e != null));
         } else if (a !== null) {
-            return (a instanceof Array ? a.filter(e => e != null) : a);
+            return (Array.isArray(a) ? a.filter(e => e != null) : a);
         } else return null;
     };
 
