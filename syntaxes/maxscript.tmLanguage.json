@@ -371,7 +371,7 @@
 			"patterns": [
 				{
 					"name":  "constant.language.boolean.mxs",
-					"match": "(?i)\\b(?>true|on|false|off)\\b"
+					"match": "(?i)\\b(true|on|false|off)\\b"
 				},
 				{
 					"name":  "constant.language.math.mxs",
