@@ -1,5 +1,4 @@
 // moo tokenizer
-//import moo from 'moo';
 const moo = require('moo');
 //-----------------------------------------------------------------------------------
 // CASE INSENSITIVE FOR KEYWORKDS
@@ -90,150 +89,131 @@ const keywordsDB = {
 	'kw_where': 'where',
 	'kw_while': 'while',
 	'kw_with': 'with',
+	'kw_parameters' : 'parameters',
 	// 'kw_max':         'max',
 	// 'kw_throw':       'throw',
 	//'kw_continue':    'continue',
 	//'kw_redraw':      'redraw',
 };
 //-----------------------------------------------------------------------------------
-// In order to be able to use rules like this, first I need to change All the src src to Lowers..and exclude strings...?
-// {type:'declaration', match: /\blocal\b/},
-// {type:'declaration', match: /\bglobal\b/},
-// {type:'declaration', match: /\bpersistent\b(?:[ \t]+global\b)/},
-
 // Moo Lexer
-var mxLexer = moo.compile(
-	{
-		// the comments
-		comment_SL: { match: /--.*$/, lineBreaks: false, },
-		comment_BLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true, },
-		// strings
-		string:
-			[
-				{ match: /@"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(2, -1) },
-				{ match: /"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(1, -1) },
-				// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
-			],
-		// whitespace -  also matches line continuations
-		// ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
-		newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
-		ws: { match: /[ \t]+/, lineBreaks: false },
-		// path_name $mounstrosity*/_?
-		path: [
-			{ match: /[$](?:[A-Za-z0-9_*?.\\]*)/ },
-			{ match: /[$](?:'[^'\r\n]+?')/ },
-		],
-		// strings ~RESOURCE~
-		locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
-		// parameter <param_name>:
-		params: {
-			match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*[:]/,
-			value: x => x.slice(0, -1)
-		},
-		// just in case...
-		param: { match: /:{1}/ },
-		// this [3] should go down the chain, under identity??
-		// property <object>.<property>
-		property: {
-			match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1)
-		},
-		// ::global variable
-		global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
-		// IDENTIFIERS
-		// includes special alphanumeric chars
-		identity: {
-			match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
-			type: caseInsensitiveKeywords(keywordsDB)
-		},
-		// a mounstrosity
-		typed_iden: {
-			match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1)
-		},
-		// DISABLED TOKENS
-		//reference: { match: /\&/},
-		// cont:     { match: /\\/},
-		//res: {match:/\?/},
-		//sharp: {match: /#/},
-		// ws:       { match: /[ \t]+/},
-		// o_ws: {match: /[\w][^a-zA-Z\d\s:]/, value: x => x.slice(1, -1)},
-		// this is handled by the parser recursion...
-		//voidparens:   { match: /\(\)/},
-		//parens:   { match: /\([ \t\n\r]+\)/},
+var mxLexer = moo.states({
+	main:{
+			// the comments
+			comment_SL: { match: /--.*$/, lineBreaks: false, },
+			comment_BLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true, },
+			// strings
+			string:
+				[
+					{ match: /@"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(2, -1) },
+					{ match: /"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(1, -1) },
+					// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
+				],
+			// whitespace -  also matches line continuations
+			// ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
 
-		// array marker #(...) | #{...}
-		arraydef: { match: /#[ \t]*\(/ },
-		bitarraydef: { match: /#[ \t]*\{/ },
-		// PARENS
-		lparen: { match: /\(/ },
-		rparen: { match: /\)/ },
-		// BRACKETS, BRACES...
-		lbracket: { match: '[' },
-		rbracket: { match: ']' },
-		lbrace: { match: '{' },
-		rbrace: { match: '}' },
-		// time format
-		time: [
-			{ match: /(?:(?:[-]?[0-9]+[.])*[0-9]+[mMsSfFtT])+/ },
-			{ match: /(?:(?:[-]?[0-9]+[.])[0-9]*[mMsSfFtT])+/ },
-			{ match: /[0-9]+[:][0-9]+[.][0-9]*/ }
-		],
-		// number formats
-		number: [
-			{ match: /(?:[-]?[0-9]*[.][0-9]+[eEdD][+-]?[0-9]+)/ },
-			{ match: /(?:[-]?[0-9]+[eEdD][+-]?[0-9]+)/ },
-			{ match: /(?:(?:[-]?[0-9]+)?\.[0-9]+)/ },
-			{ match: /(?:[-]?[0-9]+\.(?:[0-9]+)?)/ },
-		],
-		negint: { match: /[-][0-9]+[LP]?/ },
-		posint: { match: /[0-9]+[LP]?/ },
-		hex: { match: /0[xX][0-9a-fA-F]+/ },
-		// #name literals .. should go higher??
-		name:
-			[
-				{ match: /#[A-Za-z0-9_]+\b/ },
-				{ match: /#'[A-Za-z0-9_]+'/ },
+			newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
+			ws: { match: /[ \t]+/, lineBreaks: false },
+			// path_name $mounstrosity*/_?
+			path: [
+				{ match: /[$](?:[A-Za-z\u00C0-\u00FF0-9_*?./\\]*)/ },
+				// { match: /[$]'(?:[^'\r\n]+)'/ },
+				{match:/[$]/}
 			],
-		// Operators.
-		comparison: ['==', '!=', '>', '<', '>=', '<='],
-		assign: ['=', '+=', '-=', '*=', '/='],
-		math: ['+', '-', '*', '/', '^'],
-		// comparison: [
-		//   { match: '>=' },
-		//   { match: '<=' },
-		//   { match: '==' },
-		//   { match: '!=' },
-		//   { match: '>'  },
-		//   { match: '<'  },
-		// ],
-		// assign: [
-		//   { match: '='  },
-		//   { match: '+=' },
-		//   { match: '-=' },
-		//   { match: '*=' },
-		//   { match: '/=' }
-		// ],
-		// math: [
-		//   { match: '+' },
-		//   { match: '-' },
-		//   { match: '*' },
-		//   { match: '/' },
-		//   { match: '^' },
-		// ],
-		// DELIMITERS
-		delimiter: { match: /\./ },
-		sep: { match: /,/ },
-		// NEWLINES
-		statement: { match: /;/ },
-		// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
-		error: [
-			{ match: /[¿¡!`´]/, /* error: true  */},
-			{ match: /[/?\\]{2,}/},
-			// { match: /[?]{2,}/},
-		],
-		// This contains the rest of the stack in case of error.
-		fatalError : moo.error
-		// ---- MOO RULES END-----
-	});
+
+
+			// strings ~RESOURCE~
+			locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
+			// parameter <param_name>:
+			/*
+			params: {
+				match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*[ \t]*[:]/,
+				value: x => x.slice(0, -1)
+			},
+			*/
+			// just in case...
+			param: { match: /:{1}/ },
+			// this [3] should go down the chain, under identity??
+			// property <object>.<property>
+			property: {
+				match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1)
+			},
+			// ::global variable
+			global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
+			// IDENTIFIERS
+			// includes special alphanumeric chars
+			identity: {
+				match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
+				type: caseInsensitiveKeywords(keywordsDB)
+			},
+			// a mounstrosity
+			typed_iden: {
+				match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1)
+			},
+			// DISABLED TOKENS
+			//reference: { match: /\&/},
+			// cont:     { match: /\\/},
+			//res: {match:/\?/},
+			//sharp: {match: /#/},
+			// ws:       { match: /[ \t]+/},
+			// o_ws: {match: /[\w][^a-zA-Z\d\s:]/, value: x => x.slice(1, -1)},
+			// this is handled by the parser recursion...
+			//voidparens:   { match: /\(\)/},
+			//parens:   { match: /\([ \t\n\r]+\)/},
+
+			// array marker #(...) | #{...}
+			arraydef: { match: /#[ \t]*\(/ },
+			bitarraydef: { match: /#[ \t]*{/ },
+			// PARENS
+			lparen: { match: /\(/ },
+			rparen: { match: /\)/ },
+			// BRACKETS, BRACES...
+			lbracket: { match: '[' },
+			rbracket: { match: ']' },
+			lbrace: { match: '{' },
+			rbrace: { match: '}' },
+			// time format
+			time: [
+				{ match: /(?:(?:[-]?[0-9]+[.])*[0-9]+[mMsSfFtT])+/ },
+				{ match: /(?:(?:[-]?[0-9]+[.])[0-9]*[mMsSfFtT])+/ },
+				{ match: /[0-9]+[:][0-9]+[.][0-9]*/ }
+			],
+
+			// number formats
+			bitrange: {match:/[.]{2}/},
+			number: [
+				{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
+				{ match: /(?:[-]?[0-9]+\.(?!\.))/},
+				{ match: /[-]?[0-9]+(?:[LP]|[eEdD][+-]?[0-9]+)?/ },
+				{ match: /(?:(?<!\.)[-]?\.[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
+			],
+			hex: { match: /0[xX][0-9a-fA-F]+/ },
+			// #name literals .. should go higher??
+			name:
+				[
+					{ match: /#[A-Za-z0-9_]+\b/ },
+					{ match: /#'[A-Za-z0-9_]+'/ },
+				],
+			// Operators.
+			comparison: ['==', '!=', '>', '<', '>=', '<='],
+			assign: ['=', '+=', '-=', '*=', '/='],
+			math: ['+', '-', '*', '/', '^'],
+			// DELIMITERS
+			delimiter: { match: /\.(?!\.)/ },
+			sep: { match: /,/ },
+			// NEWLINES
+			statement: { match: /;/ },
+			// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
+			error: [
+				{ match: /[¿¡!`´]/, /* error: true  */},
+				{ match: /[/?\\]{2,}/},
+				// { match: /[?]{2,}/},
+			],
+			// This contains the rest of the stack in case of error.
+			// fatalError : moo.error
+			// ---- MOO RULES END-----
+		}
+});
 //-----------------------------------------------------------------------------------
 //export {mxLexer};
 module.exports = mxLexer;
