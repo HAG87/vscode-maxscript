@@ -464,7 +464,7 @@
 				},
 				{
 					"name": "support.type.rolloutcontrol.mxs",
-					"match": "(?i)\\b(?>angle|button|checkbox|checkbutton|colorpicker|comboBox|curveControl|dotNetControl|dropdownList|editText|group|groupBox|hyperLink|imgTag|label|listBox|mapbutton|materialbutton|menuitem|multilistBox|pickbutton|popUpMenu|progressbar|radiobuttons|SchematicControl|slider|spinner|SubRollout|timer)\\b"
+					"match": "(?i)\\b(?>angle|button|checkbox|checkbutton|colorpicker|comboBox|curveControl|dotNetControl|dropdownList|editText|group|groupBox|hyperLink|imgTag|label|listBox|mapbutton|materialbutton|menuitem|subMenu|separator|multilistBox|pickbutton|popUpMenu|progressbar|radiobuttons|SchematicControl|slider|spinner|SubRollout|timer)\\b"
 				}
 			]
 		}
