@@ -18,8 +18,8 @@ let lexer = moo.compile({
 	WS: { match: /(?:[ \t]+|(?:[ \t]*?[\\]+[ \t\r\n]*)+?)/, lineBreaks: true },
 	// path_name $mounstrosity*/_?
 	path: [
-		{ match: /[$](?:[A-Za-z0-9_\*\?\.\\]*)/ },
-		{ match: /[$](?:'[^'\r\n]+?')/ },
+		{ match: /[$](?:(?:[A-Za-z0-9_*?/\\]|[.]{3})*)/ },
+		{match:/[$]/}
 	],
 	// parameter <param_name>:
 	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*[:]/ },
