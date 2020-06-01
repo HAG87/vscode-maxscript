@@ -363,7 +363,7 @@
 				},
 				{
 					"name":"variable.other.pathname.mxs",
-					"match": "\\b\\$\\b|\\$[^ \\t\\r\\n]+"
+					"match": "\\b[$]\\b|[$](?:(?:[A-Za-z0-9_*?/\\\\]|[.]{3})*)"
 				}
 			]
 		},
