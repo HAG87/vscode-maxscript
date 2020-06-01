@@ -202,13 +202,13 @@ let SymbolKind: { [key: string]: number } = {
  * collects all node types in the filter.
  * I'm retrieving only the paths, because will need to get the parents location later.
  * I will not be using this for now, since vscode only cares about definitions, I can later reference-search that definition
- * @param {any[]} AST Abstract Syntax tree source
+ * @param {any[]} CST Abstract Syntax tree source
  * @param {string} filter Object with keys:[] to be collected.
  */
-export function collectStatementsFromAST(AST: any[], filter: string = 'id') {
+export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
 	let statements: string[] = [];
-	//traverse the AST
-	traverse2(AST, (key1: string, val1: null, innerObj: { path: string }, stop: any) => {
+	//traverse the CST
+	traverse2(CST, (key1: string, val1: null, innerObj: { path: string }, stop: any) => {
 		const current = val1 != null ? val1 : key1;
 		if (key1 === filter) statements.push(innerObj.path);
 		return current;
@@ -222,19 +222,19 @@ export function collectStatementsFromAST(AST: any[], filter: string = 'id') {
 
 /**
  * For each element of a object-path collection, return a valid {name|parent|kind|location} node
- * @param {any[]} AST the AST
+ * @param {any[]} CST the CST
  * @param {string[]} paths Collection of object-paths
  */
-export function collectSymbols(AST: any[], paths: string[], source?: string) {
+export function collectSymbols(CST: any[], paths: string[], source?: string) {
 	let theSymbols;
 	if (!source) {
 		theSymbols = paths.map(
 			path => {
-				let currentNode = objectPath.get(AST, parentPath(path));
+				let currentNode = objectPath.get(CST, parentPath(path));
 				let _name = currentNode.id.value.value;
 				let theSymbol: ISymbolInformation = {
 					name: _name !== '' ? _name : '[unnamed]',
-					containerName: findParentName(AST, parentPath(path, 2)) || '',
+					containerName: findParentName(CST, parentPath(path, 2)) || '',
 					location: currentNode.loc || range.fromChilds(currentNode),
 					kind: SymbolKind[currentNode.type] || 5,
 				};
@@ -244,11 +244,11 @@ export function collectSymbols(AST: any[], paths: string[], source?: string) {
 		let src = source.split('\n');
 		theSymbols = paths.map(
 			path => {
-				let currentNode = objectPath.get(AST, parentPath(path));
+				let currentNode = objectPath.get(CST, parentPath(path));
 				let _name = currentNode.id.value.value;
 				let theSymbol: ISymbolInformation = {
 					name: _name !== '' ? _name : '[unnamed]',
-					containerName: findParentName(AST, parentPath(path, 2)) || '',
+					containerName: findParentName(CST, parentPath(path, 2)) || '',
 					location: range.fromChildsLC(src, currentNode),
 					kind: SymbolKind[currentNode.type] || 5,
 				};
@@ -261,13 +261,13 @@ export function collectSymbols(AST: any[], paths: string[], source?: string) {
 // INVALID TOKENS
 /**
  * Return errorSymbol from invalid tokens
- * @param {object} AST the AST
+ * @param {object} CST the CST
  */
-export function collectTokens(AST: any, key: string = 'type', source?: string, value?: any) {
+export function collectTokens(CST: any, key: string = 'type', source?: string, value?: any) {
 
 	let Tokens: any[] = [];
 
-	traverse2(AST, (key1: string, val1: string | null, innerObj: { parent: any }, stop: any) => {
+	traverse2(CST, (key1: string, val1: string | null, innerObj: { parent: any }, stop: any) => {
 		const current = val1 != null ? val1 : key1;
 		if (key1 === key) {
 			// console.log(innerObj.parent);

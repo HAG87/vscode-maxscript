@@ -51,7 +51,7 @@ export class mxsParseSource {
 	hash: string;
 	__source: string;
 	__parserState: any;
-	__parsedAST: any;
+	__parsedCST: any;
 
 	// constructor
 	constructor(source: string | undefined) {
@@ -77,9 +77,9 @@ export class mxsParseSource {
 		this.hash = mxsParseSource.HashSource(this.__source);
 		this.ParseSource();
 	}
-	/** Get the parsed AST, if any */
-	get parsedAST() {
-		return this.__parsedAST || this.parserInstance.results[0];
+	/** Get the parsed CST, if any */
+	get parsedCST() {
+		return this.__parsedCST || this.parserInstance.results[0];
 		// return this.parserInstance.results[0];
 	}
 	/** Reset the parser * */
@@ -125,7 +125,7 @@ export class mxsParseSource {
 
 		try {
 			this.parserInstance.feed(this.__source);
-			this.__parsedAST = this.parserInstance.results[0];
+			this.__parsedCST = this.parserInstance.results[0];
 		} catch (err) {
 			this.parserInstance.restore(this.__parserState);
 			this.__parseWhitErrors();
@@ -144,7 +144,7 @@ export class mxsParseSource {
 			throw err;
 		}
 		this.__parserState = this.parserInstance.save();
-		this.__parsedAST = this.parserInstance.results[0];
+		this.__parsedCST = this.parserInstance.results[0];
 	}
 	/**
 	 * Parser with error recovery
@@ -188,13 +188,13 @@ export class mxsParseSource {
 		let newErr;
 		if (this.parserInstance.results[0]) {
 			// console.log(this.parserInstance.results[0]);
-			this.__parsedAST = this.parserInstance.results[0];
+			this.__parsedCST = this.parserInstance.results[0];
 			// parsing passed
 			newErr = new ParserError('Parser finished with errors.');
 			newErr.name = 'ERR_RECOVER';
 			newErr.tokens = badTokens;
 			newErr.details = errorReport;
-			// newErr.parsedAST = this.parserInstance.results[0];
+			// newErr.parsedCST = this.parserInstance.results[0];
 		} else {
 			// console.log('unrecoverable error');
 			newErr = new ParserError('Parser failed. unrecoverable errors.');

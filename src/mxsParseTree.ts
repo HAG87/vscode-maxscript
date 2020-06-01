@@ -10,7 +10,7 @@ export const msxParser = new mxsParseSource('');
 	try {
 		// console.log ('feed parser');
 		msxParser.source = source;
-		// console.log(msxParser.parsedAST.length);
+		// console.log(msxParser.parsedCST.length);
 	} catch (err) {
 		// provide-update diagnostics
 		// console.log(mxsDiagnostics.parsingErrorMessage(err));
@@ -18,7 +18,7 @@ export const msxParser = new mxsParseSource('');
 		throw err;
 	}
 };
-export const ast = () => {
-	// console.log(msxParser.parsedAST.length);
-	return msxParser.parsedAST;
+export const CST = () => {
+	// console.log(msxParser.parsedCST.length);
+	return msxParser.parsedCST;
 }; */

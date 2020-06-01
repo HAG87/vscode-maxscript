@@ -127,7 +127,7 @@ export function provideParserDiagnostic(document: vscode.TextDocument, error: Pa
 /**
  * Provides bad token diagnosys based on lexer error token
  * @param document current document
- * @param AST parsed AST
+ * @param CST parsed CST
  */
 export function provideTokenDiagnostic(document: vscode.TextDocument, errTokens: moo.Token[] | undefined): vscode.Diagnostic[] {
 

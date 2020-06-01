@@ -10,7 +10,7 @@ const objectPath = require("object-path");
  */
 export function parentPath(path: string, level = 1): string {
 	if (typeof path === "string") {
-		// AST must have at least two dots:
+		// CST must have at least two dots:
 		if (!path.includes(".") || !path.slice(path.indexOf(".") + 1).includes(".")) {
 			// zero is the root level's first element
 			return "0";
@@ -23,24 +23,24 @@ export function parentPath(path: string, level = 1): string {
 //-----------------------------------------------------------------------------------
 /**
  * Looks for a key in the inmediate parent, going up the tree, returns the value of the first match, if any.
- * @param {object} ast The AST
+ * @param {object} CST The CST
  * @param {string} path The path of the current node/leaf
  */
-export function findParentName (ast: any, path: string, key = 'id.value.value') {
+export function findParentName (CST: any, path: string, key = 'id.value.value') {
 	// this is faster than using ats-money find method
 	let roots = path.split('.');
 
 	while (roots.length > 0) {
 		roots.pop();
 		roots.push(key);
-		let theNode = objectPath.get(ast, roots.join('.'));
+		let theNode = objectPath.get(CST, roots.join('.'));
 		if (theNode != null) return theNode;
 	}
 	/*
 	let i = roots.length;
 	do {
 		let thePath = roots.slice(0, i).concat(key).join('.');
-		let theNode = objectPath.get(ast, thePath);
+		let theNode = objectPath.get(CST, thePath);
 
 		if (theNode != null) return theNode;
 

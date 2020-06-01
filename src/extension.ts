@@ -64,6 +64,8 @@ export function subscribeToDocumentChanges(context: vscode.ExtensionContext, emo
  */
 export function activate(context: vscode.ExtensionContext) {
 
+	// const providerRegistrations = vscode.Disposable.from()
+
 	vscode.languages.setLanguageConfiguration(MXS_MODE.language!, LANG_CFG);
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => { msxHelp(help_addr); }));

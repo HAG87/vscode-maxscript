@@ -33,9 +33,9 @@ class mxsParseSource {
 		this.hash = mxsParseSource.HashSource(this.__source);
 		this.ParseSource();
 	}
-	/** Get the parsed AST, if any */
-	get parsedAST() {
-		return this.__parsedAST || this.parserInstance.results[0];
+	/** Get the parsed CST, if any */
+	get parsedCST() {
+		return this.__parsedCST || this.parserInstance.results[0];
 		// return this.parserInstance.results[0];
 	}
 	/** Reset the parser * */
@@ -81,7 +81,7 @@ class mxsParseSource {
 
 		try {
 			this.parserInstance.feed(this.__source);
-			this.__parsedAST = this.parserInstance.results[0];
+			this.__parsedCST = this.parserInstance.results[0];
 		} catch (err) {
 			this.parserInstance.restore(this.__parserState);
 			this.__parseWhitErrors();
@@ -100,7 +100,7 @@ class mxsParseSource {
 			throw err;
 		}
 		this.__parserState = this.parserInstance.save();
-		this.__parsedAST = this.parserInstance.results[0];
+		this.__parsedCST = this.parserInstance.results[0];
 	}
 	/**
 	 * Parser with error recovery
@@ -155,23 +155,23 @@ class mxsParseSource {
 		}; parsings();
 		//-------------------------------------------------
 		/*
-		// DISABLED: Can't get a working AST, token locations are wrong
+		// DISABLED: Can't get a working CST, token locations are wrong
 		let newErr;
  		if (this.parserInstance.results[0]) {
-			this.__parsedAST = this.parserInstance.results[0];
+			this.__parsedCST = this.parserInstance.results[0];
 			// parsing passed
 			newErr = new Error('Parser finished with errors.');
 			newErr.name = 'ERR_RECOVER';
 			newErr.tokens = badTokens;
 			newErr.details = errorReport;
-			// newErr.parsedAST = this.parserInstance.results[0];
+			// newErr.parsedCST = this.parserInstance.results[0];
 		} else {
 			newErr = new Error('Parser failed. unrecoverable errors.');
 			newErr.name = 'ERR_FATAL';
 			newErr.tokens = badTokens;
 			newErr.details = errorReport;
 		} */
-		this.__parsedAST = [];
+		this.__parsedCST = [];
 		
 		let newErr = new Error('Parser failed. unrecoverable errors.');
 		newErr.name = 'ERR_FATAL';

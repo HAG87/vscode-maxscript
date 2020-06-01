@@ -11,7 +11,7 @@ import {
 	// parsingErrorMessage
 } from './mxsDiagnostics';
 
-import { collectStatementsFromAST, collectSymbols, collectTokens } from './mxsProvideSymbols';
+import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 const mxsParseSource = require('./lib/mxsParser');
 // import { mxsParseSource } from './mxsParser';
 //--------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 			// /*
 			switch (err.name) {
 				case 'ERR_RECOVER': {
-					// DISABLED: Can't get a working AST, token locations are wrong
+					// DISABLED: Can't get a working CST, token locations are wrong
 					// token offsets are broken for this!!! // no valid locations!!! // must use line-col
 					refSource = docTxt;
 					diagnostics = diagnostics.concat(provideParserDiagnostic(document, <ParserError>err));
@@ -68,7 +68,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					throw err;
 				}
 				case 'ERR_FATAL': {
-					// fatal error - No AST
+					// fatal error - No CST
 					throw err;
 					// break;
 				}
@@ -79,9 +79,9 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 			// */
 		}
 		// /*
-		let AST = msxParser.parsedAST;
-		let ASTstatements = collectStatementsFromAST(AST);
-		let Symbols = collectSymbols(AST, ASTstatements, refSource);
+		let CST = msxParser.parsedCST;
+		let CSTstatements = collectStatementsFromCST(CST);
+		let Symbols = collectSymbols(CST, CSTstatements, refSource);
 		SymbolInfCol = Symbols.map((item) => {
 			return new vscode.SymbolInformation(
 				item.name,
@@ -96,7 +96,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		});
 		// */
 		// set Diagnostics for tokens
-		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(AST, 'type', refSource, 'error')));
+		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(CST, 'type', refSource, 'error')));
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
 		// Return
 		return SymbolInfCol;
