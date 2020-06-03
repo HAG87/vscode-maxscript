@@ -102,43 +102,41 @@ var mxLexer = moo.compile({
 	comment_SL: { match: /--.*$/, lineBreaks: false, },
 	comment_BLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true, },
 	// strings
-	string:
-		[
-			{ match: /@"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(2, -1) },
-			{ match: /"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(1, -1) },
-			// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
-		],
+	string: [
+		{ match: /@"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(2, -1) },
+		{ match: /"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(1, -1) },
+		// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
+	],
 	// whitespace -  also matches line continuations
-	// ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
-
+	ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
+	// ws: { match: /[ \t]+/, lineBreaks: false },
 	newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
-	ws: { match: /[ \t]+/, lineBreaks: false },
 	// path_name $mounstrosity*/_?
 	path: [
-		{ match: /[$](?:[A-Za-z\u00C0-\u00FF0-9_*?./\\]*)/ },
-		// { match: /[$]'(?:[^'\r\n]+)'/ },
+		{ match: /[$](?:(?:[A-Za-z0-9_*?/\\]|[.]{3})*)/ },
 		{ match: /[$]/ }
 	],
 	// strings ~RESOURCE~
 	locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
-
+	// parameter <param_name>:
+	params: {
+		match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/,
+		// value: x => x.slice(0, -1)
+	},
 	param: { match: /:{1}/ },
 	// property <object>.<property>
-	property: {
-		match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1)
-	},
+	// property: {
+	// match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1)
+	// },
 	// ::global variable
 	global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
 	// IDENTIFIERS
-	// includes special alphanumeric chars
 	identity: {
-		match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
+		match: /[&]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
 		type: caseInsensitiveKeywords(keywordsDB)
 	},
 	// a mounstrosity
-	typed_iden: {
-		match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1)
-	},
+	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1) },
 	// array marker #(...) | #{...}
 	arraydef: { match: /#[ \t]*\(/ },
 	bitarraydef: { match: /#[ \t]*{/ },
@@ -151,6 +149,11 @@ var mxLexer = moo.compile({
 	lbrace: { match: '{' },
 	rbrace: { match: '}' },
 	// time format
+
+	comparison: ['==', '!=', '>', '<', '>=', '<='],
+	assign: ['=', '+=', '-=', '*=', '/='],
+	unary: {match: /(?<=[^\w)-])-(?![-\s])/},
+	math: ['+', '-', '*', '/', '^'],
 	time: [
 		{ match: /(?:(?:[-]?[0-9]+[.])*[0-9]+[mMsSfFtT])+/ },
 		{ match: /(?:(?:[-]?[0-9]+[.])[0-9]*[mMsSfFtT])+/ },
@@ -158,6 +161,8 @@ var mxLexer = moo.compile({
 	],
 	// number formats
 	bitrange: { match: /[.]{2}/ },
+		// Operators.
+
 	number: [
 		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
 		{ match: /(?:[-]?[0-9]+\.(?!\.))/ },
@@ -166,15 +171,11 @@ var mxLexer = moo.compile({
 	],
 	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	// #name literals .. should go higher??
-	name:
-		[
-			{ match: /#[A-Za-z0-9_]+\b/ },
-			{ match: /#'[A-Za-z0-9_]+'/ },
-		],
-	// Operators.
-	comparison: ['==', '!=', '>', '<', '>=', '<='],
-	assign: ['=', '+=', '-=', '*=', '/='],
-	math: ['+', '-', '*', '/', '^'],
+	name: [
+		{ match: /#[A-Za-z0-9_]+\b/ },
+		{ match: /#'[A-Za-z0-9_]+'/ },
+	],
+
 	// DELIMITERS
 	delimiter: { match: /\.(?!\.)/ },
 	sep: { match: /,/ },
@@ -184,12 +185,9 @@ var mxLexer = moo.compile({
 	error: [
 		{ match: /[¿¡!`´]/, /* error: true  */ },
 		{ match: /[/?\\]{2,}/ },
-		// { match: /[?]{2,}/},
 	],
 	// This contains the rest of the stack in case of error.
-	fatalError : moo.error
-	// ---- MOO RULES END-----
+	fatalError: moo.error
 });
 //-----------------------------------------------------------------------------------
-//export {mxLexer};
 module.exports = mxLexer;

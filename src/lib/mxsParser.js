@@ -111,7 +111,7 @@ class mxsParseSource {
 		// NEW METHOD TOKENIZING THE INPUT, COULD BE A WAY TO FEED TOKENS TO THE PARSER?
 		// let src = this.__source.split(/(?<=\n)/);
 		let src = this.TokenizeSource();
-		let _init = this.parserInstance.save();
+		// let _init = this.parserInstance.save();
 		let state = this.parserInstance.save();
 		// let passTokens = [];
 		let badTokens = [];
@@ -172,7 +172,7 @@ class mxsParseSource {
 			newErr.details = errorReport;
 		} */
 		this.__parsedCST = [];
-		
+
 		let newErr = new Error('Parser failed. unrecoverable errors.');
 		newErr.name = 'ERR_FATAL';
 		newErr.tokens = badTokens;
