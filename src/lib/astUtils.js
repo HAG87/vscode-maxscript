@@ -24,7 +24,7 @@ function parentPath(path, level = 1) {
 //-----------------------------------------------------------------------------------
 /**
  * Looks for a key in the inmediate parent, going up the tree, returns the value of the first match, if any.
- * @param {object} CST The CST
+ * @param {object} ast The CST
  * @param {string} path The path of the current node/leaf
  */
 function findParentName (CST, path, key = 'id.value.value') {

@@ -18,10 +18,10 @@ const mxsParseSource = require('./lib/mxsParser');
 
 // type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
 const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
-	1:  vscode.SymbolKind.Module,
-	5:  vscode.SymbolKind.Method,
-	6:  vscode.SymbolKind.Property,
-	8:  vscode.SymbolKind.Constructor,
+	1: vscode.SymbolKind.Module,
+	5: vscode.SymbolKind.Method,
+	6: vscode.SymbolKind.Property,
+	8: vscode.SymbolKind.Constructor,
 	11: vscode.SymbolKind.Function,
 	12: vscode.SymbolKind.Variable,
 	13: vscode.SymbolKind.Constant,
@@ -33,31 +33,26 @@ const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
 /**
  * Parser initialization
  */
-export const msxParser = new mxsParseSource('');
+// export const msxParser = new mxsParseSource('');
 //--------------------------------------------------------------------------------
+
 export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+
+	msxParser = new mxsParseSource('');
+	ActiveDocument!: vscode.TextDocument;
 
 	private _getDocumentSymbols(document: vscode.TextDocument/*, tokens: mxsSymbolMatch[]*/): vscode.SymbolInformation[] {
 		let docTxt = document.getText();
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 		let refSource;
-		let diagnostics: vscode.Diagnostic[] = []; // NOT WORKING WITH CONCAT ?
-		/*
-		try {
-			var msxParser = new mxsParseSource(docTxt);
-		} catch (err) {
-			// provide-update diagnostics
-		}
-		// */
-		// feed the parser
-		// msxParser.source(docTxt);
-		try {
-			msxParser.source = docTxt;
+		let diagnostics: vscode.Diagnostic[] = [];
 
+		try {
+			// feed the parser
+			this.msxParser.source = docTxt;
 		} catch (err) {
 			// console.log(err.name);
 			// throw err;
-			// /*
 			switch (err.name) {
 				case 'ERR_RECOVER': {
 					// DISABLED: Can't get a working CST, token locations are wrong
@@ -73,15 +68,17 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					// break;
 				}
 				default:
-					// console.log(err.name);
 					throw err;
 			}
-			// */
 		}
-		// /*
-		let CST = msxParser.parsedCST;
+		// pass a reference to the current parsed document
+		this.ActiveDocument = document;
+		let CST = this.msxParser.parsedCST;
+		// console.log(msxParser.parsedCST);
 		let CSTstatements = collectStatementsFromCST(CST);
+		// console.log(CSTstatements);
 		let Symbols = collectSymbols(CST, CSTstatements, refSource);
+		// console.log(Symbols);
 		SymbolInfCol = Symbols.map((item) => {
 			return new vscode.SymbolInformation(
 				item.name,
@@ -94,7 +91,6 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					))
 			);
 		});
-		// */
 		// set Diagnostics for tokens
 		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(CST, 'type', refSource, 'error')));
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
@@ -109,7 +105,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 				// setDiagnostics(document);
 				resolve(this._getDocumentSymbols(document/*, mxsSymbols*/));
 			} catch (err) {
-				// console{}.log(err);
+				// console.log(err);
 				if (err.name === 'ERR_FATAL') {
 					reject(setDiagnostics(document, provideParserDiagnostic(document, <ParserError>err)));
 				} else {
@@ -119,3 +115,4 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		});
 	}
 }
+export const mxsDocumentSymbols = new mxsDocumentSymbolProvider();

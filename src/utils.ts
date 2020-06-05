@@ -1,5 +1,6 @@
-import {window} from 'vscode';
+import {window, workspace, Uri} from 'vscode';
 import * as fs from 'fs';
+import {posix} from 'path';
 
 export function getTextSel(editor = window.activeTextEditor) {
 	if(!editor) {
@@ -34,8 +35,14 @@ export function precWord(line: string):string | undefined {
 	return (wordmatches?.[wordmatches.length - 1]);
 }
 
-function trimString(src: string, substr: string) {
+export function trimString(src: string, substr: string) {
 	var start = src.indexOf(substr);
 	var end = start + substr.length;
 	return src.substring(0, start - 1) + src.substring(end);
+}
+
+export function prefixFile(source: Uri, prefix: string) {
+	let fName = posix.basename(source.path);
+	let newPath = posix.join(source.path,'..', prefix + fName);
+	return source.with({path: newPath});
 }

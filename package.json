@@ -22,7 +22,8 @@
 	],
 	"activationEvents": [
 		"onLanguage:maxscript",
-		"onCommand:mxs.help"
+		"onCommand:mxs.minify.file",
+		"onCommand:mxs.minify.files"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -88,15 +89,47 @@
 		"commands": [
 			{
 				"command": "mxs.help",
-				"title": "MaxScript help"
+				"title": "Code reference...",
+				"category": "MaxScript"
+			},
+			{
+				"command": "mxs.minify",
+				"title": "Minify open document",
+				"category": "MaxScript"
+			},
+			{
+				"command": "mxs.minify.file",
+				"title": "Minify file",
+				"category": "MaxScript"
+			},
+			{
+				"command": "mxs.minify.files",
+				"title": "Minify files...",
+				"category": "MaxScript"
 			}
 		],
 		"menus": {
+			"explorer/context": [
+				{
+					"when": "resourceExtname == .ms || resourceExtname == .mcr",
+					"command": "mxs.minify.file",
+					"group": "1_modification@1"
+				}
+			],
 			"editor/context": [
 				{
 					"when": "editorHasSelection && editorTextFocus && resourceLangId == maxscript",
 					"command": "mxs.help",
 					"group": "navigation@1"
+				}
+			],
+			"commandPalette": [
+				{
+					"when": "editorLangId  == maxscript",
+					"command": "mxs.minify"
+				},
+				{
+					"command": "mxs.minify.files"
 				}
 			]
 		},
@@ -118,12 +151,17 @@
 				"maxscript.gotosymbol": {
 					"type": "boolean",
 					"default": true,
-					"description": "Enable Document Symbols & Diagnostics."
+					"description": "Enable Document Symbols and Diagnostics."
 				},
 				"maxscript.gotodefinition": {
 					"type": "boolean",
 					"default": true,
 					"description": "Enable Document Definitions."
+				},
+				"maxscript.diagnostics": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable Document diagnostics"
 				},
 				"maxscript.completions": {
 					"type": "boolean",
@@ -139,6 +177,11 @@
 					"type": "string",
 					"default": "http://help.autodesk.com/view/3DSMAX/2018/ENU/",
 					"description": "maxScript help source"
+				},
+				"maxscript.minprefix": {
+					"type": "string",
+					"default": "min_",
+					"description": "Prefix for code minify output"
 				}
 			}
 		}

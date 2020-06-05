@@ -3,10 +3,14 @@ import * as vscode from 'vscode';
 import { getTextSel } from './utils';
 
 import mxsCompletion from './mxsAutocomplete';
-import { mxsDocumentSymbolProvider } from './mxsOutline';
+
+import { mxsDocumentSymbols } from './mxsOutline';
+
 import mxsDefinitions from './mxsDefinitions';
 import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
 import { DiagnosticCollection }  from './mxsDiagnostics';
+
+import * as mxsMin from './mxsMin';
 
 export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
 // this is implemented in contributes languaje-configuration.json
@@ -27,8 +31,8 @@ let help_addr: string = mxsConfig.get('helpprovider', 'http://help.autodesk.com/
  * MaxScript online help launch at current selected word
  * @param help_addr Addess of the help page
  */
-export async function msxHelp(help_addr: string) {
-	let query = getTextSel();
+export async function msxHelp(textEditor: vscode.TextEditor, help_addr: string) {
+	let query = getTextSel(textEditor);
 	// if (query) {
 	let uri = vscode.Uri.parse(encodeURI(`${help_addr}?query=${query!}&cg=Scripting%20%26%20Customization`));
 	await vscode.commands.executeCommand('vscode.open', uri);
@@ -65,20 +69,19 @@ export function subscribeToDocumentChanges(context: vscode.ExtensionContext, emo
 export function activate(context: vscode.ExtensionContext) {
 
 	// const providerRegistrations = vscode.Disposable.from()
-
 	vscode.languages.setLanguageConfiguration(MXS_MODE.language!, LANG_CFG);
+
 	// MaxScript Help command
-	context.subscriptions.push(vscode.commands.registerCommand('mxs.help', () => { msxHelp(help_addr); }));
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand('mxs.help', (textEditor) => { msxHelp(textEditor, help_addr); }));
 	// completions
 	if (mxsConfig.get('completions', true)) {
 		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(), '.'));
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, new mxsDocumentSymbolProvider()));
-		// diagnostics
-		context.subscriptions.push(DiagnosticCollection);
-		/*
+		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, mxsDocumentSymbols));
+	}
+	/*
 		// Why this works?
 		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 			if (editor) {
@@ -88,6 +91,9 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}));
 		*/
+	// Diagnostics
+	if (mxsConfig.get('diagnostics', true) && mxsConfig.get('gotosymbol', true)) {
+		context.subscriptions.push(DiagnosticCollection);
 	}
 	// definition provider
 	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {
@@ -97,6 +103,14 @@ export function activate(context: vscode.ExtensionContext) {
 	if (mxsConfig.get('semantics', true)) {
 		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_MODE, new DocumentSemanticTokensProvider(), legend));
 	}
+	// Minify
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand('mxs.minify', mxsMin.minifyOpenEditor));
+
+	context.subscriptions.push(vscode.commands.registerCommand('mxs.minify.file', mxsMin.minifyFile));
+
+	context.subscriptions.push(vscode.commands.registerCommand('mxs.minify.files', mxsMin.openAndMinify));
+
+
 }
 // this method is called when your extension is deactivated
 export function deactivate() { }

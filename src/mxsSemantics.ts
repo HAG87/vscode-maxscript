@@ -1,21 +1,23 @@
 'use strict';
 import * as vscode from 'vscode';
-
+//-------------------------------------------------------------------------------------------------------------
 import * as moo from 'moo';
 import maxAPI from './schema/mxsAPI';
+// const {mxLexer} = require('./lib/mooTokenize.js');
 //-------------------------------------------------------------------------------------------------------------
 const caseInsensitiveKeywords = (map: { [k: string]: string | string[] }) => {
 	const transform = moo.keywords(map);
 	return (text: string) => transform(text.toLowerCase());
 };
+// This is a simplified ruleset of the parser tokenizer
 let lexer = moo.compile({
 	// the comments
 	commentSL: { match: /--.*$/, lineBreaks: false, },
 	commentBLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true },
 	// there is a problem with the strings
 	string: { match: /[@]?"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true },
-	//WS:      /[ \t]+/,
 	//string:  /"(?:\\["\\]|[^\n"\\])*"/,
+	// WHITESPACE --  also matches line continuations
 	WS: { match: /(?:[ \t]+|(?:[ \t]*?[\\]+[ \t\r\n]*)+?)/, lineBreaks: true },
 	// path_name $mounstrosity*/_?
 	path: [
@@ -30,8 +32,6 @@ let lexer = moo.compile({
 	typedIden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/ },
 	// strings ~RESOURCE~
 	locale: { match: /~[A-Za-z0-9_]+~/ },
-	// WHITESPACE -- Should go higher on the chain??
-	// also matches line continuations
 	arraydef: { match: /\#[ \t]*\(/ },
 	bitarraydef: { match: /\#[ \t]*\{/ },
 	// PARENS
@@ -63,14 +63,11 @@ let lexer = moo.compile({
 	assign: ['=', '+=', '-=', '*=', '/='],
 	math: ['+', '-', '*', '/', '^'],
 	delimiter: ['.', ',', ':', ';'],
-
-	// IDENTIFIERS
-	// includes special alphanumeric chars
+	// IDENTIFIERS - includes special alphanumeric chars
 	identity: {
 		match: /[&-]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
 		type: caseInsensitiveKeywords(maxAPI)
 	},
-
 	NL: { match: /(?:\r|\r\n|\n)+/, lineBreaks: true },
 	// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
 	error: [

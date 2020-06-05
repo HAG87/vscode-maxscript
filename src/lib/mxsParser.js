@@ -85,6 +85,7 @@ class mxsParseSource {
 		} catch (err) {
 			this.parserInstance.restore(this.__parserState);
 			this.__parseWhitErrors();
+			// err.name = 'ERR_FATAL';
 			// throw err;
 		}
 		return;
@@ -178,8 +179,8 @@ class mxsParseSource {
 		newErr.tokens = badTokens;
 		newErr.details = errorReport;
 
-		this.badTokens = [];
-		this.errorReport = [];
+		// this.badTokens = [];
+		// this.errorReport = [];
 		// exit with error
 		throw newErr;
 	}

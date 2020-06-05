@@ -60,7 +60,7 @@ var grammar = {
     ParserRules: [
     {"name": "Main", "symbols": ["_", "_EXPR", "_"], "postprocess": d => d[1]},
     {"name": "_EXPR", "symbols": ["_EXPR", "EOL", "expr"], "postprocess": d => [].concat(d[0], d[2])},
-    {"name": "_EXPR", "symbols": ["expr"], "postprocess": id},
+    {"name": "_EXPR", "symbols": ["expr"]},
     {"name": "expr_seq", "symbols": ["LPAREN", "_expr_seq", "RPAREN"], "postprocess":  d => ({
             type: 'BlockStatement',
             body: d[1]
@@ -465,14 +465,14 @@ var grammar = {
     {"name": "context$subexpression$1", "symbols": [(mxLexer.has("kw_level") ? {type: "kw_level"} : kw_level)]},
     {"name": "context$subexpression$1", "symbols": [(mxLexer.has("kw_time") ? {type: "kw_time"} : kw_time)]},
     {"name": "context$subexpression$2", "symbols": ["operand"]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_at") ? {type: "kw_at"} : kw_at), "__", "context$subexpression$1", "__", "context$subexpression$2"], "postprocess":  d => ({
+    {"name": "context", "symbols": [(mxLexer.has("kw_at") ? {type: "kw_at"} : kw_at), "__", "context$subexpression$1", "_", "context$subexpression$2"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : empty,
             context: d[0],
             args: d[2].concat(d[4])
         })},
     {"name": "context$subexpression$3", "symbols": ["operand"]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_in") ? {type: "kw_in"} : kw_in), "__", "context$subexpression$3"], "postprocess":  d => ({
+    {"name": "context", "symbols": [(mxLexer.has("kw_in") ? {type: "kw_in"} : kw_in), "_", "context$subexpression$3"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : empty,
             context: d[0],
@@ -483,7 +483,7 @@ var grammar = {
     {"name": "context$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "context$subexpression$4", "symbols": [(mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)]},
     {"name": "context$subexpression$4", "symbols": ["operand"]},
-    {"name": "context", "symbols": ["context$ebnf$1", (mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys), "__", "context$subexpression$4"], "postprocess":  d => ({
+    {"name": "context", "symbols": ["context$ebnf$1", (mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys), "_", "context$subexpression$4"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : (d[0] != null ? d[0][0] : empty),
             context: d[1],
@@ -491,7 +491,7 @@ var grammar = {
         })},
     {"name": "context$subexpression$5", "symbols": [(mxLexer.has("kw_coordsys") ? {type: "kw_coordsys"} : kw_coordsys)]},
     {"name": "context$subexpression$5", "symbols": ["operand"]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_about") ? {type: "kw_about"} : kw_about), "__", "context$subexpression$5"], "postprocess":  d => ({
+    {"name": "context", "symbols": [(mxLexer.has("kw_about") ? {type: "kw_about"} : kw_about), "_", "context$subexpression$5"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : empty,
             context: d[0],
@@ -502,7 +502,7 @@ var grammar = {
     {"name": "context$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "context$subexpression$6", "symbols": ["logical_expr"]},
     {"name": "context$subexpression$6", "symbols": ["bool"]},
-    {"name": "context", "symbols": ["context$ebnf$2", (mxLexer.has("kw_context") ? {type: "kw_context"} : kw_context), "__", "context$subexpression$6"], "postprocess":  d => ({
+    {"name": "context", "symbols": ["context$ebnf$2", (mxLexer.has("kw_context") ? {type: "kw_context"} : kw_context), "_", "context$subexpression$6"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : (d[0] != null ? d[0][0] : empty),
             context: d[1],
@@ -511,7 +511,7 @@ var grammar = {
     {"name": "context$subexpression$7", "symbols": [{"literal":"#logmsg"}]},
     {"name": "context$subexpression$7", "symbols": [{"literal":"#logtofile"}]},
     {"name": "context$subexpression$7", "symbols": [{"literal":"#abort"}]},
-    {"name": "context", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__", (mxLexer.has("kw_defaultAction") ? {type: "kw_defaultAction"} : kw_defaultAction), "__", "context$subexpression$7"], "postprocess":  d => ({
+    {"name": "context", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__", (mxLexer.has("kw_defaultAction") ? {type: "kw_defaultAction"} : kw_defaultAction), "_", "context$subexpression$7"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : d[0],
             context: d[2],
@@ -520,12 +520,12 @@ var grammar = {
     {"name": "context$ebnf$3$subexpression$1", "symbols": [(mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "__"]},
     {"name": "context$ebnf$3", "symbols": ["context$ebnf$3$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "context$ebnf$4$subexpression$1", "symbols": ["undo_label", "__"]},
+    {"name": "context$ebnf$4$subexpression$1", "symbols": ["undo_label", "_"]},
     {"name": "context$ebnf$4", "symbols": ["context$ebnf$4$subexpression$1"], "postprocess": id},
     {"name": "context$ebnf$4", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "context$subexpression$8", "symbols": ["logical_expr"]},
     {"name": "context$subexpression$8", "symbols": ["bool"]},
-    {"name": "context", "symbols": ["context$ebnf$3", (mxLexer.has("kw_undo") ? {type: "kw_undo"} : kw_undo), "__", "context$ebnf$4", "context$subexpression$8"], "postprocess":  d => ({
+    {"name": "context", "symbols": ["context$ebnf$3", (mxLexer.has("kw_undo") ? {type: "kw_undo"} : kw_undo), "_", "context$ebnf$4", "context$subexpression$8"], "postprocess":  d => ({
             type: 'ContextExpression',
             prefix : (d[0] != null ? d[0][0] : empty),
             context: d[1],
@@ -680,19 +680,24 @@ var grammar = {
     {"name": "destination", "symbols": ["property"], "postprocess": id},
     {"name": "destination", "symbols": ["index"], "postprocess": id},
     {"name": "destination", "symbols": ["path_name"], "postprocess": id},
-    {"name": "math_expr", "symbols": ["math_expr", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_operand"], "postprocess":  d => ({
+    {"name": "math_expr$subexpression$1", "symbols": ["math_operand"]},
+    {"name": "math_expr$subexpression$1", "symbols": ["math_as"]},
+    {"name": "math_expr", "symbols": ["math_expr", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_expr$subexpression$1"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
-            right:    d[4]
+            right:    d[4][0]
         })},
-    {"name": "math_expr", "symbols": ["math_operand", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_operand"], "postprocess":  d => ({
+    {"name": "math_expr$subexpression$2", "symbols": ["math_operand"]},
+    {"name": "math_expr$subexpression$2", "symbols": ["math_as"]},
+    {"name": "math_expr", "symbols": ["math_operand", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_expr$subexpression$2"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
-            right:    d[4]
+            right:    d[4][0]
         })},
-    {"name": "math_expr", "symbols": ["math_operand", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
+    {"name": "math_expr", "symbols": ["math_as"], "postprocess": id},
+    {"name": "math_as", "symbols": ["math_operand", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
