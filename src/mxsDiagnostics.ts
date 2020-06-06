@@ -12,14 +12,20 @@ const tokenListToValues = (tokenList: Dictionary<string>[]): string[] => {
 interface Dictionary<T> {
 	[key: string]: T;
 }
-// type parserError<T> = {
-// 	[P in keyof T]: T[P]
-// };
+
 type ErrorDetail = {
 	token?: moo.Token;
 	expected: Dictionary<string>[];
 
 };
+export interface ParserFatalError extends Error {
+	token: moo.Token;
+	offset: number;
+	details: Dictionary<string>[];
+}
+/**
+ * ParserError extends js Error
+ */
 export class ParserError extends Error {
 	constructor(message?: string) {
 	  // 'Error' breaks prototype chain here
@@ -31,28 +37,10 @@ export class ParserError extends Error {
 	tokens: moo.Token[] = [];
 	details: ErrorDetail[] = [];
 }
-/* export interface ParserError extends Error {
-	tokens: moo.Token[];
-	details: ErrorDetail[];
-} */
-export interface ParserFatalError extends Error {
-	token: moo.Token;
-	offset: number;
-	details: Dictionary<string>[];
-}
+
 function isFatalError(error: ParserError | ParserFatalError): error is ParserFatalError {
 	return (error as ParserFatalError).token ? true : false;
 }
-/*
-interface IerrSymbolInformation {
-	message: string;
-	// tag?:      string;
-	source?: string;
-	code?: string;
-	range: { start: number; end: number };
-	severity?: number;
-}
-*/
 //--------------------------------------------------------------------------------
 /**
  * Diagnostics collection. using just one for all the documents in workspace.
@@ -91,21 +79,10 @@ export function parsingErrorMessage(error: ParserFatalError): string {
  * @param error parser error type
  */
 export function provideParserDiagnostic(document: vscode.TextDocument, error: ParserError): vscode.Diagnostic[] {
-	// console.log('DOCTOR SIMI A LA ORDEN');
 	if (!document) { return []; }
 	let diagnostics: vscode.Diagnostic[];
 	let source = document.getText().split('\n');
-	/*
-	let tokenList = [];
-	if (isFatalError(error)) {
-		tokenList.push(error.token);
-		// tokenList.push( <ErrorDetail>{token:error.token, expected:error.details} );
-	} else {
-		// console.log('recovered!');
-		tokenList = [...error.tokens];
-		// tokenList = error.details;
-	}
-	//*/
+
 	let tokenList = [...error.tokens];
 	diagnostics = tokenList.map(t => {
 		let vsRange = vsRangeFromToken(document, t, source);

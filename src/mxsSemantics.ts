@@ -21,12 +21,12 @@ let lexer = moo.compile({
 	WS: { match: /(?:[ \t]+|(?:[ \t]*?[\\]+[ \t\r\n]*)+?)/, lineBreaks: true },
 	// path_name $mounstrosity*/_?
 	path: [
-		{ match: /[$](?:[A-Za-z0-9_\*\?\.\\]*)/ },
-		{ match: /[$](?:'[^'\r\n]+?')/ },
+		{ match: /[$](?:(?:[A-Za-z0-9_*?/\\]|[.]{3})*)/ },
+		{ match: /[$]/ }
 	],
 	// parameter <param_name>:
-	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*[:]/ },
-	// param: {match: /\:{1}/},
+	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/ },
+	param: { match: /:{1}/ },
 	globalTyped: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
 	// a mounstrosity
 	typedIden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/ },
@@ -161,7 +161,7 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 		});
 		return r;
 	}
-	// this will need to catch errors. currentry it tryes to dump all errors to a token and skip them.
+	// this will need to catch errors. currently it tries to dump all errors to a token and skip them.
 	private _tokenize(text: string): any[] {
 		let toks = [];
 		let save_state;
@@ -175,7 +175,6 @@ export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTo
 				toks.push(_token);
 			}
 		}
-		// console.log(toks);
 		return toks;
 	}
 }

@@ -1412,7 +1412,6 @@ const maxPrimitives = [
 	{label: 'GroupStartControl', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'HashTable', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'HKey', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
-	{label: 'ImgTag', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'integer', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'Integer64', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},
 	{label: 'IntegerPtr', detail: 'Primitive Values and constructors', kind: CompletionItemKind.Value,},

@@ -1,21 +1,16 @@
 'use strict';
 import * as vscode from 'vscode';
-// import {msxParser} from './mxsParseTree';
-
 import {
 	provideParserDiagnostic,
 	setDiagnostics,
 	provideTokenDiagnostic,
 	ParserError,
-	// ParserFatalError,
-	// parsingErrorMessage
 } from './mxsDiagnostics';
 
 import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
-const mxsParseSource = require('./lib/mxsParser');
-// import { mxsParseSource } from './mxsParser';
+// const mxsParseSource = require('./lib/mxsParser');
+import { mxsParseSource } from './mxsParser';
 //--------------------------------------------------------------------------------
-
 // type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
 const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
 	1: vscode.SymbolKind.Module,
@@ -31,11 +26,14 @@ const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
 };
 //--------------------------------------------------------------------------------
 /**
- * Parser initialization
+ * Parser initialization - DEPRECATED
  */
 // export const msxParser = new mxsParseSource('');
 //--------------------------------------------------------------------------------
-
+/**
+ * Provide document symbols. Impements the parser.
+ * TODO: fallback to safe regex match
+ */
 export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 	msxParser = new mxsParseSource('');
@@ -115,4 +113,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		});
 	}
 }
+/**
+ * Initialized mxsDocumentSymbolProvider. Intended to be consumed by the SymbolProviders and be persistent for the current editor, i norder to acces it from the minifier
+ */
 export const mxsDocumentSymbols = new mxsDocumentSymbolProvider();
