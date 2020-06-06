@@ -119,15 +119,10 @@ var mxLexer = moo.compile({
 	// strings ~RESOURCE~
 	locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
 	// parameter <param_name>:
-	params: {
-		match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/,
-		// value: x => x.slice(0, -1)
-	},
+	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/ },
 	param: { match: /:{1}/ },
 	// property <object>.<property>
-	// property: {
-	// match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1)
-	// },
+	// property: { match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1) },
 	// ::global variable
 	global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
 	// IDENTIFIERS
@@ -144,16 +139,16 @@ var mxLexer = moo.compile({
 	lparen: { match: /\(/ },
 	rparen: { match: /\)/ },
 	// BRACKETS, BRACES...
-	lbracket: { match: '[' },
-	rbracket: { match: ']' },
-	lbrace: { match: '{' },
-	rbrace: { match: '}' },
-	// time format
-
+	lbracket: { match: /\[/ },
+	rbracket: { match: /\]/ },
+	lbrace: { match: /\{/ },
+	rbrace: { match: /\}/ },
+	// Operators.
 	comparison: ['==', '!=', '>', '<', '>=', '<='],
 	assign: ['=', '+=', '-=', '*=', '/='],
 	unary: {match: /(?<=[^\w)-])-(?![-\s])/},
 	math: ['+', '-', '*', '/', '^'],
+	// time format
 	time: [
 		{ match: /(?:(?:[-]?[0-9]+[.])*[0-9]+[mMsSfFtT])+/ },
 		{ match: /(?:(?:[-]?[0-9]+[.])[0-9]*[mMsSfFtT])+/ },
@@ -161,8 +156,6 @@ var mxLexer = moo.compile({
 	],
 	// number formats
 	bitrange: { match: /[.]{2}/ },
-		// Operators.
-
 	number: [
 		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
 		{ match: /(?:[-]?[0-9]+\.(?!\.))/ },
@@ -175,7 +168,6 @@ var mxLexer = moo.compile({
 		{ match: /#[A-Za-z0-9_]+\b/ },
 		{ match: /#'[A-Za-z0-9_]+'/ },
 	],
-
 	// DELIMITERS
 	delimiter: { match: /\.(?!\.)/ },
 	sep: { match: /,/ },
