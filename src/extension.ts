@@ -4,13 +4,11 @@ import { getTextSel } from './utils';
 
 import mxsCompletion from './mxsAutocomplete';
 
-import { mxsDocumentSymbols } from './mxsOutline';
-
 import mxsDefinitions from './mxsDefinitions';
+import { mxsDocumentSymbols } from './mxsOutline';
 import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
 import { DiagnosticCollection }  from './mxsDiagnostics';
-
-import * as mxsMin from './mxsMin';
+import mxsMinifier from './mxsMin';
 
 export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
 // this is implemented in contributes languaje-configuration.json
@@ -104,13 +102,11 @@ export function activate(context: vscode.ExtensionContext) {
 		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_MODE, new DocumentSemanticTokensProvider(), legend));
 	}
 	// Minify
-	context.subscriptions.push(vscode.commands.registerTextEditorCommand('mxs.minify', mxsMin.minifyOpenEditor));
-
-	context.subscriptions.push(vscode.commands.registerCommand('mxs.minify.file', mxsMin.minifyFile));
-
-	context.subscriptions.push(vscode.commands.registerCommand('mxs.minify.files', mxsMin.openAndMinify));
-
-
+	context.subscriptions.push(
+		vscode.commands.registerTextEditorCommand('mxs.minify', mxsMinifier.minifyOpenEditor),
+		vscode.commands.registerCommand('mxs.minify.file', (fileUri) => {mxsMinifier.minifyFile(fileUri);}),
+		vscode.commands.registerCommand('mxs.minify.files', mxsMinifier.openAndMinify)
+	);
 }
 // this method is called when your extension is deactivated
 export function deactivate() { }
