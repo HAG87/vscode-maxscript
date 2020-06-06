@@ -201,15 +201,15 @@ class mxsParseSource {
 		// If there is more than one derivation, we only display the first one.
 		var stateStacks = expectantStates
 			.map(function (state) {
-				return this.parserInstance.buildFirstStateStack(state, []);
-			}, this);
+				return this.buildFirstStateStack(state, []);
+			}, this.parserInstance);
 		// Display each state that is expecting a terminal symbol next.
 		stateStacks.forEach(function (stateStack) {
 			var state = stateStack[0];
 			var nextSymbol = state.rule.symbols[state.dot];
 
 			possibleTokens.push(nextSymbol);
-		}, this);
+		});
 		return possibleTokens;
 	}
 	/** MD5 hash */

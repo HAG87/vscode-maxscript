@@ -8,165 +8,14 @@ const objectPath = require("object-path");
 // import { parentPath, findParentName } from './astUtils';
 const { parentPath, findParentName } = require('./lib/astUtils.js');
 //-----------------------------------------------------------------------------------
-function hasKey<O>(obj: O, key: keyof any): key is keyof O {
-	return key in obj;
-}
-type Dictionary = { [index: string]: string };
-/**
- * Type to represent a text range with start and end offset
- */
-export type Trange = { start: number; end: number };
-//-----------------------------------------------------------------------------------
-/**
- * Functions for getting the range of a statement. Grouped in a static class for coherency
- */
-export abstract class range {
-	static getRange(start: number, end: number): Trange {
-		return {
-			start: start,
-			end: end
-		};
-	}
-	static fromStartEndOffsets(startOff: number, endOff: number, value1: string): Trange {
-		return {
-			start: startOff,
-			end: (endOff + value1.length)
-		};
-	}
-	static fromOffset(offset: number, value: string): Trange {
-		return {
-			start: offset,
-			end: (offset + value.length)
-		};
-	}
-	static posFromLineCol(src: string | string[], line: number, col: number) {
-		let lines;
-		if (src instanceof Array) {
-			lines = src;
-		} else {
-			lines = src.split('\n');
-		}
-		/*
-		let charcount = 0;
-		for (var i = 0; i < line; i++) {
-			charcount += lines[i].length;
-		}
-		*/
-		let charcount = lines.slice(0, line - 1).reduce((prev, next) => {
-			return prev + next.length + 1;
-		}, 0);
-		return (charcount += col - 1);
-	}
-	static tokenOffsetFromLineCol(src: string | string[], node: any) {
-		let lines;
-		if (src instanceof Array) {
-			lines = src;
-		} else {
-			lines = src.split('\n');
-		}
-		// console.log('lines: '+node.line);
-		let charcount = lines.slice(0, node.line - 1).reduce((prev, next) => {
-			return prev + next.length + 1;
-		}, 0);
-		/*
-		// console.log(node.line);
-		let charcount = 0;
-		for (var i = 0; i < node.line; i++) {
-
-			// console.log(lines[i].length);
-			charcount += lines[i].length;
-		}
-		*/
-		// console.log('------');
-		// console.log(charcount);
-
-		return (charcount += node.col - 1);
-	}
-	static fromLineCol(src: string | string[], node: any) {
-		let offset = range.tokenOffsetFromLineCol(src, node);
-		return {
-			start: offset,
-			end: offset + node.text.length
-		};
-	}
-	// Get the range of the statement from the offset of the first and last child of the node
-	static fromChilds(node: any): Trange {
-		let paths: any[] = [];
-		// traverse the node to collect first and last child offset
-		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
-			const current = val1 != null ? val1 : key1;
-			if (key1 === "offset") {
-				paths.push(parentPath(innerObj.path));
-			}
-			return current;
-		});
-		// Childs
-		let start = objectPath.get(node, paths[0]).offset;
-		let last = objectPath.get(node, paths[paths.length - 1]);
-		// let start = paths[0].offset;
-		// let last = paths[paths.length - 1];
-
-		return this.fromStartEndOffsets(start, last.offset, last.text);
-	}
-	static fromChildsLC(source: string | string[], node: any): Trange {
-		let paths: any[] = [];
-		// traverse the node to collect first and last child offset
-		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
-			const current = val1 != null ? val1 : key1;
-			if (key1 === "offset") {
-				paths.push(parentPath(innerObj.path));
-			}
-			return current;
-		});
-		// Childs
-		let start = range.tokenOffsetFromLineCol(source, objectPath.get(node, paths[0]));
-		let last = objectPath.get(node, paths[paths.length - 1]);
-		// let start = paths[0].offset;
-		// let last = paths[paths.length - 1];
-
-		return this.fromStartEndOffsets(start, range.tokenOffsetFromLineCol(source, last), last.text);
-	}
-}
-export const vsRangeFromToken = (document: vscode.TextDocument, token: moo.Token, source?: string | string[]) => {
-	if (!source) {
-		let loc = range.fromOffset(token.offset, token.text);
-		return new vscode.Range(
-			document.positionAt(loc.start),
-			document.positionAt(loc.end)
-		);
-	} else {
-		let loc = range.fromLineCol(source, token);
-		return new vscode.Range(
-			document.positionAt(loc.start),
-			document.positionAt(loc.end)
-		);
-	}
-};
-/**
- * To vscode.SymbolInformation mapping later
- */
-export interface ISymbolInformation {
-	name: string;
-	kind: number;
-	containerName?: string;
-	location: Trange;
-}
-/**
- * To vscode.Diagnostic mapping later
- */
-export interface IerrSymbolInformation {
-	message: string;
-	tag?: string;
-	source: string;
-	code: string;
-	range: Trange;
-	severity: number;
+interface Dictionary<T> {
+	[key: string]: T;
 }
 //-----------------------------------------------------------------------------------
 /**
  * Maps values from type > vcode kind enumeration
  */
-let SymbolKind: { [key: string]: number } = {
+let SymbolKind: Dictionary<number> = {
 	'EntityRcmenu': 18,
 	'EntityRcmenu_submenu': 8,
 	'EntityRcmenu_separator': 18,
@@ -195,6 +44,135 @@ let SymbolKind: { [key: string]: number } = {
 	'Include': 1,
 };
 //-----------------------------------------------------------------------------------
+function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+	return key in obj;
+}
+/**
+ * Type to represent a text range with start and end offset
+ */
+export type Trange = { start: number; end: number };
+//-----------------------------------------------------------------------------------
+/**
+ * Functions for getting the range of a statement. Grouped in a static class for coherency
+ */
+export abstract class range {
+	static getRange(start: number, end: number): Trange {
+		return {
+			start: start,
+			end: end
+		};
+	}
+	static fromStartEndOffsets(startOff: number, endOff: number, value1: string): Trange {
+		return {
+			start: startOff,
+			end: (endOff + value1.length)
+		};
+	}
+	static fromOffset(offset: number, value: string): Trange {
+		return {
+			start: offset,
+			end: (offset + value.length)
+		};
+	}
+	static posFromLineCol(src: string | string[], line: number, col: number) {
+		let lines = Array.isArray(src) ? src : src.split('\n');
+		let charcount = lines.slice(0, line - 1).reduce((prev, next) => {
+			return prev + next.length + 1;
+		}, 0);
+		return (charcount += col - 1);
+	}
+	static tokenOffsetFromLineCol(src: string | string[], node: any) {
+		let lines = Array.isArray(src) ? src : src.split('\n');
+		let charcount = lines.slice(0, node.line - 1).reduce((prev, next) => {
+			return prev + next.length + 1;
+		}, 0);
+		return (charcount += node.col - 1);
+	}
+	static fromLineCol(src: string | string[], node: any) {
+		let offset = range.tokenOffsetFromLineCol(src, node);
+		return {
+			start: offset,
+			end: offset + node.text.length
+		};
+	}
+	/**
+	 * Get the range of the statement from the offset of the first and last child of the node
+	 * @param node CST node
+	 */
+	static fromChilds(node: any): Trange {
+		let paths: any[] = [];
+		// traverse the node to collect first and last child offset
+		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
+			const current = val1 != null ? val1 : key1;
+			if (key1 === "offset") {
+				paths.push(parentPath(innerObj.path));
+			}
+			return current;
+		});
+		// Childs
+		let start = objectPath.get(node, paths[0]).offset;
+		let last = objectPath.get(node, paths[paths.length - 1]);
+		return this.fromStartEndOffsets(start, last.offset, last.text);
+	}
+	/**
+	 *  Get the range of the statement from the line-column of the first and last child of the node
+	 * @param source Reference, the original string.
+	 * @param node CST node
+	 */
+	static fromChildsLC(source: string | string[], node: any): Trange {
+		let paths: any[] = [];
+		// traverse the node to collect first and last child offset
+		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
+			const current = val1 != null ? val1 : key1;
+			if (key1 === "offset") {
+				paths.push(parentPath(innerObj.path));
+			}
+			return current;
+		});
+		// Childs
+		let start = range.tokenOffsetFromLineCol(source, objectPath.get(node, paths[0]));
+		let last = objectPath.get(node, paths[paths.length - 1]);
+		return this.fromStartEndOffsets(start, range.tokenOffsetFromLineCol(source, last), last.text);
+	}
+}
+//-----------------------------------------------------------------------------------
+export const vsRangeFromToken = (document: vscode.TextDocument, token: moo.Token, source?: string | string[]) => {
+	if (!source) {
+		let loc = range.fromOffset(token.offset, token.text);
+		return new vscode.Range(
+			document.positionAt(loc.start),
+			document.positionAt(loc.end)
+		);
+	} else {
+		let loc = range.fromLineCol(source, token);
+		return new vscode.Range(
+			document.positionAt(loc.start),
+			document.positionAt(loc.end)
+		);
+	}
+};
+//-----------------------------------------------------------------------------------
+/**
+ * To vscode.SymbolInformation mapping later
+ */
+export interface ISymbolInformation {
+	name: string;
+	kind: number;
+	containerName?: string;
+	location: Trange;
+}
+/**
+ * To vscode.Diagnostic mapping later
+ */
+export interface IerrSymbolInformation {
+	message: string;
+	tag?: string;
+	source: string;
+	code: string;
+	range: Trange;
+	severity: number;
+}
+//-----------------------------------------------------------------------------------
 //DECLARATIONS
 //-----------------------------------------------------------------------------------
 /**
@@ -216,10 +194,6 @@ export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
 	return statements;
 }
 //-----------------------------------------------------------------------------------
-//TODO: Collect identifiers and calls to find references to functions, structs... decl, so on...
-// establish a declaration and usage points
-// get declarations in statements, set apernt>child>child order, set a declaration póint and implementation points for symbol defintions, and goto
-
 /**
  * For each element of a object-path collection, return a valid {name|parent|kind|location} node
  * @param {any[]} CST the CST
