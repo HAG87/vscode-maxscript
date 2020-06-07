@@ -1,4 +1,4 @@
-import {nearley} from 'nearley';
+import * as nearley from 'nearley';
 declare module 'nearley' {
 	interface Parser {
 		table: any[];
