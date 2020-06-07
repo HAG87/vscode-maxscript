@@ -103,8 +103,8 @@ var mxLexer = moo.compile({
 	comment_BLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true, },
 	// strings
 	string: [
-		{ match: /@"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(2, -1) },
-		{ match: /"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true, value: x => x.slice(1, -1) },
+		{ match: /@"(?:\\"|[^"])*?(?:"|\\")/, lineBreaks: true},
+		{ match: /"(?:\\["\\rntsx]|[^"])*?"/, lineBreaks: true},
 		// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
 	],
 	// whitespace -  also matches line continuations
@@ -119,17 +119,21 @@ var mxLexer = moo.compile({
 	// strings ~RESOURCE~
 	locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
 	// parameter <param_name>:
-	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/ },
+	global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
+	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:][^:])/ },
 	param: { match: /:{1}/ },
 	// property <object>.<property>
 	// property: { match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1) },
 	// ::global variable
-	global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
 	// IDENTIFIERS
-	identity: {
-		match: /[&]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
-		type: caseInsensitiveKeywords(keywordsDB)
-	},
+	identity: [
+		{ match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=\.)/},
+		{ match: /(?<=\.)[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/},
+		{
+			match: /[&]?[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/,
+			type: caseInsensitiveKeywords(keywordsDB)
+		}
+	],
 	// a mounstrosity
 	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1) },
 	// array marker #(...) | #{...}
@@ -175,11 +179,11 @@ var mxLexer = moo.compile({
 	statement: { match: /;/ },
 	// [\$?`] COMPLETE WITH UNWANTED CHARS HERE THAT CAN BREAK THE TOKENIZER
 	error: [
-		{ match: /[¿¡!`´]/, /* error: true  */ },
+		{ match: /[¿¡!`´]/, error: true},
 		{ match: /[/?\\]{2,}/ },
 	],
 	// This contains the rest of the stack in case of error.
-	fatalError: moo.error
+	// fatalError: moo.error
 });
 //-----------------------------------------------------------------------------------
 module.exports = mxLexer;
