@@ -34,6 +34,8 @@ export class ParserError extends Error {
 	  const actualProto = new.target.prototype;
 	  Object.setPrototypeOf(this, actualProto);
 	}
+	name: string = 'parse_error';
+	recoverable!: boolean;
 	tokens: moo.Token[] = [];
 	details: ErrorDetail[] = [];
 }
