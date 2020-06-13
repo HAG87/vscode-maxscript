@@ -22,7 +22,10 @@ function visit(node, callbackMap) {
 				let collection = [];
 				for (let j = 0; j < child.length; j++) {
 					if (isNode(child[j])) {
-						collection.push(_visit(child[j], node, key, level + 1));
+						collection.push(
+							_visit(child[j], node, key, level + 1)
+							// setImmediate(_visit, child[j], node, key, level + 1)
+						);
 					}
 					else {
 						// not object array items. i.e. null values
@@ -34,6 +37,7 @@ function visit(node, callbackMap) {
 			else if (isNode(child)) {
 				// value is an object, visit it
 				stack[key] = _visit(child, node, key, level + 1);
+				// stack[key] = setImmediate(_visit, child, node, key, level + 1);
 				// console.log(stack);
 			}
 			/*
@@ -45,6 +49,7 @@ function visit(node, callbackMap) {
 		}
 		let res;
 		if (nodeType && nodeType in callbackMap) {
+			// setImmediate( () => callbackMap[nodeType](node, stack));
 			res = callbackMap[nodeType](node, stack);
 		}
 		else if (nodeType) {
@@ -259,8 +264,9 @@ let visitorPatterns = {
 	MathExpression(node, stack) { return binaryNode(stack); },
 	LogicalExpression(node, stack) { return binaryNode(stack); },
 	UnaryExpression(node, stack) {
-		let ws = stack.right[0] !== '-' ? '' : ' ';
-		return `-${ws}${stack.right}`;
+		// let ws = stack.right[0] !== '-' ? '' : ' ';
+		// return `-${ws}${stack.right}`;
+		return `-${stack.right}`;
 	},
 	IfStatement(node, stack) {
 		let test = spaceSE(stack.test);
