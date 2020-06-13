@@ -5,7 +5,13 @@ import * as nearley from 'nearley';
 import grammar = require('./lib/grammar.js');
 import mxLexer = require('./lib/mooTokenize.js');
 import { ParserError } from "./mxsDiagnostics";
+import console = require('console');
+import console = require('console');
 //-----------------------------------------------------------------------------------
+function replaceWithWS(str: string) {
+	let ref = [...str];
+	return ref.reduce((acc,next) => { return acc + ' ';}, '');
+}
 /**
  * main class to manage the parser. Implements 'nearley' parser and 'moo' tokenizer
  */
@@ -26,7 +32,10 @@ export class mxsParseSource {
 	/** Declare a new parser instance */
 	private _declareParser() {
 		this.parserInstance = new nearley.Parser(
-			nearley.Grammar.fromCompiled(grammar));
+			nearley.Grammar.fromCompiled(grammar),
+			{
+				keepHistory: true
+			});
 		// this.parserInstance.feed('');
 		this.__parserState = this.parserInstance.save();
 	}
@@ -75,26 +84,6 @@ export class mxsParseSource {
 		}
 		return toks;
 	}
-	/**
-	 *
-	 * @param {String} source String to parse
-	 * @param {nearley.parser} parserInstance Instance of initialized parser
-	 * @param {Integer} tree Index of the parsed tree I want in return, results are multiple when the parser finds and ambiguity
-	 */
-	ParseSource() {
-		// Set a clean state
-		this.__parserState = this.parserInstance.save();
-
-		try {
-			this.parserInstance.feed(this.__source);
-			this.__parsedCST = this.parserInstance.results[0];
-		} catch (err) {
-			this.parserInstance.restore(this.__parserState);
-			this.parseWhitErrors();
-			// throw err;
-		}
-		// this.__parserState = this.parserInstance.save();
-	}
 	/** feed Stream to active parser */
 	feed(str: string) {
 		try {
@@ -108,9 +97,29 @@ export class mxsParseSource {
 		this.__parsedCST = this.parserInstance.results[0];
 	}
 	/**
+	 *
+	 * @param {String} source String to parse
+	 * @param {nearley.parser} parserInstance Instance of initialized parser
+	 * @param {Integer} tree Index of the parsed tree I want in return, results are multiple when the parser finds and ambiguity
+	 */
+	ParseSource() {
+		// Set a clean state
+		this.__parserState = this.parserInstance.save();
+		try {
+			this.parserInstance.feed(this.__source);
+			this.__parsedCST = this.parserInstance.results[0];
+		} catch (err) {
+			this.parserInstance.restore(this.__parserState);
+			let theErr = this.parseWithErrors();
+			throw theErr;
+		}
+		// this.__parserState = this.parserInstance.save();
+		return;
+	}
+	/**
 	 * Parser with error recovery
 	 */
-	private parseWhitErrors() {
+	private parseWithErrors() {
 		//-------------------------------------------------
 		// NEW METHOD TOKENIZING THE INPUT, COULD BE A WAY TO FEED TOKENS TO THE PARSER?
 		let src = this.TokenizeSource();
@@ -119,59 +128,147 @@ export class mxsParseSource {
 		let badTokens: any[] = [];
 		let errorReport: any[] = [];
 
-		let next = 0;
-		let remain = src.length - 1;
-		let parsings = () => {
+		let total = src.length - 1;
+
+		let reportSuccess = () => {
+			// console.log('parser report! - OK');
+			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
+			newErr.name = 'ERR_RECOVER';
+			newErr.recoverable = true;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+		let reportFailure = () => {
+			// console.log('parser report! - BAD ');
+			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
+			newErr.name = 'ERR_FATAL';
+			newErr.recoverable = false;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+
+		for (var next = 0; next < src.length; next++) {
 			try {
-				// this.parserInstance.feed(src[tok].text);
 				this.parserInstance.feed(src[next].text);
 			} catch (err) {
 				// catch non parsing related errors.
 				if (!err.token) { throw err; }
-				// console.log(src[next]);
+				// console.log(err.token);
 				badTokens.push(src[next]);
-				errorReport.push({ token: src[next], expected: this.PossibleTokens() });
+				errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
+				let filler = replaceWithWS(err.token.text);
+				err.token.text = filler;
+				err.token.value = filler;
+				err.token.type = "ws";
+				// src.splice(next, 1, err.token);
+				src[next] = err.token;
+				// console.log(src[next]);
+				// console.log(badTokens);
+				next -= 1;
 				this.parserInstance.restore(state);
-				// continue;
 			}
 			state = this.parserInstance.save();
-			if (next < remain) {
-				next += 1;
-				parsings();
-			}
-		}; parsings();
-		// DISABLED: Can't get a working CST, token locations are wrong
-		/*
-		let newErr;
-		if (this.parserInstance.results[0]) {
-			// console.log(this.parserInstance.results[0]);
-			this.__parsedCST = this.parserInstance.results[0];
-			// parsing passed
-			newErr = new ParserError('Parser finished with errors.');
-			newErr.name = 'ERR_RECOVER';
-			newErr.tokens = badTokens;
-			newErr.details = errorReport;
-			// newErr.parsedCST = this.parserInstance.results[0];
-		} else {
-			// console.log('unrecoverable error');
-			newErr = new ParserError('Parser failed. unrecoverable errors.');
-			newErr.name = 'ERR_FATAL';
-			newErr.tokens = badTokens;
-			newErr.details = errorReport;
-			// newErr = lastError;
-			// newErr.name = 'ERR_FATAL';
-			// newErr.expected = this._PossibleTokens();
-			// newErr.tokens = badTokens;
-			// newErr.details = errorReport;
 		}
-		*/
-		this.__parsedCST = [];
 
-		let newErr = new ParserError('Parser failed. unrecoverable errors.');
-		newErr.name = 'ERR_FATAL';
-		newErr.tokens = badTokens;
-		newErr.details = errorReport;
-		throw newErr;
+		this.__parsedCST = this.parserInstance.results[0] || [];
+
+		if (this.parserInstance.results[0]) {
+			return reportSuccess();
+		} else {
+			return reportFailure();
+		}
+	}
+
+	async ParseSourceAsync() {
+		// Set a clean state
+		this.__parserState = this.parserInstance.save();
+		try {
+			this.parserInstance.feed(this.__source);
+			this.__parsedCST = this.parserInstance.results[0];
+			return;
+		} catch (err) {
+			this.parserInstance.restore(this.__parserState);
+
+			this.parseWithErrorsAsync()
+				.then((response) => {
+					throw response;
+				});
+		}
+		// this.__parserState = this.parserInstance.save();
+	}
+
+	private parseWithErrorsAsync() {
+		let src = this.TokenizeSource();
+		let state = this.parserInstance.save();
+
+		let badTokens: any[] = [];
+		let errorReport: any[] = [];
+
+		let total = src.length - 1;
+
+		let reportSuccess = () => {
+			console.log('parser report! - OK');
+			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
+			newErr.name = 'ERR_RECOVER';
+			newErr.recoverable = true;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+		let reportFailure = () => {
+			console.log('parser report! - BAD ');
+			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
+			newErr.name = 'ERR_FATAL';
+			newErr.recoverable = false;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+		// report?:{tokens: any[]; details:{token: import("moo").Token[]; alvernatives: any[]}[]}
+		let promise = new Promise((resolve, reject) => {
+			let parsings = (src: import("moo").Token[], next: number, total: number ): any => {
+				try {
+					this.parserInstance.feed(src[next].text);
+				} catch (err) {
+					// catch non parsing related errors.
+					if (!err.token) { reject(err); }
+					badTokens.push(src[next]);
+					errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
+					let filler = replaceWithWS(err.token.text);
+					err.token.text = filler;
+					err.token.value = filler;
+					err.token.type = "ws";
+					// src.splice(next, 1, err.token);
+					src[next] = err.token;
+					next -= 1;
+					this.parserInstance.restore(state);
+				}
+				state = this.parserInstance.save();
+
+				if (next === total) {
+					console.log('parser ended!');
+					resolve();
+				} else {
+					return setImmediate( () => parsings(src, next + 1, total));
+				}
+			};
+			parsings(src, 0, total);
+		});
+		return new Promise((resolve, reject) => {
+			promise.then((response) => {
+				this.__parsedCST = this.parserInstance.results[0] || [];
+				console.log('parser waited!');
+				if (this.parserInstance.results[0]) {
+					resolve(reportSuccess());
+				} else {
+					resolve(reportFailure());
+				}
+			}, (err) => {
+				reject(err);
+			});
+		});
 	}
 	private PossibleTokens() {
 		var possibleTokens: any[] = [];

@@ -1,14 +1,15 @@
 'use strict';
+// import * as cp from 'child_process';
 import * as vscode from 'vscode';
 import {
 	provideParserDiagnostic,
 	setDiagnostics,
 	provideTokenDiagnostic,
 	ParserError,
+	DiagnosticCollection
 } from './mxsDiagnostics';
 
 import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
-// const mxsParseSource = require('./lib/mxsParser');
 import { mxsParseSource } from './mxsParser';
 //--------------------------------------------------------------------------------
 // type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
@@ -32,52 +33,23 @@ const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
 //--------------------------------------------------------------------------------
 /**
  * Provide document symbols. Impements the parser.
- * TODO: fallback to safe regex match
+ * TODO:
+ *  - fallback to safe regex match
+ *  - implement async version
+ * 	- implement child_process
  */
 export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
-
+	/** Start a parser instance */
 	msxParser = new mxsParseSource('');
-	ActiveDocument!: vscode.TextDocument;
+	/** Current active document */
+	activeDocument!: vscode.TextDocument;
+	/** Current document symbols */
+	activeDocumentSymbols!: vscode.SymbolInformation[];
 
-	private _getDocumentSymbols(document: vscode.TextDocument/*, tokens: mxsSymbolMatch[]*/): vscode.SymbolInformation[] {
-		let docTxt = document.getText();
-		let SymbolInfCol = new Array<vscode.SymbolInformation>();
-		let refSource;
-		let diagnostics: vscode.Diagnostic[] = [];
-
-		try {
-			// feed the parser
-			this.msxParser.source = docTxt;
-		} catch (err) {
-			// console.log(err.name);
-			// throw err;
-			switch (err.name) {
-				case 'ERR_RECOVER': {
-					// DISABLED: Can't get a working CST, token locations are wrong
-					// token offsets are broken for this!!! // no valid locations!!! // must use line-col
-					refSource = docTxt;
-					diagnostics = diagnostics.concat(provideParserDiagnostic(document, <ParserError>err));
-					// break;
-					throw err;
-				}
-				case 'ERR_FATAL': {
-					// fatal error - No CST
-					throw err;
-					// break;
-				}
-				default:
-					throw err;
-			}
-		}
-		// pass a reference to the current parsed document
-		this.ActiveDocument = document;
-		let CST = this.msxParser.parsedCST;
-		// console.log(msxParser.parsedCST);
+	private documentSymbolsFromCST(document: vscode.TextDocument, CST: any, options = {remapLocations: false}) {
 		let CSTstatements = collectStatementsFromCST(CST);
-		// console.log(CSTstatements);
-		let Symbols = collectSymbols(CST, CSTstatements, refSource);
-		// console.log(Symbols);
-		SymbolInfCol = Symbols.map((item) => {
+		let Symbols = collectSymbols(CST, CSTstatements, options.remapLocations ? document.getText() : undefined);
+		let SymbolInfCol = Symbols.map( item => {
 			return new vscode.SymbolInformation(
 				item.name,
 				SymbolKindMap[item.kind],
@@ -89,26 +61,65 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					))
 			);
 		});
-		// set Diagnostics for tokens
-		diagnostics = diagnostics.concat(provideTokenDiagnostic(document, collectTokens(CST, 'type', refSource, 'error')));
+		return SymbolInfCol;
+	}
+
+	private _getDocumentSymbols(document: vscode.TextDocument) {
+
+		let SymbolInfCol = new Array<vscode.SymbolInformation>();
+		let diagnostics: vscode.Diagnostic[] = [];
+		this.activeDocument = document;
+		try {
+			// console.log('> PARSER MAIN CALL');
+			// feed the parser
+			this.msxParser.source = document.getText();
+			this.msxParser.ParseSource();
+			// this.documentCST = this.msxParser.parsedCST;
+			SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST);
+			diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
+
+		} catch (err) {
+			if (err.recoverable !== undefined) {
+				// console.log('parse error! recover?: '+ err.recoverable);
+				if (err.recoverable === true) {
+					//recovered from error
+					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
+					SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST,{remapLocations: true});
+					diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error', document.getText())));
+					// throw err;
+				} else {
+					// fatal error
+					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
+					// throw err;
+				}
+			} else {
+				// not a parser error
+				throw err;
+			}
+		}
+		// setDiagnostics
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
-		// Return
+		// return
 		return SymbolInfCol;
 	}
 	// Function called from Main !!
-	// Diagnosis Hook UP here!
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
 		return new Promise((resolve, reject) => {
+			// console.log('OUTLINER CALLED!!: ' + document.uri.path);
+			if (token.isCancellationRequested) {
+				// console.log('rejection called');
+				reject(token);
+			}
+			// this hack tries to limit the parser execution. will keep it until I find a better solution.
 			try {
-				// setDiagnostics(document);
-				resolve(this._getDocumentSymbols(document/*, mxsSymbols*/));
-			} catch (err) {
-				// console.log(err);
-				if (err.name === 'ERR_FATAL') {
-					reject(setDiagnostics(document, provideParserDiagnostic(document, <ParserError>err)));
-				} else {
-					reject(err);
+				if (!document.isDirty || DiagnosticCollection.has(document.uri) || this.activeDocumentSymbols === undefined) {
+					this.activeDocumentSymbols = this._getDocumentSymbols(document);
 				}
+				// resolve(this._getDocumentSymbols(document));
+				resolve(this.activeDocumentSymbols);
+			} catch (err) {
+				setDiagnostics(document, undefined);
+				reject(err);
 			}
 		});
 	}
