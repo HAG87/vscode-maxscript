@@ -11,14 +11,13 @@ const objectPath = require("object-path");
  */
 function parentPath(path, level = 1) {
 	if (typeof path === "string") {
-		// CST must have at least two dots:
-		if (!path.includes(".") || !path.slice(path.indexOf(".") + 1).includes(".")) {
-			// zero is the root level's first element
-			return "0";
+		if (!path.includes(".")) {
+			return path;
+		} else {
+			let pathTree = path.split('.');
+			// will fail if level is greater than the path depth.
+			return pathTree.slice(0, -level).join('.');
 		}
-		return (
-			path.split('.').slice(0, -level).join('.')
-		);
 	}
 }
 //-----------------------------------------------------------------------------------
