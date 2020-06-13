@@ -117,16 +117,16 @@ var mxLexer = moo.compile({
 		{ match: /[$]/ }
 	],
 	// strings ~RESOURCE~
-	locale: { match: /~[A-Za-z0-9_]+~/, value: x => x.slice(2, -1) },
+	locale: { match: /~[A-Za-z0-9_]+~/},
 	// parameter <param_name>:
 	global_typed: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
-	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:][^:])/ },
-	param: { match: /:{1}/ },
+	// params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:][^:])/ },
 	// property <object>.<property>
 	// property: { match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/, value: x => x.slice(1) },
 	// ::global variable
 	// IDENTIFIERS
 	identity: [
+		{ match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:][^:])/ },
 		{ match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=\.)/},
 		{ match: /(?<=\.)[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/},
 		{
@@ -134,6 +134,7 @@ var mxLexer = moo.compile({
 			type: caseInsensitiveKeywords(keywordsDB)
 		}
 	],
+	param: { match: /:{1}/ },
 	// a mounstrosity
 	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1) },
 	// array marker #(...) | #{...}
@@ -150,7 +151,7 @@ var mxLexer = moo.compile({
 	// Operators.
 	comparison: ['==', '!=', '>', '<', '>=', '<='],
 	assign: ['=', '+=', '-=', '*=', '/='],
-	unary: {match: /(?<=[^\w)-])-(?![-\s])/},
+	// unary: {match: /(?<=[^\w)-])-(?![-\s])/},
 	math: ['+', '-', '*', '/', '^'],
 	// time format
 	time: [
@@ -161,10 +162,10 @@ var mxLexer = moo.compile({
 	// number formats
 	bitrange: { match: /[.]{2}/ },
 	number: [
-		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
-		{ match: /(?:[-]?[0-9]+\.(?!\.))/ },
-		{ match: /[-]?[0-9]+(?:[LP]|[eEdD][+-]?[0-9]+)?/ },
-		{ match: /(?:(?<!\.)[-]?\.[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
+		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ }, // 123.123d-6
+		{ match: /(?:[-]?[0-9]+\.(?!\.))/ }, // 123.
+		{ match: /[-]?[0-9]+(?:[LP]|[eEdD][+-]?[0-9]+)?/ }, // 456 | 123e-5 | integers
+		{ match: /(?:(?<!\.)[-]?\.[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ }, // -.789e-9
 	],
 	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	// #name literals .. should go higher??
@@ -173,7 +174,7 @@ var mxLexer = moo.compile({
 		{ match: /#'[A-Za-z0-9_]+'/ },
 	],
 	// DELIMITERS
-	delimiter: { match: /\.(?!\.)/ },
+	delimiter: { match: /\./ },
 	sep: { match: /,/ },
 	// NEWLINES
 	statement: { match: /;/ },

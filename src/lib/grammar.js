@@ -96,8 +96,6 @@ var grammar = {
     {"name": "simple_expr", "symbols": ["math_expr"], "postprocess": id},
     {"name": "simple_expr", "symbols": ["compare_expr"], "postprocess": id},
     {"name": "simple_expr", "symbols": ["logical_expr"], "postprocess": id},
-    {"name": "simple_expr", "symbols": ["operand"], "postprocess": id},
-    {"name": "simple_expr", "symbols": ["fn_call"], "postprocess": id},
     {"name": "rcmenu_def$subexpression$1", "symbols": [(mxLexer.has("kw_rcmenu") ? {type: "kw_rcmenu"} : kw_rcmenu), "__"]},
     {"name": "rcmenu_def$ebnf$1", "symbols": ["rcmenu_clauses"], "postprocess": id},
     {"name": "rcmenu_def$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
@@ -680,47 +678,76 @@ var grammar = {
     {"name": "destination", "symbols": ["property"], "postprocess": id},
     {"name": "destination", "symbols": ["index"], "postprocess": id},
     {"name": "destination", "symbols": ["path_name"], "postprocess": id},
-    {"name": "math_expr$subexpression$1", "symbols": ["math_operand"]},
-    {"name": "math_expr$subexpression$1", "symbols": ["math_as"]},
-    {"name": "math_expr", "symbols": ["math_expr", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_expr$subexpression$1"], "postprocess":  d => ({
+    {"name": "math_expr", "symbols": ["rest"], "postprocess": id},
+    {"name": "rest", "symbols": ["rest", "minus_ws", "sum"], "postprocess":  d => ({
             type:     'MathExpression',
-            operator: d[2],
+            operator: d[1],
             left:     d[0],
-            right:    d[4][0]
+            right:    d[2]
         })},
-    {"name": "math_expr$subexpression$2", "symbols": ["math_operand"]},
-    {"name": "math_expr$subexpression$2", "symbols": ["math_as"]},
-    {"name": "math_expr", "symbols": ["math_operand", "_S", (mxLexer.has("math") ? {type: "math"} : math), "_", "math_expr$subexpression$2"], "postprocess":  d => ({
-            type:     'MathExpression',
-            operator: d[2],
-            left:     d[0],
-            right:    d[4][0]
-        })},
-    {"name": "math_expr", "symbols": ["math_as"], "postprocess": id},
-    {"name": "math_as", "symbols": ["math_operand", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
+    {"name": "rest", "symbols": ["sum"], "postprocess": id},
+    {"name": "minus_ws", "symbols": [{"literal":"-"}], "postprocess": id},
+    {"name": "minus_ws", "symbols": [{"literal":"-"}, "__"], "postprocess": d => d[0]},
+    {"name": "minus_ws", "symbols": ["__", {"literal":"-"}, "__"], "postprocess": d => d[1]},
+    {"name": "sum", "symbols": ["sum", "_S", {"literal":"+"}, "_", "prod"], "postprocess":  d => ({
             type:     'MathExpression',
             operator: d[2],
             left:     d[0],
             right:    d[4]
         })},
+    {"name": "sum", "symbols": ["prod"], "postprocess": id},
+    {"name": "prod$subexpression$1", "symbols": [{"literal":"*"}]},
+    {"name": "prod$subexpression$1", "symbols": [{"literal":"/"}]},
+    {"name": "prod", "symbols": ["prod", "_S", "prod$subexpression$1", "_", "exp"], "postprocess":  d => ({
+            type:     'MathExpression',
+            operator: d[2],
+            left:     d[0],
+            right:    d[4]
+        })},
+    {"name": "prod", "symbols": ["exp"], "postprocess": id},
+    {"name": "exp", "symbols": ["as", "_S", {"literal":"^"}, "_", "exp"], "postprocess":  d => ({
+            type:     'MathExpression',
+            operator: d[2],
+            left:     d[0],
+            right:    d[4]
+        })},
+    {"name": "exp", "symbols": ["as"], "postprocess": id},
+    {"name": "as", "symbols": ["as", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
+            type:     'MathExpression',
+            operator: d[2],
+            left:     d[0],
+            right:    d[4]
+        })},
+    {"name": "as", "symbols": ["uny"], "postprocess": id},
+    {"name": "uny", "symbols": [{"literal":"-"}, "_", "math_operand"], "postprocess":  d => ({
+            type: 'UnaryExpression',
+            operator: d[0],
+            right:    d[2]
+        }) },
+    {"name": "uny", "symbols": ["math_operand"], "postprocess": id},
     {"name": "math_operand", "symbols": ["operand"], "postprocess": id},
     {"name": "math_operand", "symbols": ["fn_call"], "postprocess": id},
-    {"name": "conversion", "symbols": ["operand", "_S", (mxLexer.has("kw_as") ? {type: "kw_as"} : kw_as), "_", "var_name"], "postprocess":  d => ({
-            type:    'ConvertExpression',
-            operand: d[0],
-            class:   d[4]
-        })},
-    {"name": "logical_expr", "symbols": ["logical_expr", "_S", (mxLexer.has("kw_compare") ? {type: "kw_compare"} : kw_compare), "_", "logical_operand"], "postprocess":  d => ({
+    {"name": "logical_expr$subexpression$1", "symbols": ["logical_operand"]},
+    {"name": "logical_expr$subexpression$1", "symbols": ["not_operand"]},
+    {"name": "logical_expr", "symbols": ["logical_expr", "_S", (mxLexer.has("kw_compare") ? {type: "kw_compare"} : kw_compare), "_", "logical_expr$subexpression$1"], "postprocess":  d => ({
             type :    'LogicalExpression',
             operator: d[2],
             left:     d[0],
-            right:    d[4]
+            right:    d[4][0]
         }) },
-    {"name": "logical_expr", "symbols": ["logical_operand", "_S", (mxLexer.has("kw_compare") ? {type: "kw_compare"} : kw_compare), "_", "logical_operand"], "postprocess":  d => ({
+    {"name": "logical_expr$subexpression$2", "symbols": ["logical_operand"]},
+    {"name": "logical_expr$subexpression$2", "symbols": ["not_operand"]},
+    {"name": "logical_expr", "symbols": ["logical_operand", "_S", (mxLexer.has("kw_compare") ? {type: "kw_compare"} : kw_compare), "_", "logical_expr$subexpression$2"], "postprocess":  d => ({
             type :    'LogicalExpression',
             operator: d[2],
             left:     d[0],
-            right:    d[4]
+            right:    d[4][0]
+        }) },
+    {"name": "logical_expr", "symbols": ["not_operand"], "postprocess": id},
+    {"name": "not_operand", "symbols": [(mxLexer.has("kw_not") ? {type: "kw_not"} : kw_not), "_", "logical_operand"], "postprocess":  d => ({
+            type :    'LogicalExpression',
+            operator: d[0],
+            right:    d[2]
         }) },
     {"name": "logical_operand", "symbols": ["operand"], "postprocess": id},
     {"name": "logical_operand", "symbols": ["compare_expr"], "postprocess": id},
@@ -732,24 +759,41 @@ var grammar = {
             right:    d[4]
         }) },
     {"name": "compare_operand", "symbols": ["math_expr"], "postprocess": id},
-    {"name": "compare_operand", "symbols": ["operand"], "postprocess": id},
-    {"name": "compare_operand", "symbols": ["fn_call"], "postprocess": id},
-    {"name": "fn_call", "symbols": ["operand", "_S", "call_params"], "postprocess":  d => ({
+    {"name": "fn_call$ebnf$1$subexpression$1", "symbols": ["_S", "call_params"]},
+    {"name": "fn_call$ebnf$1", "symbols": ["fn_call$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "fn_call$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "fn_call", "symbols": ["call_caller", "_S", "call_args", "fn_call$ebnf$1"], "postprocess":  d => ({
+            type:  'CallExpression',
+            calle: d[0],
+            args:  merge(d[2], d[3])
+        })},
+    {"name": "fn_call", "symbols": ["call_caller", "_S", "call_params"], "postprocess":  d => ({
             type:  'CallExpression',
             calle: d[0],
             args:  d[2]
         })},
-    {"name": "call_params", "symbols": ["call_params", "_S", "fn_call_args"], "postprocess": d => [].concat(d[0], d[2])},
-    {"name": "call_params", "symbols": ["fn_call_args"]},
-    {"name": "fn_call_args", "symbols": ["operand"], "postprocess": id},
-    {"name": "fn_call_args", "symbols": ["parameter"], "postprocess": id},
-    {"name": "parameter", "symbols": ["param_name", "_", "operand"], "postprocess":  d => ({
+    {"name": "call_params", "symbols": ["call_params", "_S", "parameter"], "postprocess": d => [].concat(d[0], d[2])},
+    {"name": "call_params", "symbols": ["parameter"]},
+    {"name": "call_args", "symbols": ["call_args", "_S", "call_arg"], "postprocess": d => [].concat(d[0], d[2])},
+    {"name": "call_args", "symbols": ["call_arg"]},
+    {"name": "call_arg", "symbols": ["__", "u_operand"], "postprocess": d => d[1]},
+    {"name": "call_arg", "symbols": ["operand"], "postprocess": id},
+    {"name": "call_caller", "symbols": ["var_name"], "postprocess": id},
+    {"name": "call_caller", "symbols": ["property"], "postprocess": id},
+    {"name": "parameter$subexpression$1", "symbols": ["operand"]},
+    {"name": "parameter$subexpression$1", "symbols": ["u_operand"]},
+    {"name": "parameter", "symbols": ["param_name", "_", "parameter$subexpression$1"], "postprocess":  d => ({
             type: 'ParameterAssignment',
             param: d[0],
-            value: d[2],
+            value: d[2][0],
             //loc: d[0].loc
         })},
-    {"name": "param_name", "symbols": [(mxLexer.has("params") ? {type: "params"} : params), "_S", {"literal":":"}], "postprocess": d => ({type:'Identifier', value:d[0]})},
+    {"name": "param_name", "symbols": ["var_name", "_S", {"literal":":"}], "postprocess": d => ({type:'Identifier', value:d[0]})},
+    {"name": "u_operand", "symbols": [{"literal":"-"}, "operand"], "postprocess":  d => ({
+            type: 'UnaryExpression',
+            operator: d[1],
+            right:    d[2]
+        }) },
     {"name": "operand", "symbols": ["factor"], "postprocess": id},
     {"name": "operand", "symbols": ["property"], "postprocess": id},
     {"name": "operand", "symbols": ["index"], "postprocess": id},
@@ -765,39 +809,22 @@ var grammar = {
             index:   d[3],
             loc:     getLoc(d[0], d[4])
         })},
-    {"name": "factor", "symbols": ["norev_factor"], "postprocess": id},
-    {"name": "factor", "symbols": ["rev_factor"], "postprocess": id},
-    {"name": "factor", "symbols": ["u_factor"], "postprocess": id},
-    {"name": "factor", "symbols": ["not_factor"], "postprocess": id},
-    {"name": "u_factor", "symbols": [(mxLexer.has("unary") ? {type: "unary"} : unary), "rev_factor"], "postprocess":  d => ({
-            type: 'UnaryExpression',
-            operator: d[0],
-            right:    d[1]
-        }) },
-    {"name": "not_factor", "symbols": [(mxLexer.has("kw_not") ? {type: "kw_not"} : kw_not), "_", "neg_factor"], "postprocess":  d => ({
-            type :    'LogicalExpression',
-            operator: d[0],
-            right:    d[2]
-        }) },
-    {"name": "neg_factor", "symbols": ["bool"], "postprocess": id},
-    {"name": "neg_factor", "symbols": ["var_name"], "postprocess": id},
-    {"name": "neg_factor", "symbols": ["expr_seq"], "postprocess": id},
-    {"name": "norev_factor", "symbols": ["string"], "postprocess": id},
-    {"name": "norev_factor", "symbols": ["path_name"], "postprocess": id},
-    {"name": "norev_factor", "symbols": ["name_value"], "postprocess": id},
-    {"name": "norev_factor", "symbols": ["bool"], "postprocess": id},
-    {"name": "norev_factor", "symbols": ["void"], "postprocess": id},
-    {"name": "norev_factor", "symbols": [(mxLexer.has("error") ? {type: "error"} : error)], "postprocess": id},
-    {"name": "norev_factor", "symbols": [{"literal":"?"}], "postprocess": d => ({type: 'Keyword', value: d[0]})},
-    {"name": "rev_factor", "symbols": ["number"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["time"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["var_name"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["array"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["bitarray"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["point4"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["point3"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["point2"], "postprocess": id},
-    {"name": "rev_factor", "symbols": ["expr_seq"], "postprocess": id},
+    {"name": "factor", "symbols": ["string"], "postprocess": id},
+    {"name": "factor", "symbols": ["number"], "postprocess": id},
+    {"name": "factor", "symbols": ["path_name"], "postprocess": id},
+    {"name": "factor", "symbols": ["name_value"], "postprocess": id},
+    {"name": "factor", "symbols": ["bool"], "postprocess": id},
+    {"name": "factor", "symbols": ["void"], "postprocess": id},
+    {"name": "factor", "symbols": ["time"], "postprocess": id},
+    {"name": "factor", "symbols": ["var_name"], "postprocess": id},
+    {"name": "factor", "symbols": ["array"], "postprocess": id},
+    {"name": "factor", "symbols": ["bitarray"], "postprocess": id},
+    {"name": "factor", "symbols": ["point4"], "postprocess": id},
+    {"name": "factor", "symbols": ["point3"], "postprocess": id},
+    {"name": "factor", "symbols": ["point2"], "postprocess": id},
+    {"name": "factor", "symbols": ["expr_seq"], "postprocess": id},
+    {"name": "factor", "symbols": [{"literal":"?"}], "postprocess": d => ({type: 'Keyword', value: d[0]})},
+    {"name": "factor", "symbols": [(mxLexer.has("error") ? {type: "error"} : error)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_uicontrols") ? {type: "kw_uicontrols"} : kw_uicontrols)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_objectset") ? {type: "kw_objectset"} : kw_objectset)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_time") ? {type: "kw_time"} : kw_time)], "postprocess": id},
@@ -805,6 +832,8 @@ var grammar = {
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_menuitem") ? {type: "kw_menuitem"} : kw_menuitem)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_separator") ? {type: "kw_separator"} : kw_separator)], "postprocess": id},
     {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_submenu") ? {type: "kw_submenu"} : kw_submenu)], "postprocess": id},
+    {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_dontcollect") ? {type: "kw_dontcollect"} : kw_dontcollect)], "postprocess": id},
+    {"name": "kw_reserved", "symbols": [(mxLexer.has("kw_continue") ? {type: "kw_continue"} : kw_continue)]},
     {"name": "point4$subexpression$1", "symbols": ["_S", {"literal":","}, "_"]},
     {"name": "point4$subexpression$2", "symbols": ["_S", {"literal":","}, "_"]},
     {"name": "point4$subexpression$3", "symbols": ["_S", {"literal":","}, "_"]},
@@ -840,9 +869,9 @@ var grammar = {
             elements: d[1],
             loc:      getLoc(d[0][0], d[2][1])
         }) },
-    {"name": "array_expr", "symbols": ["expr"], "postprocess": id},
     {"name": "array_expr$subexpression$1", "symbols": ["_", {"literal":","}, "_"]},
     {"name": "array_expr", "symbols": ["array_expr", "array_expr$subexpression$1", "expr"], "postprocess": d => [].concat(d[0], d[2])},
+    {"name": "array_expr", "symbols": ["expr"]},
     {"name": "bitarray", "symbols": [(mxLexer.has("bitarraydef") ? {type: "bitarraydef"} : bitarraydef), "_", (mxLexer.has("rbrace") ? {type: "rbrace"} : rbrace)], "postprocess":  d => ({
             type:     'ObjectBitArray',
             elements: [],
@@ -855,12 +884,12 @@ var grammar = {
             elements: d[1],
             loc:      getLoc(d[0][0], d[2][1])
         }) },
-    {"name": "bitarray_expr", "symbols": ["bitarray_item"], "postprocess": id},
     {"name": "bitarray_expr$subexpression$1", "symbols": ["_", {"literal":","}, "_"]},
     {"name": "bitarray_expr", "symbols": ["bitarray_expr", "bitarray_expr$subexpression$1", "bitarray_item"], "postprocess": d => [].concat(d[0], d[2])},
-    {"name": "bitarray_item", "symbols": ["expr"], "postprocess": id},
+    {"name": "bitarray_expr", "symbols": ["bitarray_item"]},
     {"name": "bitarray_item$subexpression$1", "symbols": ["_S", (mxLexer.has("bitrange") ? {type: "bitrange"} : bitrange), "_"]},
     {"name": "bitarray_item", "symbols": ["expr", "bitarray_item$subexpression$1", "expr"], "postprocess": d => ({type: 'BitRange', start: d[0], end: d[2]})},
+    {"name": "bitarray_item", "symbols": ["expr"], "postprocess": id},
     {"name": "time", "symbols": [(mxLexer.has("time") ? {type: "time"} : time)], "postprocess": d => ({ type: 'Literal', value: d[0] })},
     {"name": "bool", "symbols": [(mxLexer.has("kw_bool") ? {type: "kw_bool"} : kw_bool)], "postprocess": d => ({ type: 'Literal', value: d[0] })},
     {"name": "bool", "symbols": [(mxLexer.has("kw_on") ? {type: "kw_on"} : kw_on)], "postprocess": d => ({ type: 'Literal', value: d[0] })},
