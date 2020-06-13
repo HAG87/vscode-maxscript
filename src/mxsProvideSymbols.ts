@@ -82,7 +82,9 @@ export abstract class range {
 		return (charcount += col - 1);
 	}
 	static tokenOffsetFromLineCol(src: string | string[], node: any) {
+
 		let lines = Array.isArray(src) ? src : src.split('\n');
+
 		let charcount = lines.slice(0, node.line - 1).reduce((prev, next) => {
 			return prev + next.length + 1;
 		}, 0);
@@ -100,19 +102,23 @@ export abstract class range {
 	 * @param node CST node
 	 */
 	static fromChilds(node: any): Trange {
-		let paths: any[] = [];
+		// let paths: any[] = [];
+		let childs: any[] = [];
 		// traverse the node to collect first and last child offset
 		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
 			const current = val1 != null ? val1 : key1;
 			if (key1 === "offset") {
-				paths.push(parentPath(innerObj.path));
+				// paths.push(parentPath(innerObj.path));
+				childs.push(innerObj.parent);
 			}
 			return current;
 		});
 		// Childs
-		let start = objectPath.get(node, paths[0]).offset;
-		let last = objectPath.get(node, paths[paths.length - 1]);
-		return this.fromStartEndOffsets(start, last.offset, last.text);
+		// let start = objectPath.get(node, paths[0]).offset;
+		// let last = objectPath.get(node, paths[paths.length - 1]);
+		let start = childs[0].offset;
+		let last = childs[childs.length - 1];
+		return range.fromStartEndOffsets(start, last.offset, last.text);
 	}
 	/**
 	 *  Get the range of the statement from the line-column of the first and last child of the node
@@ -120,36 +126,29 @@ export abstract class range {
 	 * @param node CST node
 	 */
 	static fromChildsLC(source: string | string[], node: any): Trange {
-		let paths: any[] = [];
+		let childs: any[] = [];
 		// traverse the node to collect first and last child offset
 		traverse2(node, (key1: string, val1: null, innerObj: any, stop: any) => {
 			const current = val1 != null ? val1 : key1;
 			if (key1 === "offset") {
-				paths.push(parentPath(innerObj.path));
+				childs.push(innerObj.parent);
 			}
 			return current;
 		});
-		// Childs
-		let start = range.tokenOffsetFromLineCol(source, objectPath.get(node, paths[0]));
-		let last = objectPath.get(node, paths[paths.length - 1]);
+		let start = range.tokenOffsetFromLineCol(source, childs[0]);
+		let last = childs[childs.length - 1];
 		return this.fromStartEndOffsets(start, range.tokenOffsetFromLineCol(source, last), last.text);
 	}
 }
 //-----------------------------------------------------------------------------------
 export const vsRangeFromToken = (document: vscode.TextDocument, token: moo.Token, source?: string | string[]) => {
-	if (!source) {
-		let loc = range.fromOffset(token.offset, token.text);
-		return new vscode.Range(
-			document.positionAt(loc.start),
-			document.positionAt(loc.end)
-		);
-	} else {
-		let loc = range.fromLineCol(source, token);
-		return new vscode.Range(
-			document.positionAt(loc.start),
-			document.positionAt(loc.end)
-		);
-	}
+	let loc = !source
+		? range.fromOffset(token.offset, token.text)
+		: range.fromLineCol(source, token);
+	return new vscode.Range(
+		document.positionAt(loc.start),
+		document.positionAt(loc.end)
+	);
 };
 //-----------------------------------------------------------------------------------
 /**
@@ -201,6 +200,9 @@ export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
  */
 export function collectSymbols(CST: any[], paths: string[], source?: string) {
 	let theSymbols;
+
+	// let loc = source ? range.fromChildsLC : range.fromChilds;
+
 	if (!source) {
 		theSymbols = paths.map(
 			path => {
@@ -218,6 +220,7 @@ export function collectSymbols(CST: any[], paths: string[], source?: string) {
 		let src = source.split('\n');
 		theSymbols = paths.map(
 			path => {
+				// This could be dropped, and collect the nodes directly, but maybe it performs better...
 				let currentNode = objectPath.get(CST, parentPath(path));
 				let _name = currentNode.id.value.value;
 				let theSymbol: ISymbolInformation = {
@@ -237,31 +240,29 @@ export function collectSymbols(CST: any[], paths: string[], source?: string) {
  * Return errorSymbol from invalid tokens
  * @param {object} CST the CST
  */
-export function collectTokens(CST: any, key: string = 'type', source?: string, value?: any) {
-
+export function collectTokens(CST: any, key: string = 'type', value?: any, source?: string) {
 	let Tokens: any[] = [];
-
-	traverse2(CST, (key1: string, val1: string | null, innerObj: { parent: any }, stop: any) => {
-		const current = val1 != null ? val1 : key1;
-		if (key1 === key) {
-			// console.log(innerObj.parent);
-			if (value) {
-				if (val1 === value) {
-					Tokens.push(innerObj.parent);
-				}
-			} else {
+	if (value) {
+		traverse2(CST, (key1: string, val1: string | null, innerObj: { parent: any }) => {
+			const current = val1 != null ? val1 : key1;
+			if (key1 === key && val1 === value) {
 				Tokens.push(innerObj.parent);
 			}
-		}
-		// if (filter[key1] === val1) Tokens.push(innerObj.parent);
-		return current;
-	});
+			return current;
+		});
+	} else {
+		traverse2(CST, (key1: string, val1: string | null, innerObj: { parent: any }) => {
+			const current = val1 != null ? val1 : key1;
+			if (key1 === key) {
+				Tokens.push(innerObj.parent);
+			}
+			return current;
+		});
+	}
+
 	if (source) {
-		// console.log('map offsets');
 		let src = source.split('\n');
 		Tokens = Tokens.map(token => {
-			// console.log(token.line+'|'+token.col);
-			// console.log(source.length);
 			token.offset = range.tokenOffsetFromLineCol(src, token);
 			return token;
 		});
