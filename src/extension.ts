@@ -83,20 +83,20 @@ export function activate(context: vscode.ExtensionContext) {
 		*/
 		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, mxsDocumentSymbols));
 	}
-	/*
-	// Diagnostics are handled by the parser.
-	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-		if (editor) {
-			// updateDiagnostics(editor.document, collection);
-			DiagnosticCollection;
-
-		}
-	}));
-	*/
 	// Diagnostics
+	// Diagnostics are handled by the parser.
 	if (mxsConfig.get('diagnostics', true) && mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(DiagnosticCollection);
 	}
+	// workspace.onDidChangeTextDocument
+	// this will remove diagnostics for deletd files.
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+		DiagnosticCollection.forEach(document => {
+			vscode.workspace.fs.stat(document).then( () => { },
+				() => DiagnosticCollection.delete(document));
+		});
+
+	}));
 	// definition provider
 	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new mxsDefinitions()));

@@ -129,10 +129,15 @@ export function provideTokenDiagnostic(document: vscode.TextDocument, errTokens:
  */
 export function setDiagnostics(document: vscode.TextDocument, diagnostic?: vscode.Diagnostic[],
 	collection: vscode.DiagnosticCollection = DiagnosticCollection): void {
+		
 	if (diagnostic) {
 		collection.set(document.uri, diagnostic);
 	} else {
 		// collection.clear();
 		collection.delete(document.uri);
 	}
+	// collection.forEach(document => {
+	// 	vscode.workspace.fs.stat(document).then(stat => {
+	// 	}, err => collection.delete(document));
+	// });
 }
