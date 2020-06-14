@@ -3,7 +3,7 @@
 .vscode-test/**
 out/src/test/**
 out/test/**
-src/test/**
+src/**
 test/**
 **/*.ts
 **/*.map
