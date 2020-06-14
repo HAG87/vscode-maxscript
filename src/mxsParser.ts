@@ -107,11 +107,13 @@ export class mxsParseSource {
 		this.__parserState = this.parserInstance.save();
 		try {
 			this.parserInstance.feed(this.__source);
+			console.log('PARSE TREES: '+ this.parserInstance.results.length);
+
 			this.__parsedCST = this.parserInstance.results[0];
 		} catch (err) {
 			this.parserInstance.restore(this.__parserState);
 			let theErr = this.parseWithErrors();
-			throw theErr;
+			// throw theErr;
 		}
 		// this.__parserState = this.parserInstance.save();
 		return;
@@ -122,42 +124,31 @@ export class mxsParseSource {
 	private parseWithErrors() {
 		//-------------------------------------------------
 		// NEW METHOD TOKENIZING THE INPUT, COULD BE A WAY TO FEED TOKENS TO THE PARSER?
+		console.log('parser - error');
+		// reset the parser
+		this.reset();
+
 		let src = this.TokenizeSource();
+		console.log(src.length);
 		let state = this.parserInstance.save();
 
 		let badTokens: any[] = [];
 		let errorReport: any[] = [];
 
+		let next = 0;
 		let total = src.length - 1;
 
-		let reportSuccess = () => {
-			// console.log('parser report! - OK');
-			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
-			newErr.name = 'ERR_RECOVER';
-			newErr.recoverable = true;
-			newErr.tokens = badTokens;
-			newErr.details = errorReport;
-			return newErr;
-		};
-		let reportFailure = () => {
-			// console.log('parser report! - BAD ');
-			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
-			newErr.name = 'ERR_FATAL';
-			newErr.recoverable = false;
-			newErr.tokens = badTokens;
-			newErr.details = errorReport;
-			return newErr;
-		};
-
-		for (var next = 0; next < src.length; next++) {
+		// for (var next = 0; next < total; next++) {
+		while (next <= total) {
 			try {
-				this.parserInstance.feed(src[next].text);
+				this.parserInstance.feed(src[next].toString());
+				// this.parserInstance.feed(src[next].text);
 			} catch (err) {
 				// catch non parsing related errors.
 				if (!err.token) { throw err; }
 				// console.log(err.token);
 				badTokens.push(src[next]);
-				errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
+				// errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
 				let filler = replaceWithWS(err.token.text);
 				err.token.text = filler;
 				err.token.value = filler;
@@ -166,18 +157,40 @@ export class mxsParseSource {
 				src[next] = err.token;
 				// console.log(src[next]);
 				// console.log(badTokens);
-				next -= 1;
+				next--;
 				this.parserInstance.restore(state);
 			}
 			state = this.parserInstance.save();
+			next++;
 		}
+		console.log('parser - error - ended');
+		// console.log(this.parserInstance.results.length);
 
+		let reportSuccess = () => {
+			console.log('parser report! - OK');
+			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
+			newErr.name = 'ERR_RECOVER';
+			newErr.recoverable = true;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+		let reportFailure = () => {
+			console.log('parser report! - BAD ');
+			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
+			newErr.name = 'ERR_FATAL';
+			newErr.recoverable = false;
+			newErr.tokens = badTokens;
+			newErr.details = errorReport;
+			return newErr;
+		};
+		
 		this.__parsedCST = this.parserInstance.results[0] || [];
 
 		if (this.parserInstance.results[0]) {
-			return reportSuccess();
+			throw reportSuccess();
 		} else {
-			return reportFailure();
+			throw reportFailure();
 		}
 	}
 
@@ -200,6 +213,8 @@ export class mxsParseSource {
 	}
 
 	private parseWithErrorsAsync() {
+		// reset the parser
+		this.reset();
 		let src = this.TokenizeSource();
 		let state = this.parserInstance.save();
 
