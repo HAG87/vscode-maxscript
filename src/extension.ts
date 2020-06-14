@@ -58,7 +58,6 @@ export function subscribeToDocumentChanges(context: vscode.ExtensionContext, emo
 	);
 
 }
-*/
 /**
  * This method is called when your extension is activated
  * Your extension is activated the very first time the command is executed
@@ -77,18 +76,23 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
+		/*
+		let dipoasable = vscode.workspace.onDidChangeTextDocument( (e) => {
+
+		}, null, context.subscriptions);
+		*/
 		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, mxsDocumentSymbols));
 	}
 	/*
-		// Why this works?
-		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-			if (editor) {
-				// updateDiagnostics(editor.document, collection);
-				DiagnosticCollection;
+	// Diagnostics are handled by the parser.
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+		if (editor) {
+			// updateDiagnostics(editor.document, collection);
+			DiagnosticCollection;
 
-			}
-		}));
-		*/
+		}
+	}));
+	*/
 	// Diagnostics
 	if (mxsConfig.get('diagnostics', true) && mxsConfig.get('gotosymbol', true)) {
 		context.subscriptions.push(DiagnosticCollection);
