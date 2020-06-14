@@ -5,8 +5,6 @@ import * as nearley from 'nearley';
 import grammar = require('./lib/grammar.js');
 import mxLexer = require('./lib/mooTokenize.js');
 import { ParserError } from "./mxsDiagnostics";
-import console = require('console');
-import console = require('console');
 //-----------------------------------------------------------------------------------
 function replaceWithWS(str: string) {
 	let ref = [...str];
@@ -37,7 +35,7 @@ export class mxsParseSource {
 				keepHistory: true
 			});
 		// this.parserInstance.feed('');
-		this.__parserState = this.parserInstance.save();
+		// this.__parserState = this.parserInstance.save();
 	}
 	/** get the source Stream */
 	get source() { return this.__source; }
@@ -103,17 +101,17 @@ export class mxsParseSource {
 	 * @param {Integer} tree Index of the parsed tree I want in return, results are multiple when the parser finds and ambiguity
 	 */
 	ParseSource() {
-		// Set a clean state
-		this.__parserState = this.parserInstance.save();
+		// Set a clean state - DISABLED FOR WORKAROUND OF PROBLEM -> ERROR RECOVERY DECLARES A CLEAN PARSER INSTANCE
+		// this.__parserState = this.parserInstance.save();
 		try {
 			this.parserInstance.feed(this.__source);
-			console.log('PARSE TREES: '+ this.parserInstance.results.length);
-
+			// console.log('PARSE TREES: '+ this.parserInstance.results.length);
+			// this.__parserState = this.parserInstance.save();
 			this.__parsedCST = this.parserInstance.results[0];
 		} catch (err) {
-			this.parserInstance.restore(this.__parserState);
+			// this.parserInstance.restore(this.__parserState);
 			let theErr = this.parseWithErrors();
-			// throw theErr;
+			throw theErr;
 		}
 		// this.__parserState = this.parserInstance.save();
 		return;
@@ -124,12 +122,11 @@ export class mxsParseSource {
 	private parseWithErrors() {
 		//-------------------------------------------------
 		// NEW METHOD TOKENIZING THE INPUT, COULD BE A WAY TO FEED TOKENS TO THE PARSER?
-		console.log('parser - error');
+		// console.log('parser - error');
 		// reset the parser
 		this.reset();
 
 		let src = this.TokenizeSource();
-		console.log(src.length);
 		let state = this.parserInstance.save();
 
 		let badTokens: any[] = [];
@@ -148,6 +145,7 @@ export class mxsParseSource {
 				if (!err.token) { throw err; }
 				// console.log(err.token);
 				badTokens.push(src[next]);
+				/* DISABLED FEATURE - NEEDS OPTIMIZATION */
 				// errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
 				let filler = replaceWithWS(err.token.text);
 				err.token.text = filler;
@@ -163,11 +161,10 @@ export class mxsParseSource {
 			state = this.parserInstance.save();
 			next++;
 		}
-		console.log('parser - error - ended');
+		// console.log('parser - error - ended');
 		// console.log(this.parserInstance.results.length);
-
 		let reportSuccess = () => {
-			console.log('parser report! - OK');
+			// console.log('parser report! - OK');
 			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
 			newErr.name = 'ERR_RECOVER';
 			newErr.recoverable = true;
@@ -176,7 +173,7 @@ export class mxsParseSource {
 			return newErr;
 		};
 		let reportFailure = () => {
-			console.log('parser report! - BAD ');
+			// console.log('parser report! - BAD ');
 			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
 			newErr.name = 'ERR_FATAL';
 			newErr.recoverable = false;
@@ -184,16 +181,20 @@ export class mxsParseSource {
 			newErr.details = errorReport;
 			return newErr;
 		};
-		
+		// SET CST RESULT...
 		this.__parsedCST = this.parserInstance.results[0] || [];
-
+		// REPORT THE ERROR BACK
 		if (this.parserInstance.results[0]) {
-			throw reportSuccess();
+			// throw reportSuccess();
+			return reportSuccess();
 		} else {
-			throw reportFailure();
+			// throw reportFailure();
+			return reportFailure();
 		}
 	}
-
+	/**
+	 * UNFINISHED: ASYNC Parser 
+	 */
 	async ParseSourceAsync() {
 		// Set a clean state
 		this.__parserState = this.parserInstance.save();
@@ -211,7 +212,9 @@ export class mxsParseSource {
 		}
 		// this.__parserState = this.parserInstance.save();
 	}
-
+	/**
+	 * UNFINISHED: ASYNC Error recovery
+	 */
 	private parseWithErrorsAsync() {
 		// reset the parser
 		this.reset();

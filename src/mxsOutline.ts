@@ -73,12 +73,12 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 			// console.log('> PARSER MAIN CALL');
 			// feed the parser
 			this.msxParser.source = document.getText();
-			this.msxParser.ParseSource();
 			// this.documentCST = this.msxParser.parsedCST;
 			SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST);
 			diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
 
 		} catch (err) {
+			// console.log(err);
 			if (err.recoverable !== undefined) {
 				// console.log('parse error! recover?: '+ err.recoverable);
 				if (err.recoverable === true) {
@@ -89,11 +89,13 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					// throw err;
 				} else {
 					// fatal error
+					// console.log('parse error! recover?: '+ err.recoverable);
 					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
 					// throw err;
 				}
 			} else {
 				// not a parser error
+				// console.log(err);
 				throw err;
 			}
 		}
@@ -104,10 +106,11 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 	}
 	// Function called from Main !!
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
+		// console.log('OUTLINER CALLED!!: ' + document.uri.path);
 		return new Promise((resolve, reject) => {
-			// console.log('OUTLINER CALLED!!: ' + document.uri.path);
 			if (token.isCancellationRequested) {
 				// console.log('rejection called');
+				setDiagnostics(document, undefined);
 				reject(token);
 			}
 			// this hack tries to limit the parser execution. will keep it until I find a better solution.
