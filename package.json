@@ -2,7 +2,7 @@
 	"name": "language-maxscript",
 	"displayName": "Language MaxScript",
 	"description": "Autodesk 3ds Max MaxScript language support",
-	"version": "1.10.0",
+	"version": "1.50.0",
 	"publisher": "atelierbump",
 	"icon": "mxs.png",
 	"homepage": "https://github.com/HAG87/vscode-maxscript",
@@ -213,9 +213,7 @@
 	},
 	"dependencies": {
 		"ast-monkey-traverse-with-lookahead": "^1.1.2",
-		"ast-monkey-traverse": "^1.12.9",
 		"ast-monkey-util": "^1.1.5",
-		"ast-monkey": "^7.11.7",
 		"moo": "^0.5.1",
 		"nearley": "^2.19.3",
 		"object-path": "^0.11.4"
