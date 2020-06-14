@@ -173,7 +173,7 @@
 				},
 				{
 					"name": "keyword.control.mxs",
-					"match": "(?i)\\b(?>case|catch|collect|continue|do|else|exit|for|if|return|then|throw|try|when|where|while|with|dontcollect|of|at|by|in|to)\\b"
+					"match": "(?i)\\b(case|catch|collect|continue|do|else|exit|for|if|return|then|throw|try|when|where|while|with|dontcollect|of|at|by|in|to)\\b"
 				},
 				{
 					"name":  "keyword.other.mxs",
