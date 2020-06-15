@@ -650,9 +650,9 @@ var grammar = {
             ...d[0],
             decls: d[2]
         })},
-    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)], "postprocess": d => ({scope: d[0].value, loc:getLoc(d[0])})},
-    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_global") ? {type: "kw_global"} : kw_global)], "postprocess": d => ({scope: d[0].value, loc:getLoc(d[0])})},
-    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_persistent") ? {type: "kw_persistent"} : kw_persistent), "__", (mxLexer.has("kw_global") ? {type: "kw_global"} : kw_global)], "postprocess": d => ({scope: 'persistent global', loc:getLoc(d[0], d[2])})},
+    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)], "postprocess": d => ({modifier:null, scope: d[0], loc:getLoc(d[0])})},
+    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_global") ? {type: "kw_global"} : kw_global)], "postprocess": d => ({modifier:null, scope: d[0], loc:getLoc(d[0])})},
+    {"name": "kw_decl", "symbols": [(mxLexer.has("kw_persistent") ? {type: "kw_persistent"} : kw_persistent), "__", (mxLexer.has("kw_global") ? {type: "kw_global"} : kw_global)], "postprocess": d => ({modifier: d[0], scope: d[2], loc:getLoc(d[0], d[2])})},
     {"name": "decl_args", "symbols": ["decl"]},
     {"name": "decl_args$ebnf$1$subexpression$1$subexpression$1", "symbols": ["_S", {"literal":","}, "_"]},
     {"name": "decl_args$ebnf$1$subexpression$1", "symbols": ["decl_args$ebnf$1$subexpression$1$subexpression$1", "decl"]},
