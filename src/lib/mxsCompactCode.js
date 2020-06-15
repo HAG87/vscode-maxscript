@@ -59,7 +59,6 @@ function visit(node, callbackMap) {
 			res = keys.map(x => stack[x]).join(';');
 		}
 		//--------------------------------
-		// console.log(chalk.inverse(res));
 		return res;
 	}
 }
@@ -109,11 +108,10 @@ let visitorPatterns = {
 	// LITERALS
 	Literal: (node, stack) => stack.value,
 	Identifier: (node, stack) => stack.value,
+	BitRange: (node, stack) => `${stack.start}..${stack.end}`,
+	// Declaration
 	Declaration(node, stack) {
 		return stack.value ? `${stack.id}=${stack.value}` : stack.id;
-	},
-	BitRange(node, stack) {
-		return `${stack.start}..${stack.end}`;
 	},
 	// Types
 	ObjectArray(node, stack) {
@@ -140,7 +138,7 @@ let visitorPatterns = {
 	AccessorProperty(node, stack) { return `${stack.operand}.${stack.property}`; },
 	// Call
 	CallExpression(node, stack) {
-		let args = joinStr(stack.args);
+		let args = joinStatements(stack.args);
 		return `${stack.calle}${spaceLR(stack.calle, args)}${args}`;
 	},
 	// Assign
@@ -173,46 +171,37 @@ let visitorPatterns = {
 		}
 		return `struct ${stack.id}(${body})`;
 	},
-	StructScope(node, stack) {
-		return stack.value;
-	},
+	StructScope: (node, stack) => stack.value,
 	// Functions
 	Function(node, stack) {
 		let decl = `${node.mapped ? 'mapped ' : ''}${stack.keyword} ${stack.id}`;
-
-		let args = ('args' in stack) ? joinStr(stack.args) : '';
-		let params = ('params' in stack) ? joinStr(stack.params) : '';
-
+		let args = ('args' in stack) ? joinStatements(stack.args) : '';
+		let params = ('params' in stack) ? joinStatements(stack.params) : '';
 		let body = exprTerm(stack.body);
-
-		let spacer = args.length > 0 ? spaceLR(decl, args) : spaceLR(decl, params);
-
-		return `${decl}${spacer}${args}${spaceLR(args, params)}${params}=${body}`
-		// return (decl + args + params + '=' + spaceLR('=', body) + body);
+		return joinStatements([decl, args, params, '=', body]);
 	},
 	FunctionReturn(node, stack) {
-		let body = exprTerm(stack.body);
-		return `return${spaceLR('return', body)}${body}`;
+		return joinStatements(['return', exprTerm(stack.body)]);
 	},
 	// Plugin
 	EntityPlugin(node, stack) {
 		let body = exprTerm(stack.body);
-		return `plugin ${stack.superclass} ${stack.class} ${joinStr(stack.params)}(${body})`;
+		return joinStatements(['plugin', stack.superclass, stack.class, ...stack.params, body]);
 	},
 	EntityPlugin_params(node, stack) {
 		let body = exprTerm(stack.body);
-		return `parameters ${stack.id} ${joinStr(stack.params)}(${body})`;
+		return `parameters ${stack.id} ${joinStatements(stack.params)}(${body})`;
 	},
 	PluginParam(node, stack) {
-		return `${stack.id} ${joinStr(stack.params)}`;
+		return `${stack.id} ${joinStatements(stack.params)}`;
 	},
 	// Tool
 	EntityTool(node, stack) {
-		return `tool ${stack.id} ${joinStr(stack.params)}(${exprTerm(stack.body)})`;
+		return `tool ${stack.id} ${joinStatements(stack.params)}(${exprTerm(stack.body)})`;
 	},
 	// MacroScript
 	EntityMacroscript(node, stack) {
-		return `macroScript ${stack.id} ${joinStr(stack.params)}(${exprTerm(stack.body)})`;
+		return `macroScript ${stack.id} ${joinStatements(stack.params)}(${exprTerm(stack.body)})`;
 	},
 	// rcMenu
 	EntityRcmenu(node, stack) {
@@ -222,120 +211,118 @@ let visitorPatterns = {
 		return `subMenu${stack.label}${stack.params}(${exprTerm(stack.body)})`;
 	},
 	EntityRcmenu_menuitem(node, stack) {
-		return `menuItem ${stack.id}${stack.label}${joinStr(stack.params)}`;
+		return `menuItem ${stack.id}${stack.label}${joinStatements(stack.params)}`;
 	},
 	EntityRcmenu_separator(node, stack) {
-		let params = joinStr(stack.params);
-		return `separator ${stack.id}${spaceLR(stack.id, params)}${params}`;
+		return joinStatements(['separator', stack.id, ...stack.params]);
 	},
 	// Utility - Rollout
 	EntityUtility(node, stack) {
-		return `utility ${stack.id}${stack.title}${joinStr(stack.params)}(${exprTerm(stack.body)})`;
+		return `utility ${stack.id}${stack.title}${joinStatements(stack.params)}(${exprTerm(stack.body)})`;
 	},
 	EntityRollout(node, stack) {
-		return `rollout ${stack.id}${stack.title}${joinStr(stack.params)}(${exprTerm(stack.body)})`;
+		return `rollout ${stack.id}${stack.title}${joinStatements(stack.params)}(${exprTerm(stack.body)})`;
 	},
 	EntityRolloutGroup(node, stack) {
 		return `group${stack.id}(${exprTerm(stack.body)})`;
 	},
 	EntityRolloutControl(node, stack) {
-		return `${stack.class} ${stack.id}${stack.text || ' '}${joinStr(stack.params)}`;
+		return joinStatements([stack.class, stack.id, stack.text, ...stack.params]);
 	},
 	// Event
 	Event(node, stack) {
 		let body = exprTerm(stack.body);
-		return `on ${stack.args} ${stack.modifier}${spaceLR(stack.modifier, body)}${body}`;
+		return joinStatements(['on', stack.args, stack.modifier, body]);
 	},
 	EventArgs(node, stack) {
-		let args = [].concat((stack.target || ''), (stack.event || ''), (joinStr(stack.args))).filter(x => x.length > 0).join(' ');
-		return args;
+		return [].concat(
+				stack.target || '',
+				stack.event || '',
+				joinStatements(stack.args)
+			)
+			.filter(x => x.length > 0)
+			.join(' ');
 	},
 	WhenStatement(node, stack) {
-		let args = joinStr(stack.args);
+		let args = joinStatements(stack.args);
 		let body = exprTerm(stack.body);
-
-		return `when${spaceLR('when', args)}${args}${spaceLR(args, 'do')}do${spaceLR('do', body)}${body}`;
+		return joinStatements(['when', args, 'do', body]);
 	},
 	// Declarations
 	VariableDeclaration(node, stack) {
-		return `${node.scope} ${stack.decls.join(',')}`;
+		if (stack.modifier) {
+			return `${stack.modifier} ${stack.scope} ${stack.decls.join(',')}`;
+		} else {
+			return `${stack.scope} ${stack.decls.join(',')}`;
+		}
 	},
 	// SIMPLE EXPRESSIONS
-	MathExpression(node, stack) { return binaryNode(stack); },
-	LogicalExpression(node, stack) { return binaryNode(stack); },
-	UnaryExpression(node, stack) {
-		// let ws = stack.right[0] !== '-' ? '' : ' ';
-		// return `-${ws}${stack.right}`;
-		return `-${stack.right}`;
-	},
+	MathExpression: (node, stack) => binaryNode(stack),
+	LogicalExpression: (node, stack) => binaryNode(stack),
+	UnaryExpression: (node, stack) => `-${stack.right}`,
+	// STATEMENTS
 	IfStatement(node, stack) {
-		let test = spaceSE(stack.test);
-		let operator = stack.operator && stack.operator === 'do' ? 'do' : 'then';
-		let consequent;
+		let test = stack.test;
+		let operator = stack.operator ? stack.operator : 'then';
+		let consequent = stack.consequent;
+		let alternate = stack.alternate;
 		let res;
-		if (stack.alternate) {
-			consequent = spaceSE(stack.consequent);
-			let alternate = spaceSE(stack.alternate, false);
-			res = `if${test}${operator}${consequent}else${alternate}`;
+		if (alternate) {
+			res = ['if', test, operator, consequent, 'else', alternate];
+		} else {
+			res = ['if', test, operator, consequent];
 		}
-		else {
-			consequent = spaceSE(stack.consequent, false);
-			res = `if${test}${operator}${consequent}`;
-		}
-		return res;
+		return joinStatements(res);
 	},
 	LoopExit(node, stack) {
 		let body = exprTerm(stack.body);
-		return `exit with${spaceLR('with', body)}${body}`;
+		return joinStatements(['exit with', body])
 	},
 	TryStatement(node, stack) {
-		let block = spaceSE(stack.block);
-		let finalizer = spaceSE(stack.finalizer, false);
-		return `try${block}catch${finalizer}`;
+		return joinStatements(['try', stack.block, 'catch', stack.finalizer]);
 	},
 	DoWhileStatement(node, stack) {
 		let body = exprTerm(stack.body);
-		return `do${spaceSE(body)}while${spaceLR('while', stack.test)}${stack.test}`;
+		return joinStatements(['do', body, 'while', stack.test]);
 	},
 	WhileStatement(node, stack) {
-		let test = spaceSE(stack.test);
 		let body = exprTerm(stack.body);
-		return `while${test}do${spaceLR('do', body)}${body}`;
+		return joinStatements(['while', stack.test, 'do', body])
 	},
 	ForStatement(node, stack) {
-		let it = `for ${stack.variable}${spaceLR(stack.variable, stack.iteration)}${stack.iteration}`;
-		let val = `${spaceLR(stack.iteration, stack.value)}${stack.value}`;
-		let seq = spaceSE(stack.sequence);
 		let body = exprTerm(stack.body);
-		let spacer = (stack.sequence.length > 0) ? spaceLR(seq, stack.action) : spaceLR(val, stack.action);
-		let act = `${spacer}${stack.action}${spaceLR(stack.action, body)}${body}`;
-		return (it + val + seq + act);
+
+		let it = ['for', stack.variable, stack.iteration];
+		let valseq = [stack.value, stack.sequence];
+		let act = [stack.action, body];
+		return joinStatements([].concat(it, valseq, act));
 	},
 	ForLoopSequence(node, stack) {
-		let _to = (stack.to.length > 0) ? `to${spaceSE(stack.to)}` : '';
-		let _by = (stack.by.length > 0) ? `by${spaceSE(stack.by)}` : '';
-		let _while = (stack.while.length > 0) ? `while${spaceSE(stack.while)}` : '';
+		let _to = (stack.to.length > 0) ? `to${spaceSE(stack.to, false)}` : '';
+		let _by = (stack.by.length > 0) ? `by${spaceSE(stack.by, false)}` : '';
+		let _while = (stack.while.length > 0) ? `while${spaceSE(stack.while, false)}` : '';
 		let _where = (stack.where.length > 0) ? `where${spaceSE(stack.where, false)}` : '';
-		return (_to + _by + _while + _where);
+		return joinStatements([_to, _by, _while, _where]);
+
 	},
 	CaseStatement(node, stack) {
-		return `case${spaceSE(stack.test)}of(${stack.cases.join(';')});`;
+		return joinStatements(['case', stack.test, 'of', '(', stack.cases.join(';'), ');']);
 	},
 	CaseClause(node, stack) {
 		let body = exprTerm(stack.body);
-		return `${stack.case}:${body}`;
+		let spacer = /\d$/gmi.test(stack.case) ? ' ' : '';
+		return `${stack.case}${spacer}:${body}`;
 	},
 	// context expressions
 	ContextStatement(node, stack) {
 		let contx = stack.context.join(',');
 		let body = exprTerm(stack.body);
-		return `${contx}${spaceLR(contx, body)}${body}`;
+		return joinStatements([contx, body]);
 	},
 	ContextExpression(node, stack) {
 		let prefix = stack.prefix || '';
 		let context = stack.context;
-		let args = joinStr(stack.args);
-		return `${prefix}${spaceLR(prefix, context)}${context}${spaceLR(context, args)}${args}`;
+		return joinStatements([prefix, context, ...stack.args]);
 	},
 };
 // Basic expressions
@@ -355,22 +342,17 @@ function binaryNode(node) {
 	return `${left}${node.operator}${right}`;
 }
 function exprTerm(exprArr) {
-	if (Array.isArray(exprArr)) {
-		return exprArr.join(';');
-	} else {
-		return exprArr;
-	}
+	return (Array.isArray(exprArr) ? exprArr.join(';') : exprArr);
 }
 /**
  * Join string array
  * @param {string[] | undefined} arr
  */
-function joinStr(arr) {
-	if (!arr || arr.length === 0) {
-		return '';
-	}
+function joinStatements(arr) {
+	if (!arr || arr.length === 0) return '';
 	return arr.reduce((acc, curr) => {
-		return acc + spaceLR(acc, curr) + curr;
+		let term = curr || '';
+		return (acc + spaceLR(acc, term) + term);
 	});
 }
 /**
@@ -379,12 +361,8 @@ function joinStr(arr) {
  * @param {string} str2 Right string
  */
 function spaceLR(str1, str2) {
-	if (!str2 || !str1) {
-		return '';
-	}
-	else {
-		return /[\w_$?-]$/gmi.test(str1) && /^[\w_-]/gmi.test(str2) ? ' ' : '';
-	}
+	if (!str2 || !str1) return '';
+	return /[\w_$?-]$/gmi.test(str1) && /^(?:[\w_-]|::)/gmi.test(str2) ? ' ' : '';
 }
 /**
  * Wrap string in spaces if alphanumeric
@@ -392,7 +370,7 @@ function spaceLR(str1, str2) {
  * @param {bool} end Add ws at end
  */
 function spaceSE(str, end = true) {
-	let _start = /^[\w_-]/gmi.test(str) ? ' ' : '';
+	let _start = /^(?:[\w_-]|::)/gmi.test(str) ? ' ' : '';
 	let _end = /[\w_$?-]$/gmi.test(str) && end ? ' ' : '';
 	return `${_start}${str}${_end}`;
 }
