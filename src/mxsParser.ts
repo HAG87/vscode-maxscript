@@ -48,7 +48,7 @@ export class mxsParseSource {
 	}
 	/** Get the parsed CST, if any */
 	get parsedCST() {
-		return this.__parsedCST || this.parserInstance.results[0];
+		return this.__parsedCST || this.parserInstance.results[0] || [];
 	}
 	/** Reset the parser * */
 	reset() { this._declareParser(); }
@@ -114,7 +114,6 @@ export class mxsParseSource {
 			throw theErr;
 		}
 		// this.__parserState = this.parserInstance.save();
-		return;
 	}
 	/**
 	 * Parser with error recovery
@@ -183,14 +182,9 @@ export class mxsParseSource {
 		};
 		// SET CST RESULT...
 		this.__parsedCST = this.parserInstance.results[0] || [];
-		// REPORT THE ERROR BACK
-		if (this.parserInstance.results[0]) {
-			// throw reportSuccess();
-			return reportSuccess();
-		} else {
-			// throw reportFailure();
-			return reportFailure();
-		}
+		// REPORT / THROW THE ERROR
+		return this.parserInstance.results[0] ? reportSuccess() : reportFailure();
+		// throw this.parserInstance.results[0] ? reportSuccess() : reportFailure();
 	}
 	/**
 	 * UNFINISHED: ASYNC Parser 
@@ -215,7 +209,7 @@ export class mxsParseSource {
 	/**
 	 * UNFINISHED: ASYNC Error recovery
 	 */
-	private parseWithErrorsAsync() {
+	private parseWithErrorsAsync():Promise<ParserError> {
 		// reset the parser
 		this.reset();
 		let src = this.TokenizeSource();
@@ -227,7 +221,7 @@ export class mxsParseSource {
 		let total = src.length - 1;
 
 		let reportSuccess = () => {
-			console.log('parser report! - OK');
+			// console.log('parser report! - OK');
 			let newErr = new ParserError('Parser failed. Partial parsings has been recovered.');
 			newErr.name = 'ERR_RECOVER';
 			newErr.recoverable = true;
@@ -236,7 +230,7 @@ export class mxsParseSource {
 			return newErr;
 		};
 		let reportFailure = () => {
-			console.log('parser report! - BAD ');
+			// console.log('parser report! - BAD ');
 			let newErr = new ParserError('Parser failed. Unrecoverable errors.');
 			newErr.name = 'ERR_FATAL';
 			newErr.recoverable = false;
@@ -266,18 +260,18 @@ export class mxsParseSource {
 				state = this.parserInstance.save();
 
 				if (next === total) {
-					console.log('parser ended!');
+					// console.log('parser ended!');
 					resolve();
 				} else {
-					return setImmediate( () => parsings(src, next + 1, total));
+					return setImmediate( () => parsings(src, next + 1, total) );
 				}
 			};
 			parsings(src, 0, total);
 		});
 		return new Promise((resolve, reject) => {
-			promise.then((response) => {
+			promise.then( () => {
 				this.__parsedCST = this.parserInstance.results[0] || [];
-				console.log('parser waited!');
+				// console.log('parser waited!');
 				if (this.parserInstance.results[0]) {
 					resolve(reportSuccess());
 				} else {
