@@ -1,13 +1,12 @@
 "use strict";
 import { window, workspace, Uri } from 'vscode';
-import { posix } from 'path';
-// import {resolve, posix} from 'path';
-// import * as cp from 'child_process';
+import {posix} from 'path';
+// import * as path from 'path';
+// import {fork} from 'child_process';
 //--------------------------------------------------------------------------------
 import { prefixFile } from './utils';
 import { mxsDocumentSymbols } from './mxsOutline';
 const { mxsMinify } = require('./lib/mxsCompactCode');
-// const mxsParseSource = require('./lib/mxsParser');
 import { mxsParseSource } from './mxsParser';
 import { error } from 'moo';
 
@@ -38,10 +37,21 @@ export default class mxsMinifier {
 		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 		let newUri = prefixFile(document.uri, prefix);
 
+		// let child = cp.fork(path.join(__dirname, 'MinProc.js'));
+		// child.on("message", message => { });
+		// child.send({targetUri:newUri, parsed:parsed});
+
+		await mxsMinifier.MinifyParsedDoc(newUri, parsed);
+
+	}
+
+	static async MinifyParsedDoc(fileUri: Uri, parsings:any, prefix?: string) {
+		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
+		let newUri = prefixFile(fileUri, _prefix);
 		try {
-			await mxsMinifier.minifyWriter(newUri, parsed);
+			await mxsMinifier.minifyWriter(newUri, parsings);
 			await window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
-			return;
+			return true;
 		} catch (err) {
 			await window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
 			throw err;
@@ -55,9 +65,9 @@ export default class mxsMinifier {
 		// console.log(fileUri);
 		try {
 			await workspace.fs.stat(fileUri);
-		} catch {
+		} catch (err) {
 			await window.showInformationMessage(`${posix.basename(fileUri.path)} file does *not* exist`);
-			return;
+			throw err;
 		}
 		//parse...
 		const readData = await workspace.fs.readFile(fileUri);
@@ -65,7 +75,7 @@ export default class mxsMinifier {
 
 		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 		let newUri = prefixFile(fileUri, _prefix);
-		console.log( workspace.getConfiguration('maxscript').get('minprefix', 'min_'));
+		
 		try {
 			let parser = new mxsParseSource(readStr);
 			let cst = parser.parsedCST;
@@ -74,17 +84,17 @@ export default class mxsMinifier {
 				try {
 					await mxsMinifier.minifyWriter(newUri, cst);
 					await window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
-					return;
+					return true;
 				} catch (err) {
 					await window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
-					return;
+					throw err;
 				}
 			} else {
 				throw error;
 			}
 		} catch (err) {
-			// console.log(err);
 			await window.showErrorMessage(`MaxScript minify failed: ${posix.basename(fileUri.path)} contains errors and can't be minimized.`);
+			throw err;
 		}
 	}
 	/**
@@ -92,18 +102,21 @@ export default class mxsMinifier {
 	 */
 	static async openAndMinify() {
 		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
-
 		let files = await window.showOpenDialog({ canSelectMany: true });
 		if (files) {
 			files.forEach(async fileUri => {
 				// check file extension
 				let ext = posix.extname(fileUri.path);
 				if (ext !== '.ms' && ext !== '.mcr') {
-					return;
+					throw new Error('Invalid file');
 				}
 				await mxsMinifier.minifyFile(fileUri, prefix);
-				return;
 			});
+			return true;
+		} else {
+			await window.showErrorMessage(`MaxScript minify failed: Unknown error when checking the files.`);
+			throw new Error('Unknown error');
 		}
+		// return false;
 	}
 }

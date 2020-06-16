@@ -46,7 +46,6 @@ const keywordsDB = {
 	'kw_coordsys': 'coordsys',
 	'kw_defaultAction': 'defaultaction',
 	'kw_do': 'do',
-	'kw_dontcollect': 'dontcollect',
 	'kw_else': 'else',
 	'kw_exit': 'exit',
 	'kw_for': 'for',
@@ -66,7 +65,7 @@ const keywordsDB = {
 	'kw_objectset': kwObjectSet,
 	'kw_of': 'of',
 	'kw_on': 'on',
-	'kw_params': 'parameters',
+	'kw_parameters': 'parameters',
 	'kw_persistent': 'persistent',
 	'kw_plugin': 'plugin',
 	'kw_rcmenu': 'rcmenu',
@@ -89,11 +88,11 @@ const keywordsDB = {
 	'kw_where': 'where',
 	'kw_while': 'while',
 	'kw_with': 'with',
-	'kw_parameters': 'parameters',
+	// 'kw_continue':    'continue',
+	// 'kw_dontcollect': 'dontcollect',
 	// 'kw_max':         'max',
+	// 'kw_redraw':      'redraw',
 	// 'kw_throw':       'throw',
-	//'kw_continue':    'continue',
-	//'kw_redraw':      'redraw',
 };
 //-----------------------------------------------------------------------------------
 // Moo Lexer
