@@ -12,7 +12,7 @@ import { mxsParseSource } from './mxsParser';
 import { error } from 'moo';
 
 export default class mxsMinifier {
-	// private prefix = workspace.getConfiguration('maxscript.').get('minprefix', 'min_');
+	// private prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 	//--------------------------------------------------------------------------------
 	private static async minifyWriter(targetUri: Uri, parsed: any[]) {
 		let min: string = mxsMinify(parsed);
@@ -35,7 +35,7 @@ export default class mxsMinifier {
 			return;
 		}
 
-		let prefix = workspace.getConfiguration('maxscript.').get('minprefix', 'min_');
+		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 		let newUri = prefixFile(document.uri, prefix);
 
 		try {
@@ -63,9 +63,9 @@ export default class mxsMinifier {
 		const readData = await workspace.fs.readFile(fileUri);
 		const readStr = Buffer.from(readData).toString('utf8');
 
-		let _prefix = prefix ||  workspace.getConfiguration('maxscript.').get('minprefix', 'min_');
+		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 		let newUri = prefixFile(fileUri, _prefix);
-
+		console.log( workspace.getConfiguration('maxscript').get('minprefix', 'min_'));
 		try {
 			let parser = new mxsParseSource(readStr);
 			let cst = parser.parsedCST;
@@ -91,7 +91,7 @@ export default class mxsMinifier {
 	 * Select files to minify
 	 */
 	static async openAndMinify() {
-		let prefix = workspace.getConfiguration('maxscript.').get('minprefix', 'min_');
+		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 
 		let files = await window.showOpenDialog({ canSelectMany: true });
 		if (files) {
