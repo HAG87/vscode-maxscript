@@ -15,7 +15,11 @@ let lexer = moo.compile({
 	commentSL: { match: /--.*$/, lineBreaks: false, },
 	commentBLK: { match: /\/\*(?:.|[\n\r])*?\*\//, lineBreaks: true },
 	// there is a problem with the strings
-	string: { match: /[@]?"(?:\\["\\rn]|[^"])*?"/, lineBreaks: true },
+	string: [
+		{ match: /@"(?:\\"|[^"])*?(?:"|\\")/, lineBreaks: true},
+		{ match: /"(?:\\["\\rntsx]|[^"])*?"/, lineBreaks: true},
+		// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
+	],
 	//string:  /"(?:\\["\\]|[^\n"\\])*"/,
 	// WHITESPACE --  also matches line continuations
 	WS: { match: /(?:[ \t]+|(?:[ \t]*?[\\]+[ \t\r\n]*)+?)/, lineBreaks: true },
@@ -25,8 +29,10 @@ let lexer = moo.compile({
 		{ match: /[$]/ }
 	],
 	// parameter <param_name>:
-	params: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/ },
+	parameter: { match: /[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*(?=[ \t]*[:])/ },
 	param: { match: /:{1}/ },
+	property: { match: /\.[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/},
+
 	globalTyped: { match: /::[A-Za-z_\u00C0-\u00FF][A-Za-z0-9_\u00C0-\u00FF]*/ },
 	// a mounstrosity
 	typedIden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/ },
@@ -47,13 +53,13 @@ let lexer = moo.compile({
 		{ match: /[0-9]+[:][0-9]+[.][0-9]*/ }
 	],
 	bitrange: { match: /[.]{2}/ },
+	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	number: [
 		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
 		{ match: /(?:[-]?[0-9]+\.(?!\.))/ },
 		{ match: /[-]?[0-9]+(?:[LP]|[eEdD][+-]?[0-9]+)?/ },
 		{ match: /(?:(?<!\.)[-]?\.[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ },
 	],
-	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	name:
 		[
 			{ match: /#[A-Za-z0-9_]+\b/ },
@@ -87,7 +93,8 @@ export const legend = (function () {
 	const tokenTypesLegend = [
 		'comment', 'keyword', 'regexp', 'operator', 'namespace',
 		'type', 'struct', 'class', 'interface', 'enum', 'typeParameter', 'function',
-		'member', 'macro', 'variable', 'parameter', 'property', 'label',
+		'member', 'macro', 'variable', 'parameter',
+		// 'property', 'label',
 		//'string', 'number',
 	];
 
