@@ -160,13 +160,13 @@ var mxLexer = moo.compile({
 	],
 	// number formats
 	bitrange: { match: /[.]{2}/ },
+	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	number: [
 		{ match: /(?:[-]?[0-9]*)[.](?:[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ }, // 123.123d-6
 		{ match: /(?:[-]?[0-9]+\.(?!\.))/ }, // 123.
 		{ match: /[-]?[0-9]+(?:[LP]|[eEdD][+-]?[0-9]+)?/ }, // 456 | 123e-5 | integers
 		{ match: /(?:(?<!\.)[-]?\.[0-9]+(?:[eEdD][+-]?[0-9]+)?)/ }, // -.789e-9
 	],
-	hex: { match: /0[xX][0-9a-fA-F]+/ },
 	// #name literals .. should go higher??
 	name: [
 		{ match: /#[A-Za-z0-9_]+\b/ },
