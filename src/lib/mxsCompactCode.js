@@ -186,7 +186,7 @@ let visitorPatterns = {
 	// Plugin
 	EntityPlugin(node, stack) {
 		let body = exprTerm(stack.body);
-		return joinStatements(['plugin', stack.superclass, stack.class, ...stack.params, body]);
+		return joinStatements(['plugin', stack.superclass, stack.class, ...stack.params, '(', body, ')']);
 	},
 	EntityPlugin_params(node, stack) {
 		let body = exprTerm(stack.body);
@@ -236,10 +236,10 @@ let visitorPatterns = {
 	},
 	EventArgs(node, stack) {
 		return [].concat(
-				stack.target || '',
-				stack.event || '',
-				joinStatements(stack.args)
-			)
+			stack.target || '',
+			stack.event || '',
+			joinStatements(stack.args)
+		)
 			.filter(x => x.length > 0)
 			.join(' ');
 	},
@@ -276,7 +276,7 @@ let visitorPatterns = {
 	},
 	LoopExit(node, stack) {
 		let body = exprTerm(stack.body);
-		return joinStatements(['exit with', body])
+		return joinStatements(['exit with', body]);
 	},
 	TryStatement(node, stack) {
 		return joinStatements(['try', stack.block, 'catch', stack.finalizer]);
@@ -287,7 +287,7 @@ let visitorPatterns = {
 	},
 	WhileStatement(node, stack) {
 		let body = exprTerm(stack.body);
-		return joinStatements(['while', stack.test, 'do', body])
+		return joinStatements(['while', stack.test, 'do', body]);
 	},
 	ForStatement(node, stack) {
 		let body = exprTerm(stack.body);
