@@ -274,7 +274,7 @@ let visitorPatterns = {
 		}
 	},
 	LogicalExpression: (node, stack) => binaryNode(stack),
-	UnaryExpression: (node, stack) => `-${stack.right}`,
+	UnaryExpression: (node, stack) => `${stack.operator}${stack.right}`,
 	// STATEMENTS
 	IfStatement(node, stack) {
 		let test = stack.test;

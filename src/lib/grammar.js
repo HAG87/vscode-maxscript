@@ -90,11 +90,13 @@ var grammar = {
     {"name": "simple_expr", "symbols": ["logical_expr"], "postprocess": id},
     {"name": "expr_seq", "symbols": ["LPAREN", "_expr_seq", "RPAREN"], "postprocess":  d => ({
             type: 'BlockStatement',
-            body: d[1]
+            body: d[1],
+            //loc: getLoc(d[0], d[2])
         })},
     {"name": "expr_seq", "symbols": [{"literal":"("}, "_", {"literal":")"}], "postprocess":  d => ({
             type: 'BlockStatement',
-            body: []
+            body: [],
+            //loc: getLoc(d[0], d[2])
         })},
     {"name": "_expr_seq", "symbols": ["_expr_seq", "EOL", "expr"], "postprocess": d => [].concat(d[0], d[2])},
     {"name": "_expr_seq", "symbols": ["expr"]},
@@ -808,18 +810,18 @@ var grammar = {
             type:     'AccessorProperty',
             operand:  d[0],
             property: d[2],
-            loc:      getLoc(d[0], d[1])
+            //loc:      getLoc(d[0], d[1])
         })},
     {"name": "index", "symbols": ["operand", "_", "p_start", "expr", "p_end"], "postprocess":  d => ({
             type:    'AccessorIndex',
             operand: d[0],
             index:   d[3],
-            loc:     getLoc(d[0], d[4])
+            //loc:     getLoc(d[0], d[4])
         })},
     {"name": "u_operand", "symbols": [{"literal":"-"}, "operand"], "postprocess":  d => ({
             type: 'UnaryExpression',
-            operator: d[1],
-            right:    d[2]
+            operator: d[0],
+            right:    d[1]
         }) },
     {"name": "operand", "symbols": ["factor"], "postprocess": id},
     {"name": "operand", "symbols": ["property"], "postprocess": id},
