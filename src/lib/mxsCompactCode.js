@@ -260,13 +260,18 @@ let visitorPatterns = {
 	MathExpression(node, stack) {
 		// binaryNode(stack)
 		let left = stack.left || '';
-		let _right = stack.right || '';
-		let space =
-		/[-]$/gmi.test(stack.operator)
-			&& /^[-]/gmi.test(_right)
-			? ' ' : '';
-		let right = `${space}${_right}`;
-		return `${left}${stack.operator}${right}`;
+		let right = stack.right || '';
+
+		if (/\w+/gmi.test(stack.operator)) {
+			return `${left}${spaceAlphaNum(stack.operator)}${right}`;
+		} else {
+			let space =
+			/[-]$/gmi.test(stack.operator)
+				&& /^[-]/gmi.test(right)
+				? ' ' : '';
+			
+			return `${left}${stack.operator}${space}${right}`;
+		}
 	},
 	LogicalExpression: (node, stack) => binaryNode(stack),
 	UnaryExpression: (node, stack) => `-${stack.right}`,
@@ -383,6 +388,12 @@ function spaceSE(str, end = true) {
 	let _start = /^(?:[\w_-]|::)/gmi.test(str) ? ' ' : '';
 	let _end = /[\w_$?-]$/gmi.test(str) && end ? ' ' : '';
 	return `${_start}${str}${_end}`;
+}
+function spaceAlphaNum(str) {
+	let start = /^[\w]/gmi.test(str) ? ' ' : '';
+	let end = /[\w]$/gmi.test(str) ? ' ' : '';
+	return `${start}${str}${end}`; 
+
 }
 /**
  * Check if value is node
