@@ -25,12 +25,12 @@ export default class mxsMinifier {
 		let document = mxsDocumentSymbols.activeDocument;
 
 		if (!Array.isArray(parsed) || parsed.length === 0) {
-			await window.showErrorMessage(`MaxScript minify failed: ${posix.basename(document.uri.path)} contains errors and can't be minimized.`);
+			window.showErrorMessage(`MaxScript minify failed: ${posix.basename(document.uri.path)} contains errors and can't be minimized.`);
 			return;
 		}
 		// check current document here...
 		if (document.isDirty) {
-			await window.showWarningMessage(`MaxScript minify: Check document edits and save it first.`);
+			window.showWarningMessage(`MaxScript minify: Check document edits and save it first.`);
 			return;
 		}
 
@@ -42,7 +42,6 @@ export default class mxsMinifier {
 		// child.send({targetUri:newUri, parsed:parsed});
 
 		await mxsMinifier.MinifyParsedDoc(newUri, parsed);
-
 	}
 
 	static async MinifyParsedDoc(fileUri: Uri, parsings:any, prefix?: string) {
@@ -50,10 +49,10 @@ export default class mxsMinifier {
 		let newUri = prefixFile(fileUri, _prefix);
 		try {
 			await mxsMinifier.minifyWriter(newUri, parsings);
-			await window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
+			window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
 			return true;
 		} catch (err) {
-			await window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
+			window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
 			throw err;
 		}
 	}
@@ -66,7 +65,7 @@ export default class mxsMinifier {
 		try {
 			await workspace.fs.stat(fileUri);
 		} catch (err) {
-			await window.showInformationMessage(`${posix.basename(fileUri.path)} file does *not* exist`);
+			window.showInformationMessage(`${posix.basename(fileUri.path)} file does *not* exist`);
 			throw err;
 		}
 		//parse...
@@ -82,18 +81,20 @@ export default class mxsMinifier {
 			// minify
 			if (Array.isArray(cst) && cst.length > 0) {
 				try {
+					// MAIN ACTION
 					await mxsMinifier.minifyWriter(newUri, cst);
-					await window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
+
+					window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
 					return true;
 				} catch (err) {
-					await window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
+					window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
 					throw err;
 				}
 			} else {
 				throw error;
 			}
 		} catch (err) {
-			await window.showErrorMessage(`MaxScript minify failed: ${posix.basename(fileUri.path)} contains errors and can't be minimized.`);
+			window.showErrorMessage(`MaxScript minify failed: ${posix.basename(fileUri.path)} contains errors and can't be minimized.`);
 			throw err;
 		}
 	}
@@ -103,18 +104,28 @@ export default class mxsMinifier {
 	static async openAndMinify() {
 		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
 		let files = await window.showOpenDialog({ canSelectMany: true });
+
+		// console.log(files);
+
 		if (files) {
-			files.forEach(async fileUri => {
+			for (const file of files) {
 				// check file extension
-				let ext = posix.extname(fileUri.path);
+				let ext = posix.extname(file.path);
+				
 				if (ext !== '.ms' && ext !== '.mcr') {
-					throw new Error('Invalid file');
+					window.showErrorMessage(`MaxScript minify: Invalid file: ${posix.basename(file.path)}.`);
+					continue;
+					// throw new Error('Invalid file');
 				}
-				await mxsMinifier.minifyFile(fileUri, prefix);
-			});
+				console.log('File proccess start: ' + file.path);
+				// MAIN ACTION
+				await mxsMinifier.minifyFile(file, prefix);
+
+				console.log('File proccess end.');
+			}
 			return true;
 		} else {
-			await window.showErrorMessage(`MaxScript minify failed: Unknown error when checking the files.`);
+			window.showErrorMessage(`MaxScript minify failed: Unknown error when checking the files.`);
 			throw new Error('Unknown error');
 		}
 		// return false;
