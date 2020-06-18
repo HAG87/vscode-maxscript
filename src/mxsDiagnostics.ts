@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 //--------------------------------------------------------------------------------
 import * as moo from 'moo';
 import { tokenDefinitions } from './schema/mxsTokenDefs';
-import { range, vsRangeFromToken} from './mxsProvideSymbols';
+import { getTokenRange } from './mxsProvideSymbols';
 //--------------------------------------------------------------------------------
 const tokenListToValues = (tokenList: Dictionary<string>[]): string[] => {
 	return [...new Set((tokenList).map(item => item.type))];
@@ -28,11 +28,11 @@ export interface ParserFatalError extends Error {
  */
 export class ParserError extends Error {
 	constructor(message?: string) {
-	  // 'Error' breaks prototype chain here
-	  super(message);
-	  // restore prototype chain
-	  const actualProto = new.target.prototype;
-	  Object.setPrototypeOf(this, actualProto);
+		// 'Error' breaks prototype chain here
+		super(message);
+		// restore prototype chain
+		const actualProto = new.target.prototype;
+		Object.setPrototypeOf(this, actualProto);
 	}
 	name: string = 'parse_error';
 	recoverable!: boolean;
@@ -40,9 +40,6 @@ export class ParserError extends Error {
 	details: ErrorDetail[] = [];
 }
 
-function isFatalError(error: ParserError | ParserFatalError): error is ParserFatalError {
-	return (error as ParserFatalError).token ? true : false;
-}
 //--------------------------------------------------------------------------------
 /**
  * Diagnostics collection. using just one for all the documents in workspace.
@@ -83,24 +80,23 @@ export function parsingErrorMessage(error: ParserFatalError): string {
 export function provideParserDiagnostic(document: vscode.TextDocument, error: ParserError): vscode.Diagnostic[] {
 	if (!document) { return []; }
 	let diagnostics: vscode.Diagnostic[];
-	let source = document.getText().split('\n');
-
 	let tokenList = [...error.tokens];
-	diagnostics = tokenList.map(t => {
-		let vsRange = vsRangeFromToken(document, t, source);
-		let diag = new vscode.Diagnostic(
-			vsRange,
-			`Unexpected \"${t}\".`,
-			vscode.DiagnosticSeverity.Error
-		);
-		diag.source = 'MaxScript';
-		diag.code = error.name;
-		// DISABLED: List of possible tokens
-		// let list = tokenListToValues(error.alternatives);
-		// let tokenDesc: string[] = list.map(item => tokenDefinitions[item]).sort();
-		// diag.relatedInformation = tokenDesc.map( item => new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, vsRange), item));
-		return diag;
-	});
+	diagnostics = tokenList.map(
+		t => {
+			let vsRange = getTokenRange(document, t);
+			let diag = new vscode.Diagnostic(
+				vsRange,
+				`Unexpected \"${t}\".`,
+				vscode.DiagnosticSeverity.Error
+			);
+			diag.source = 'MaxScript';
+			diag.code = error.name;
+			// DISABLED: List of possible tokens
+			// let list = tokenListToValues(error.alternatives);
+			// let tokenDesc: string[] = list.map(item => tokenDefinitions[item]).sort();
+			// diag.relatedInformation = tokenDesc.map( item => new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, vsRange), item));
+			return diag;
+		});
 	return diagnostics;
 }
 /**
@@ -109,16 +105,15 @@ export function provideParserDiagnostic(document: vscode.TextDocument, error: Pa
  * @param CST parsed CST
  */
 export function provideTokenDiagnostic(document: vscode.TextDocument, errTokens: moo.Token[] | undefined): vscode.Diagnostic[] {
-
 	if (!errTokens) { return []; }
-
-	let diagnostics: vscode.Diagnostic[] = errTokens.map(t => ({
-		code: 'ERR_TOKEN',
-		message: `Unexpected token: ${t.text}`,
-		range: vsRangeFromToken(document, t),
-		severity: vscode.DiagnosticSeverity.Warning,
-		source: 'MaxScript'
-	}));
+	let diagnostics: vscode.Diagnostic[] = errTokens.map(
+		t => ({
+			code: 'ERR_TOKEN',
+			message: `Unexpected token: ${t.text}`,
+			range: getTokenRange(document, t),
+			severity: vscode.DiagnosticSeverity.Warning,
+			source: 'MaxScript'
+		}));
 	return diagnostics;
 }
 /**
@@ -129,7 +124,7 @@ export function provideTokenDiagnostic(document: vscode.TextDocument, errTokens:
  */
 export function setDiagnostics(document: vscode.TextDocument, diagnostic?: vscode.Diagnostic[],
 	collection: vscode.DiagnosticCollection = DiagnosticCollection): void {
-		
+
 	if (diagnostic) {
 		collection.set(document.uri, diagnostic);
 	} else {

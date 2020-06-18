@@ -12,25 +12,6 @@ import {
 import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 import { mxsParseSource } from './mxsParser';
 //--------------------------------------------------------------------------------
-// type tSymbolKindMap = { [key: number]: vscode.SymbolKind };
-const SymbolKindMap: { [key: number]: vscode.SymbolKind } = {
-	1: vscode.SymbolKind.Module,
-	5: vscode.SymbolKind.Method,
-	6: vscode.SymbolKind.Property,
-	8: vscode.SymbolKind.Constructor,
-	11: vscode.SymbolKind.Function,
-	12: vscode.SymbolKind.Variable,
-	13: vscode.SymbolKind.Constant,
-	18: vscode.SymbolKind.Object,
-	22: vscode.SymbolKind.Struct,
-	23: vscode.SymbolKind.Event,
-};
-//--------------------------------------------------------------------------------
-/**
- * Parser initialization - DEPRECATED
- */
-// export const msxParser = new mxsParseSource('');
-//--------------------------------------------------------------------------------
 /**
  * Provide document symbols. Impements the parser.
  * TODO:
@@ -47,21 +28,9 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 	activeDocumentSymbols!: vscode.SymbolInformation[];
 
 	private documentSymbolsFromCST(document: vscode.TextDocument, CST: any, options = {remapLocations: false}) {
-		let CSTstatements = collectStatementsFromCST(CST);
-		let Symbols = collectSymbols(CST, CSTstatements, options.remapLocations ? document.getText() : undefined);
-		let SymbolInfCol = Symbols.map( item => {
-			return new vscode.SymbolInformation(
-				item.name,
-				SymbolKindMap[item.kind],
-				item.containerName || '',
-				new vscode.Location(document.uri,
-					new vscode.Range(
-						document.positionAt(item.location.start),
-						document.positionAt(item.location.end)
-					))
-			);
-		});
-		return SymbolInfCol;
+		let CSTstatements = collectStatementsFromCST(CST);		
+		let Symbols = collectSymbols(document, CST, CSTstatements);
+		return Symbols;
 	}
 
 	private _getDocumentSymbols(document: vscode.TextDocument) {
@@ -69,6 +38,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 		let diagnostics: vscode.Diagnostic[] = [];
 		this.activeDocument = document;
+
 		try {
 			// console.log('> PARSER MAIN CALL');
 			// feed the parser
@@ -85,7 +55,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 					//recovered from error
 					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
 					SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST,{remapLocations: true});
-					diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error', document.getText())));
+					diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
 					// throw err;
 				} else {
 					// fatal error
@@ -102,6 +72,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		// setDiagnostics
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
 		// return
+		// return SymbolInfCol.length > 0 ? SymbolInfCol : undefined;
 		return SymbolInfCol;
 	}
 	// Function called from Main !!

@@ -29,27 +29,32 @@ function id(x) { return x[0]; }
             node.type = newtype;
         return node;
     }
-
+    // Offset is not reilable, changed to line - col
     const getLoc = (start, end) => {
         if (!start) {return null;}
 
-        let startOffset = start.loc ? start.loc.start : start.offset;
+        let startOffset = start.loc ? start.loc.start : {line: start.line, col: start.col};
         let endOffset;
 
         if (!end) {
-            if (!start.loc) {
-                endOffset = start.text != null ? start.offset + (start.text.length - 1): null;
+            if (start.loc) {
+                endOffset = start.loc.end;
             } else {
-                endOffset = start.loc.end
+                endOffset = {
+                    line: start.line,
+                    col: (start.text != null ? start.col + (start.text.length - 1): start.col)
+                };                
             }
         } else {
             if (end.loc) {
-                endOffset = end.loc.end
+                endOffset = end.loc.end;
             } else {
-                endOffset = end.text != null ? end.offset + (end.text.length - 1) : null;
+                endOffset = {
+                    line: end.line,
+                    col: (end.text != null ? end.col + (end.text.length - 1) : end.col)                
+                };
             }
         };
-
         return ({start: startOffset, end: endOffset});
     }
     // parser configuration
@@ -558,7 +563,8 @@ var grammar = {
             value:     d[5],
             sequence: filterNull(d[6]),
             action:    d[8],
-            body:      d[10]
+            body:      d[10],
+            loc: getLoc(d[0][0])
         })},
     {"name": "for_sequence$ebnf$1$subexpression$1", "symbols": ["_", "for_by"]},
     {"name": "for_sequence$ebnf$1", "symbols": ["for_sequence$ebnf$1$subexpression$1"], "postprocess": id},
@@ -602,28 +608,32 @@ var grammar = {
     {"name": "loop_exit$subexpression$1", "symbols": ["__", (mxLexer.has("kw_with") ? {type: "kw_with"} : kw_with), "_"]},
     {"name": "loop_exit", "symbols": [(mxLexer.has("kw_exit") ? {type: "kw_exit"} : kw_exit), "loop_exit$subexpression$1", "expr"], "postprocess":  d => ({
             type : 'LoopExit',
-            body:  d[2]
+            body:  d[2],
+            loc: getLoc(d[0])
         })},
     {"name": "do_loop$subexpression$1", "symbols": [(mxLexer.has("kw_do") ? {type: "kw_do"} : kw_do), "_"]},
     {"name": "do_loop$subexpression$2", "symbols": ["_", (mxLexer.has("kw_while") ? {type: "kw_while"} : kw_while), "_"]},
     {"name": "do_loop", "symbols": ["do_loop$subexpression$1", "expr", "do_loop$subexpression$2", "expr"], "postprocess":  d => ({
             type: 'DoWhileStatement',
             body: d[1],
-            test: d[3]
+            test: d[3],
+            loc: getLoc(d[0][0])
         })},
     {"name": "while_loop$subexpression$1", "symbols": [(mxLexer.has("kw_while") ? {type: "kw_while"} : kw_while), "_S"]},
     {"name": "while_loop$subexpression$2", "symbols": ["_S", (mxLexer.has("kw_do") ? {type: "kw_do"} : kw_do), "_"]},
     {"name": "while_loop", "symbols": ["while_loop$subexpression$1", "expr", "while_loop$subexpression$2", "expr"], "postprocess":  d => ({
             type: 'WhileStatement',
             test: d[1],
-            body: d[3]
+            body: d[3],
+            loc: getLoc(d[0][0])
         })},
     {"name": "if_expr$subexpression$1", "symbols": [(mxLexer.has("kw_if") ? {type: "kw_if"} : kw_if), "_"]},
     {"name": "if_expr", "symbols": ["if_expr$subexpression$1", "expr", "_", "if_action", "_", "expr"], "postprocess":  d => ({
             type:       'IfStatement',
             test:       d[1],
             operator:   d[3],
-            consequent: d[5]
+            consequent: d[5],
+            loc: getLoc(d[0][0])
         })},
     {"name": "if_expr$subexpression$2", "symbols": [(mxLexer.has("kw_if") ? {type: "kw_if"} : kw_if), "_"]},
     {"name": "if_expr$subexpression$3", "symbols": ["_", (mxLexer.has("kw_then") ? {type: "kw_then"} : kw_then), "_"]},
@@ -632,7 +642,8 @@ var grammar = {
             type:       'IfStatement',
             test:       d[1],
             consequent: d[3],
-            alternate:  d[5]
+            alternate:  d[5],
+            loc: getLoc(d[0][0])
         })},
     {"name": "if_action", "symbols": [(mxLexer.has("kw_do") ? {type: "kw_do"} : kw_do)], "postprocess": id},
     {"name": "if_action", "symbols": [(mxLexer.has("kw_then") ? {type: "kw_then"} : kw_then)], "postprocess": id},
@@ -641,13 +652,15 @@ var grammar = {
     {"name": "try_expr", "symbols": ["try_expr$subexpression$1", "expr", "try_expr$subexpression$2", "expr"], "postprocess":  d => ({
             type:      'TryStatement',
             block:     d[1],
-            finalizer: d[3]
+            finalizer: d[3],
+            loc: getLoc(d[0][0])
         })},
     {"name": "kw_try", "symbols": [(mxLexer.has("kw_try") ? {type: "kw_try"} : kw_try), "_"], "postprocess": d => d[0]},
     {"name": "variable_decl", "symbols": ["kw_decl", "_", "decl_args"], "postprocess":  d => ({
             type: 'VariableDeclaration',
             ...d[0],
-            decls: d[2]
+            decls: d[2],
+            loc: getLoc(d[0])
         })},
     {"name": "kw_decl", "symbols": [(mxLexer.has("kw_local") ? {type: "kw_local"} : kw_local)], "postprocess": d => ({modifier:null, scope: d[0], loc:getLoc(d[0])})},
     {"name": "kw_decl", "symbols": [(mxLexer.has("kw_global") ? {type: "kw_global"} : kw_global)], "postprocess": d => ({modifier:null, scope: d[0], loc:getLoc(d[0])})},
