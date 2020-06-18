@@ -25,7 +25,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 	/** Current active document */
 	activeDocument!: vscode.TextDocument;
 	/** Current document symbols */
-	activeDocumentSymbols!: vscode.SymbolInformation[];
+	// activeDocumentSymbols: vscode.SymbolInformation[] = [];
 
 	private documentSymbolsFromCST(document: vscode.TextDocument, CST: any, options = {remapLocations: false}) {
 		let CSTstatements = collectStatementsFromCST(CST);		
@@ -50,7 +50,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		} catch (err) {
 			// console.log(err);
 			if (err.recoverable !== undefined) {
-				// console.log('parse error! recover?: '+ err.recoverable);
+				console.log('parse error! recover?: '+ err.recoverable);
 				if (err.recoverable === true) {
 					//recovered from error
 					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
@@ -65,7 +65,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 				}
 			} else {
 				// not a parser error
-				// console.log(err);
+				console.log(err);
 				throw err;
 			}
 		}
@@ -77,21 +77,22 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 	}
 	// Function called from Main !!
 	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
-		// console.log('OUTLINER CALLED!!: ' + document.uri.path);
 		return new Promise((resolve, reject) => {
 			if (token.isCancellationRequested) {
-				// console.log('rejection called');
 				setDiagnostics(document, undefined);
-				reject(token);
+				resolve([]);
 			}
-			// this hack tries to limit the parser execution. will keep it until I find a better solution.
 			try {
-				if (!document.isDirty || DiagnosticCollection.has(document.uri) || this.activeDocumentSymbols === undefined) {
+				// this hack tries to limit the parser execution. will keep it until I find a better solution.
+				/*
+				if (!document.isDirty || DiagnosticCollection.has(document.uri) ) {
 					this.activeDocumentSymbols = this._getDocumentSymbols(document);
 				}
-				// resolve(this._getDocumentSymbols(document));
 				resolve(this.activeDocumentSymbols);
+				*/
+				resolve(this._getDocumentSymbols(document));
 			} catch (err) {
+				console.log(err);
 				setDiagnostics(document, undefined);
 				reject(err);
 			}
