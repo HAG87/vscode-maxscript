@@ -257,7 +257,17 @@ let visitorPatterns = {
 		}
 	},
 	// SIMPLE EXPRESSIONS
-	MathExpression: (node, stack) => binaryNode(stack),
+	MathExpression(node, stack) {
+		// binaryNode(stack)
+		let left = stack.left || '';
+		let _right = stack.right || '';
+		let space =
+		/[-]$/gmi.test(stack.operator)
+			&& /^[-]/gmi.test(_right)
+			? ' ' : '';
+		let right = `${space}${_right}`;
+		return `${left}${stack.operator}${right}`;
+	},
 	LogicalExpression: (node, stack) => binaryNode(stack),
 	UnaryExpression: (node, stack) => `-${stack.right}`,
 	// STATEMENTS
