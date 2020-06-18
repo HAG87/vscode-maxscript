@@ -36,28 +36,7 @@ export async function msxHelp(textEditor: vscode.TextEditor, help_addr: string) 
 	await vscode.commands.executeCommand('vscode.open', uri);
 	// }
 }
-/*
-export function subscribeToDocumentChanges(context: vscode.ExtensionContext, emojiDiagnostics: vscode.DiagnosticCollection): void {
-	if (vscode.window.activeTextEditor) {
-		refreshDiagnostics(vscode.window.activeTextEditor.document, emojiDiagnostics);
-	}
-	context.subscriptions.push(
-		vscode.window.onDidChangeActiveTextEditor(editor => {
-			if (editor) {
-				refreshDiagnostics(editor.document, emojiDiagnostics);
-			}
-		})
-	);
 
-	context.subscriptions.push(
-		vscode.workspace.onDidChangeTextDocument(e => refreshDiagnostics(e.document, emojiDiagnostics))
-	);
-
-	context.subscriptions.push(
-		vscode.workspace.onDidCloseTextDocument(doc => emojiDiagnostics.delete(doc.uri))
-	);
-
-}
 /**
  * This method is called when your extension is activated
  * Your extension is activated the very first time the command is executed
@@ -76,11 +55,6 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
-		/*
-		let dipoasable = vscode.workspace.onDidChangeTextDocument( (e) => {
-
-		}, null, context.subscriptions);
-		*/
 		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, mxsDocumentSymbols));
 	}
 	// Diagnostics
@@ -107,9 +81,9 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 	// Minify
 	context.subscriptions.push(
-		vscode.commands.registerTextEditorCommand('mxs.minify', mxsMinifier.minifyOpenEditor),
-		vscode.commands.registerCommand('mxs.minify.file', (fileUri) => {mxsMinifier.minifyFile(fileUri);}),
-		vscode.commands.registerCommand('mxs.minify.files', mxsMinifier.openAndMinify)
+		vscode.commands.registerTextEditorCommand('mxs.minify', async () => mxsMinifier.minifyOpenEditor()),
+		vscode.commands.registerCommand('mxs.minify.file', async (fileUri) => mxsMinifier.minifyFile(fileUri)),
+		vscode.commands.registerCommand('mxs.minify.files', async () => mxsMinifier.openAndMinify())
 	);
 }
 // this method is called when your extension is deactivated
