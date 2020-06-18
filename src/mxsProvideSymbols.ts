@@ -234,30 +234,6 @@ export function getDocumentPositions(document: vscode.TextDocument, node: any) {
 	);
 }
 //-----------------------------------------------------------------------------------
-/**
- * To vscode.SymbolInformation mapping later
- */
-export interface ISymbolInformation {
-	name: string;
-	kind: number;
-	containerName?: string;
-	location: vscode.Location;
-}
-
-/**
- * To vscode.Diagnostic mapping later
- */
-export interface IerrSymbolInformation {
-	message: string;
-	tag?: string;
-	source: string;
-	code: string;
-	range: Trange;
-	severity: number;
-}
-
-
-//-----------------------------------------------------------------------------------
 //DECLARATIONS
 //-----------------------------------------------------------------------------------
 /**
