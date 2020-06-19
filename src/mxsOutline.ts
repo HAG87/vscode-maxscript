@@ -50,7 +50,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		} catch (err) {
 			// console.log(err);
 			if (err.recoverable !== undefined) {
-				console.log('parse error! recover?: '+ err.recoverable);
+				// console.log('parse error! recover?: '+ err.recoverable);
 				if (err.recoverable === true) {
 					//recovered from error
 					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));

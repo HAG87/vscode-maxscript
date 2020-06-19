@@ -264,16 +264,13 @@ export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
 export function collectSymbols(document: vscode.TextDocument, CST: any, paths: string[])
 {
 	let returnSymbol = (CST: any, path: string) => {
-
 		let currentNode = objectPath.get(CST, path);
-
 		let theSymbol: vscode.SymbolInformation = {
 			name: currentNode.id.value.text || currentNode.id.text || '[unnamed]',
 			kind: SymbolKind[currentNode.type] || SymbolKindMap[5],
-			containerName: findParentName(CST, parentPath(path, 1)) || '',
+			containerName: findParentName(CST, parentPath(path, 1)) || ' ',
 			location: getDocumentPositions(document, currentNode),
 		};
-
 		return theSymbol;
 	};
 

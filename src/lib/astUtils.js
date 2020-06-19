@@ -30,24 +30,26 @@ function parentPath(path, level = 1) {
  * @param {object} ast The CST
  * @param {string} path The path of the current node/leaf
  */
-function findParentName (CST, path, key = 'id.value.value') {
+function findParentName (CST, path, key = 'id.value.text') {
 	// this is faster than using ats-money find method
 	let roots = path.split('.');
-
+	// no parent!
+	if (roots.length < 2) return;
+	// GET THE FIRST NODE WITH AN ID KEY
 	while (roots.length > 0) {
-		roots.pop();
-		let thePath = [].concat(roots, key).join('.');
+		let thePath = roots.join('.');		
 		let theNode = objectPath.get(CST, thePath);
-		if (theNode != null) return theNode;
+		if (theNode && 'id' in theNode) {
+			return objectPath.get(CST, thePath.concat('.', key));
+		}
+		roots.pop();
 	}
 	/*
 	let i = roots.length;
 	do {
 		let thePath = roots.slice(0, i).concat(key).join('.');
 		let theNode = objectPath.get(CST, thePath);
-
 		if (theNode != null) return theNode;
-
 		i = i - 1;
 	} while (i > 0);
 	*/

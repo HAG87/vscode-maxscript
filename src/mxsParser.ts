@@ -16,7 +16,7 @@ function replaceWithWS(str: string) {
 export class mxsParseSource {
 	// fields
 	parserInstance!: nearley.Parser;
-	hash: string;
+	// hash: string;
 	private __source: string;
 	private __parserState: any;
 	private __parsedCST: any;
@@ -24,7 +24,7 @@ export class mxsParseSource {
 	constructor(source: string | undefined) {
 		this._declareParser();
 		this.__source = source || '';
-		this.hash = mxsParseSource.HashSource(this.__source);
+		// this.hash = mxsParseSource.HashSource(this.__source);
 		this.ParseSource();
 	}
 	/** Declare a new parser instance */
@@ -43,7 +43,7 @@ export class mxsParseSource {
 	set source(newSource) {
 		this.__source = newSource;
 		this.reset();
-		this.hash = mxsParseSource.HashSource(this.__source);
+		// this.hash = mxsParseSource.HashSource(this.__source);
 		this.ParseSource();
 	}
 	/** Get the parsed CST, if any */
@@ -131,11 +131,11 @@ export class mxsParseSource {
 		let badTokens: any[] = [];
 		let errorReport: any[] = [];
 
-		let next = 0;
+		// let next = 0;
 		let total = src.length - 1;
 
-		// for (var next = 0; next < total; next++) {
-		while (next <= total) {
+		for (var next = 0; next < total; next++) {
+		// while (next <= total) {
 			try {
 				this.parserInstance.feed(src[next].toString());
 				// this.parserInstance.feed(src[next].text);

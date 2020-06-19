@@ -107,12 +107,13 @@ var mxLexer = moo.compile({
 		// { match: /"""[^]*?"""/, lineBreaks: true, value: x => x.slice(3, -3)},
 	],
 	// whitespace -  also matches line continuations
-	ws: { match: /(?:[ \t]+|(?:[ \t]*?[\\][ \t\r\n]*)+?)/, lineBreaks: true },
-	// ws: { match: /[ \t]+/, lineBreaks: false },
-	newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
+	ws: { match: /(?:[ \t]+|(?:[\\][ \t\r\n]+))/, lineBreaks: true },
+	// newline: { match: /(?:[\r\n]|[\\]\s*[\r\n])+/, lineBreaks: true },
+	newline: { match: /(?:[\r\n]+)/, lineBreaks: true },
+
 	// path_name $mounstrosity*/_?
 	path: [
-		{ match: /[$](?:(?:[A-Za-z0-9_*?/\\]|[.]{3})*)/ },
+		{ match: /[$](?:[A-Za-z0-9_*?/\\]|\.\.\.)+/ },
 		{ match: /[$]/ }
 	],
 	// strings ~RESOURCE~
@@ -135,7 +136,7 @@ var mxLexer = moo.compile({
 	],
 	param: { match: /:{1}/ },
 	// a mounstrosity
-	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/, value: x => x.slice(1, -1) },
+	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/},
 	// array marker #(...) | #{...}
 	arraydef: { match: /#[ \t]*\(/ },
 	bitarraydef: { match: /#[ \t]*{/ },
@@ -154,8 +155,8 @@ var mxLexer = moo.compile({
 	math: ['+', '-', '*', '/', '^'],
 	// time format
 	time: [
-		{ match: /(?:(?:[-]?[0-9]+[.])*[0-9]+[mMsSfFtT])+/ },
-		{ match: /(?:(?:[-]?[0-9]+[.])[0-9]*[mMsSfFtT])+/ },
+		{ match: /(?:[-]?(?:[0-9]+[.])?[0-9]+[msft])+/ },
+		{ match: /(?:[-]?(?:[0-9]+[.])[0-9]*[msft])+/ },
 		{ match: /[0-9]+[:][0-9]+[.][0-9]*/ }
 	],
 	// number formats
