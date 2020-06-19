@@ -21,10 +21,11 @@ export default class mxsMinifier {
 	 * Minify current editor
 	 */
 	static async minifyOpenEditor() {
-		let parsed = mxsDocumentSymbols.msxParser.parsedCST;
 		let document = mxsDocumentSymbols.activeDocument;
+		if (!document) { return;}
+		let parsed = mxsDocumentSymbols.msxParser.parsedCST;
 
-		if (!Array.isArray(parsed) || parsed.length === 0) {
+		if (!parsed) {
 			window.showErrorMessage(`MaxScript minify failed: ${posix.basename(document.uri.path)} contains errors and can't be minimized.`);
 			return;
 		}
@@ -35,17 +36,20 @@ export default class mxsMinifier {
 		}
 
 		let prefix = workspace.getConfiguration('maxscript').get('minprefix', 'min_');
-		let newUri = prefixFile(document.uri, prefix);
+		// let newUri = prefixFile(document.uri, prefix);
 
 		// let child = cp.fork(path.join(__dirname, 'MinProc.js'));
 		// child.on("message", message => { });
 		// child.send({targetUri:newUri, parsed:parsed});
 
-		await mxsMinifier.MinifyParsedDoc(newUri, parsed);
+		await mxsMinifier.MinifyParsedDoc(document.uri, parsed, prefix);
 	}
 
 	static async MinifyParsedDoc(fileUri: Uri, parsings:any, prefix?: string) {
 		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
+		
+		console.log('prefix: '+_prefix);
+
 		let newUri = prefixFile(fileUri, _prefix);
 		try {
 			await mxsMinifier.minifyWriter(newUri, parsings);
@@ -77,6 +81,8 @@ export default class mxsMinifier {
 		
 		try {
 			let parser = new mxsParseSource(readStr);
+			await parser.ParseSourceAsync();
+			
 			let cst = parser.parsedCST;
 			// minify
 			if (Array.isArray(cst) && cst.length > 0) {

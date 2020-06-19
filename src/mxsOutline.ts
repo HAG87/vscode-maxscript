@@ -23,7 +23,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 	/** Start a parser instance */
 	msxParser = new mxsParseSource('');
 	/** Current active document */
-	activeDocument!: vscode.TextDocument;
+	activeDocument!: vscode.TextDocument | undefined;
 	/** Current document symbols */
 	// activeDocumentSymbols: vscode.SymbolInformation[] = [];
 
@@ -33,16 +33,37 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		return Symbols;
 	}
 
-	private _getDocumentSymbols(document: vscode.TextDocument) {
+	private async parseDocument(document: vscode.TextDocument):Promise<vscode.SymbolInformation[]> {
+		this.activeDocument = undefined;
+
+		return new Promise((resolve, reject) => {
+			setTimeout( () => {
+				if (vscode.window.activeTextEditor?.document == document) {
+					this._getDocumentSymbols(document)
+						.then(
+							result => {
+								this.activeDocument = document;
+								resolve(result);
+							},
+							err => reject(err)
+						);
+				} else {
+					reject('document closed');
+				}
+			}, 1000);
+		});
+	}
+
+	private async _getDocumentSymbols(document: vscode.TextDocument) {
 
 		let SymbolInfCol = new Array<vscode.SymbolInformation>();
 		let diagnostics: vscode.Diagnostic[] = [];
-		this.activeDocument = document;
 
 		try {
 			// console.log('> PARSER MAIN CALL');
 			// feed the parser
 			this.msxParser.source = document.getText();
+			await this.msxParser.ParseSourceAsync();
 			// this.documentCST = this.msxParser.parsedCST;
 			SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST);
 			diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
@@ -82,20 +103,22 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 				setDiagnostics(document, undefined);
 				resolve([]);
 			}
+			this.parseDocument(document)
+				.then((symbols) => resolve(symbols), (err) => {console.log('err:'+err); reject(err);});
+			/*
 			try {
 				// this hack tries to limit the parser execution. will keep it until I find a better solution.
-				/*
-				if (!document.isDirty || DiagnosticCollection.has(document.uri) ) {
-					this.activeDocumentSymbols = this._getDocumentSymbols(document);
-				}
-				resolve(this.activeDocumentSymbols);
-				*/
+				// if (!document.isDirty || DiagnosticCollection.has(document.uri) ) {
+				//	this.activeDocumentSymbols = this._getDocumentSymbols(document);
+				// }
+				// resolve(this.activeDocumentSymbols);
 				resolve(this._getDocumentSymbols(document));
 			} catch (err) {
 				console.log(err);
 				setDiagnostics(document, undefined);
 				reject(err);
 			}
+			*/
 		});
 	}
 }

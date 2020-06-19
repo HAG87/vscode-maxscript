@@ -22,43 +22,40 @@ export class mxsParseSource {
 	private __parsedCST: any;
 	// constructor
 	constructor(source: string | undefined) {
-		this._declareParser();
 		this.__source = source || '';
+		this.reset();
 		// this.hash = mxsParseSource.HashSource(this.__source);
-		this.ParseSource();
+		// this.ParseSource();
 	}
 	/** Declare a new parser instance */
 	private _declareParser() {
-		this.parserInstance = new nearley.Parser(
+		return new nearley.Parser(
 			nearley.Grammar.fromCompiled(grammar),
 			{
 				keepHistory: true
 			});
-		// this.parserInstance.feed('');
-		// this.__parserState = this.parserInstance.save();
 	}
 	/** get the source Stream */
 	get source() { return this.__source; }
 	/**	Set new source, and re-parse */
 	set source(newSource) {
 		this.__source = newSource;
-		this.reset();
+		// this.reset();
 		// this.hash = mxsParseSource.HashSource(this.__source);
-		this.ParseSource();
+		// this.ParseSource();
 	}
 	/** Get the parsed CST, if any */
 	get parsedCST() {
-		return this.__parsedCST || this.parserInstance.results[0] || [];
+		return this.__parsedCST;
 	}
 	/** Reset the parser * */
-	reset() { this._declareParser(); }
+	reset() { this.parserInstance = this._declareParser(); }
 	/**
 	 * Tokenize mxs string
 	 * @param {moo.lexer} lexer
 	 * @param {string} source
 	 */
-	TokenizeSource(filter?: string[]) {
-
+	TokenizeStream(filter?: string[]) {
 		if (filter instanceof Array) {
 			mxLexer.next = (next => () => {
 				let tok;
@@ -67,32 +64,14 @@ export class mxsParseSource {
 				return tok;
 			})(mxLexer.next);
 		}
-		//if (!source) {return null;}
 		// feed the tokenizer
 		mxLexer.reset(this.__source);
-
 		let token;
 		let toks = [];
-
 		while ((token = mxLexer.next())) {
-			//TODO: Catch tokenizer errors.
-			// if ( token.type != "error") { toks.push(token); }
-			// if ( token.type != "comment_BLK" && token.type != "comment_SL" ) { toks.push(token); }
 			toks.push(token);
 		}
 		return toks;
-	}
-	/** feed Stream to active parser */
-	feed(str: string) {
-		try {
-			this.parserInstance.feed(str);
-		} catch (err) {
-			err.details = [{ token: err.token, expected: this.PossibleTokens() }];
-			this.parserInstance.restore(this.__parserState);
-			throw err;
-		}
-		this.__parserState = this.parserInstance.save();
-		this.__parsedCST = this.parserInstance.results[0];
 	}
 	/**
 	 *
@@ -102,6 +81,7 @@ export class mxsParseSource {
 	 */
 	ParseSource() {
 		// Set a clean state - DISABLED FOR WORKAROUND OF PROBLEM -> ERROR RECOVERY DECLARES A CLEAN PARSER INSTANCE
+		this.reset();
 		// this.__parserState = this.parserInstance.save();
 		try {
 			this.parserInstance.feed(this.__source);
@@ -125,7 +105,7 @@ export class mxsParseSource {
 		// reset the parser
 		this.reset();
 
-		let src = this.TokenizeSource();
+		let src = this.TokenizeStream();
 		let state = this.parserInstance.save();
 
 		let badTokens: any[] = [];
@@ -145,7 +125,7 @@ export class mxsParseSource {
 				// console.log(err.token);
 				badTokens.push(src[next]);
 				/* DISABLED FEATURE - NEEDS OPTIMIZATION */
-				// errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
+				// errorReport.push({token:src[next], alternatives: this.PossibleTokens(this.parserInstance) });
 				let filler = replaceWithWS(err.token.text);
 				err.token.text = filler;
 				err.token.value = filler;
@@ -189,36 +169,56 @@ export class mxsParseSource {
 	/**
 	 * UNFINISHED: ASYNC Parser 
 	 */
-	async ParseSourceAsync() {
-		// Set a clean state
-		this.__parserState = this.parserInstance.save();
-		try {
-			this.parserInstance.feed(this.__source);
-			this.__parsedCST = this.parserInstance.results[0];
-			return;
-		} catch (err) {
-			this.parserInstance.restore(this.__parserState);
+	async ParseSourceAsync(source = this.__source) {
+		let parser = () =>{
+			return new Promise((resolve, reject) => {
+				// delay execution
+				// setTimeout( () => {
+				// console.log("parser called");
+				let mxsParser = this._declareParser();
+				try {
+					mxsParser.feed(source);
+					// console.log("parser done");					
+					resolve(mxsParser.results[0]);
+				} catch (err) {
+					reject(err);
+				}
+				// },1000);
+			});
+		};
 
-			this.parseWithErrorsAsync()
-				.then((response) => {
-					throw response;
-				});
-		}
-		// this.__parserState = this.parserInstance.save();
+		return new Promise((resolve, reject) => {
+			parser()
+				.then ((result) => {
+					this.__parsedCST = result;
+					return resolve(result);
+				}, () => {
+					// console.log('source contain errors. Attemp to recover');
+					return this.parseWithErrorsAsync();
+				})
+				.then( (result) => {
+					if (result) {
+						// console.log("returning results of error recovery.");
+						this.__parsedCST = result.result;
+						return reject(result.error);
+					}
+
+				})
+				.catch (err => reject(err));
+		});
 	}
 	/**
 	 * UNFINISHED: ASYNC Error recovery
 	 */
-	private parseWithErrorsAsync():Promise<ParserError> {
-		// reset the parser
-		this.reset();
-		let src = this.TokenizeSource();
-		let state = this.parserInstance.save();
+	private parseWithErrorsAsync():Promise<{result:any; error:ParserError}> {
+	// private parseWithErrorsAsync():Promise<ParserError> {
+		let mxsParser = this._declareParser();
+		let src = this.TokenizeStream();
+		let state = mxsParser.save();
+		let total = src.length - 1;
 
 		let badTokens: any[] = [];
 		let errorReport: any[] = [];
-
-		let total = src.length - 1;
 
 		let reportSuccess = () => {
 			// console.log('parser report! - OK');
@@ -238,16 +238,16 @@ export class mxsParseSource {
 			newErr.details = errorReport;
 			return newErr;
 		};
-		// report?:{tokens: any[]; details:{token: import("moo").Token[]; alvernatives: any[]}[]}
-		let promise = new Promise((resolve, reject) => {
-			let parsings = (src: import("moo").Token[], next: number, total: number ): any => {
+
+		let errParser = (callback: any) => {			
+			let parsings = (src: import("moo").Token[], next: number, total: number ): any | undefined => {
 				try {
-					this.parserInstance.feed(src[next].text);
+					mxsParser.feed(src[next].text);
 				} catch (err) {
 					// catch non parsing related errors.
-					if (!err.token) { reject(err); }
+					if (!err.token) { throw(err); }
 					badTokens.push(src[next]);
-					errorReport.push({token:src[next], alternatives: this.PossibleTokens() });
+					// errorReport.push({token:src[next], alternatives: this.PossibleTokens(mxsParser) });
 					let filler = replaceWithWS(err.token.text);
 					err.token.text = filler;
 					err.token.value = filler;
@@ -255,37 +255,51 @@ export class mxsParseSource {
 					// src.splice(next, 1, err.token);
 					src[next] = err.token;
 					next -= 1;
-					this.parserInstance.restore(state);
+					mxsParser.restore(state);
 				}
-				state = this.parserInstance.save();
+				state = mxsParser.save();
 
 				if (next === total) {
-					// console.log('parser ended!');
-					resolve();
+					if (mxsParser.results) {
+						return callback(mxsParser.results[0]);
+					} else {
+						return callback();
+					}
 				} else {
 					return setImmediate( () => parsings(src, next + 1, total) );
 				}
 			};
 			parsings(src, 0, total);
-		});
-		return new Promise((resolve, reject) => {
-			promise.then( () => {
-				this.__parsedCST = this.parserInstance.results[0] || [];
-				// console.log('parser waited!');
-				if (this.parserInstance.results[0]) {
-					resolve(reportSuccess());
-				} else {
-					resolve(reportFailure());
+		};
+		let parseResults = () => {
+			return new Promise((resolve, reject) => {
+				// console.log('Error recovery done.');
+				try {
+					errParser( (res: any | undefined) => resolve(res));
+				} catch (err) {
+					return reject(err);
 				}
-			}, (err) => {
-				reject(err);
 			});
+		};
+
+		return new Promise((resolve, reject) => {
+			parseResults()
+				.then((result) => {
+					this.__parsedCST = result;
+					if (result) {
+						return resolve({result: <any>result, error:reportSuccess()});
+					} //else {
+					return resolve({result: undefined, error:reportFailure()});
+					//}
+				})
+				.catch (err => reject(err));
 		});
 	}
-	private PossibleTokens() {
+
+	private PossibleTokens(parserInstance: nearley.Parser) {
 		var possibleTokens: any[] = [];
-		var lastColumnIndex = this.parserInstance.table.length - 2;
-		var lastColumn = this.parserInstance.table[lastColumnIndex];
+		var lastColumnIndex = parserInstance.table.length - 2;
+		var lastColumn = parserInstance.table[lastColumnIndex];
 		var expectantStates = lastColumn.states
 			.filter(function (state: { rule: { symbols: { [x: string]: any } }; dot: string | number }) {
 				var nextSymbol = state.rule.symbols[state.dot];
@@ -296,17 +310,17 @@ export class mxsParseSource {
 		// If there is more than one derivation, we only display the first one.
 		var stateStacks = expectantStates
 			.map((state: any) => {
-				return this.parserInstance.buildFirstStateStack(state, []);
+				return parserInstance.buildFirstStateStack(state, []);
 			});
 		// Display each state that is expecting a terminal symbol next.
 		stateStacks.forEach(function (stateStack: any[]) {
 			var state = stateStack[0];
 			var nextSymbol = state.rule.symbols[state.dot];
-
 			possibleTokens.push(nextSymbol);
-		}, this);
+		});
 		return possibleTokens;
 	}
+
 	/** MD5 hash */
 	static HashSource(source: nCrypto.BinaryLike): string {
 		return nCrypto.createHash('md5').update(source).digest('hex');
