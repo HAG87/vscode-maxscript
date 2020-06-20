@@ -10,7 +10,7 @@ import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
 import { DiagnosticCollection }  from './mxsDiagnostics';
 import mxsMinifier from './mxsMin';
 
-export const MXS_MODE: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
+export const MXS_DOC: vscode.DocumentFilter = { scheme: 'file', language: 'maxscript' };
 // this is implemented in contributes languaje-configuration.json
 export const LANG_CFG: vscode.LanguageConfiguration = {
 	indentationRules: {
@@ -45,17 +45,17 @@ export async function msxHelp(textEditor: vscode.TextEditor, help_addr: string) 
 export function activate(context: vscode.ExtensionContext) {
 
 	// const providerRegistrations = vscode.Disposable.from()
-	vscode.languages.setLanguageConfiguration(MXS_MODE.language!, LANG_CFG);
+	vscode.languages.setLanguageConfiguration(MXS_DOC.language!, LANG_CFG);
 
 	// MaxScript Help command
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand('mxs.help', (textEditor) => { msxHelp(textEditor, help_addr); }));
 	// completions
 	if (mxsConfig.get('completions', true)) {
-		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_MODE, new mxsCompletion(), '.'));
+		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_DOC.language!, new mxsCompletion(), '.'));
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_MODE, mxsDocumentSymbols));
+		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_DOC, mxsDocumentSymbols));
 	}
 	// Diagnostics
 	// Diagnostics are handled by the parser.
@@ -73,11 +73,11 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	// definition provider
 	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_MODE, new mxsDefinitions()));
+		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_DOC, new mxsDefinitions()));
 	}
 	// semantics
 	if (mxsConfig.get('semantics', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_MODE, new DocumentSemanticTokensProvider(), legend));
+		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_DOC.language!, new DocumentSemanticTokensProvider(), legend));
 	}
 	// Minify
 	context.subscriptions.push(
