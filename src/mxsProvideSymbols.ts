@@ -1,5 +1,12 @@
 "use strict";
-import * as vscode from 'vscode';
+import {
+	Location,
+	Position,
+	Range,
+	SymbolInformation,
+	SymbolKind,
+	TextDocument
+} from 'vscode';
 // const { find, get, set, drop, info, del, arrayFirstOnly, traverse, } = require('ast-monkey');
 // const { pathNext, pathPrev, pathUp } = require('ast-monkey-util');
 const traverse2 = require('ast-monkey-traverse-with-lookahead');
@@ -12,48 +19,36 @@ interface Dictionary<T> {
 	[key: string]: T;
 }
 //-----------------------------------------------------------------------------------
-const SymbolKindMap: Dictionary<vscode.SymbolKind> = {
-	1: vscode.SymbolKind.Module,
-	5: vscode.SymbolKind.Method,
-	6: vscode.SymbolKind.Property,
-	8: vscode.SymbolKind.Constructor,
-	11: vscode.SymbolKind.Function,
-	12: vscode.SymbolKind.Variable,
-	13: vscode.SymbolKind.Constant,
-	18: vscode.SymbolKind.Object,
-	22: vscode.SymbolKind.Struct,
-	23: vscode.SymbolKind.Event,
-};
 /**
  * Maps values from type > vcode kind enumeration
  */
-const SymbolKind: Dictionary<number> = {
-	'EntityRcmenu'          : SymbolKindMap[18],
-	'EntityRcmenu_submenu'  : SymbolKindMap[8],
-	'EntityRcmenu_separator': SymbolKindMap[18],
-	'EntityRcmenu_menuitem' : SymbolKindMap[8],
-	'EntityPlugin'          : SymbolKindMap[18],
-	'EntityPlugin_params'   : SymbolKindMap[18],
-	'PluginParam'           : SymbolKindMap[8],
-	'EntityTool'            : SymbolKindMap[18],
-	'EntityUtility'         : SymbolKindMap[18],
-	'EntityRollout'         : SymbolKindMap[18],
-	'EntityRolloutGroup'    : SymbolKindMap[18],
-	'EntityRolloutControl'  : SymbolKindMap[8],
-	'EntityMacroscript'     : SymbolKindMap[18],
-	'Struct'                : SymbolKindMap[22],
-	'Event'                 : SymbolKindMap[23],
-	'Function'              : SymbolKindMap[11],
-	'AssignmentExpression'  : SymbolKindMap[5],
-	'CallExpression'        : SymbolKindMap[5],
-	'ParameterAssignment'   : SymbolKindMap[6],
-	'AccessorProperty'      : SymbolKindMap[6],
-	'AccessorIndex'         : SymbolKindMap[6],
-	'Literal'               : SymbolKindMap[13],
-	'Identifier'            : SymbolKindMap[6],
-	'VariableDeclaration'   : SymbolKindMap[12],
-	'Declaration'           : SymbolKindMap[12],
-	'Include'               : SymbolKindMap[1],
+const SymbolKindMatch: Dictionary<SymbolKind> = {
+	'EntityRcmenu'          : SymbolKind.Object,
+	'EntityRcmenu_submenu'  : SymbolKind.Constructor,
+	'EntityRcmenu_separator': SymbolKind.Object,
+	'EntityRcmenu_menuitem' : SymbolKind.Constructor,
+	'EntityPlugin'          : SymbolKind.Object,
+	'EntityPlugin_params'   : SymbolKind.Object,
+	'PluginParam'           : SymbolKind.Constructor,
+	'EntityTool'            : SymbolKind.Object,
+	'EntityUtility'         : SymbolKind.Object,
+	'EntityRollout'         : SymbolKind.Object,
+	'EntityRolloutGroup'    : SymbolKind.Object,
+	'EntityRolloutControl'  : SymbolKind.Constructor,
+	'EntityMacroscript'     : SymbolKind.Object,
+	'Struct'                : SymbolKind.Struct,
+	'Event'                 : SymbolKind.Event,
+	'Function'              : SymbolKind.Function,
+	'AssignmentExpression'  : SymbolKind.Method,
+	'CallExpression'        : SymbolKind.Method,
+	'ParameterAssignment'   : SymbolKind.Property,
+	'AccessorProperty'      : SymbolKind.Property,
+	'AccessorIndex'         : SymbolKind.Property,
+	'Literal'               : SymbolKind.Constant,
+	'Identifier'            : SymbolKind.Property,
+	'VariableDeclaration'   : SymbolKind.Variable,
+	'Declaration'           : SymbolKind.Variable,
+	'Include'               : SymbolKind.Module,
 };
 //-----------------------------------------------------------------------------------
 function hasKey<O>(obj: O, key: keyof any): key is keyof O {
@@ -179,58 +174,58 @@ export abstract class range {
 }
 //-----------------------------------------------------------------------------------
 /*
-export const vsRangeFromToken = (document: vscode.TextDocument, token: moo.Token, source?: string | string[]) => {
+export const vsRangeFromToken = (document: TextDocument, token: moo.Token, source?: string | string[]) => {
 	let loc = !source
 		? range.fromOffset(token.offset, token.text)
 		: range.fromLineCol(source, token);
-	return new vscode.Range(
+	return new Range(
 		document.positionAt(loc.start),
 		document.positionAt(loc.end)
 	);
 };
 */
-export function getTokenRange(document: vscode.TextDocument, token: moo.Token) {
-	let startPosition = new vscode.Position( token.line - 1, token.col );
+export function getTokenRange(document: TextDocument, token: moo.Token) {
+	let startPosition = new Position( token.line - 1, token.col );
 	let endOffset = token.col + (token.text.length || token.value.length);
-	let endPosition= new vscode.Position(token.line - 1, endOffset - 1);
+	let endPosition= new Position(token.line - 1, endOffset - 1);
 
-	return new vscode.Range(startPosition, endPosition);
+	return new Range(startPosition, endPosition);
 }
 
-export function getDocumentPositions(document: vscode.TextDocument, node: any) {
-	let startPosition: vscode.Position;
-	let endPosition: vscode.Position;
+export function getDocumentPositions(document: TextDocument, node: any) {
+	let startPosition: Position;
+	let endPosition: Position;
 
 	if (node.loc) {
 		// document.validatePosition()
 		// range from loc: {start: number, end?: number}
-		startPosition = new vscode.Position(
+		startPosition = new Position(
 			node.loc.start.line - 1,
 			node.loc.start.col - 1
 		);
 		// get position of last child
 		let childsRange = range.lastChildPos(node);
-		endPosition = new vscode.Position(
+		endPosition = new Position(
 			childsRange.line - 1,
 			childsRange.col - 1
 		);
 	} else {
 		// range from childsLC
 		let sRange = range.fromChildsLC(node);
-		startPosition = new vscode.Position(
+		startPosition = new Position(
 			sRange.start.line - 1,
 			sRange.start.col - 1
 		);
-		endPosition = new vscode.Position(
+		endPosition = new Position(
 			sRange.end.line - 1,
 			sRange.end.col - 1
 		);
 
 	}
 
-	return new vscode.Location(
+	return new Location(
 		document.uri,
-		new vscode.Range( startPosition, endPosition)
+		new Range( startPosition, endPosition)
 	);
 }
 //-----------------------------------------------------------------------------------
@@ -261,13 +256,13 @@ export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
  * @param {any[]} CST the CST
  * @param {string[]} paths Collection of object-paths
  */
-export function collectSymbols(document: vscode.TextDocument, CST: any, paths: string[])
+export function collectSymbols(document: TextDocument, CST: any, paths: string[])
 {
 	let returnSymbol = (CST: any, path: string) => {
 		let currentNode = objectPath.get(CST, path);
-		let theSymbol: vscode.SymbolInformation = {
+		let theSymbol: SymbolInformation = {
 			name: currentNode.id.value.text || currentNode.id.text || '[unnamed]',
-			kind: SymbolKind[currentNode.type] || SymbolKindMap[5],
+			kind: SymbolKindMatch[currentNode.type] || SymbolKind.Method,
 			containerName: findParentName(CST, parentPath(path, 1)) || ' ',
 			location: getDocumentPositions(document, currentNode),
 		};

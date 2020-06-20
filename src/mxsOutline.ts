@@ -1,6 +1,13 @@
 'use strict';
 // import * as cp from 'child_process';
-import * as vscode from 'vscode';
+import {
+	CancellationToken,
+	Diagnostic,
+	DocumentSymbolProvider,
+	SymbolInformation,
+	TextDocument,
+	window
+} from 'vscode';
 import {
 	provideParserDiagnostic,
 	setDiagnostics,
@@ -19,26 +26,26 @@ import { mxsParseSource } from './mxsParser';
  *  - implement async version
  * 	- implement child_process
  */
-export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 	/** Start a parser instance */
 	msxParser = new mxsParseSource('');
 	/** Current active document */
-	activeDocument!: vscode.TextDocument | undefined;
+	activeDocument!: TextDocument | undefined;
 	/** Current document symbols */
-	// activeDocumentSymbols: vscode.SymbolInformation[] = [];
+	// activeDocumentSymbols: SymbolInformation[] = [];
 
-	private documentSymbolsFromCST(document: vscode.TextDocument, CST: any, options = {remapLocations: false}) {
+	private documentSymbolsFromCST(document: TextDocument, CST: any, options = {remapLocations: false}) {
 		let CSTstatements = collectStatementsFromCST(CST);		
 		let Symbols = collectSymbols(document, CST, CSTstatements);
 		return Symbols;
 	}
 
-	private async parseDocument(document: vscode.TextDocument):Promise<vscode.SymbolInformation[]> {
+	private async parseDocument(document: TextDocument):Promise<SymbolInformation[]> {
 		this.activeDocument = undefined;
 
 		return new Promise((resolve, reject) => {
 			setTimeout( () => {
-				if (vscode.window.activeTextEditor?.document == document) {
+				if (window.activeTextEditor?.document == document) {
 					this._getDocumentSymbols(document)
 						.then(
 							result => {
@@ -54,10 +61,10 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		});
 	}
 
-	private async _getDocumentSymbols(document: vscode.TextDocument) {
+	private async _getDocumentSymbols(document: TextDocument) {
 
-		let SymbolInfCol = new Array<vscode.SymbolInformation>();
-		let diagnostics: vscode.Diagnostic[] = [];
+		let SymbolInfCol = new Array<SymbolInformation>();
+		let diagnostics: Diagnostic[] = [];
 
 		try {
 			// console.log('> PARSER MAIN CALL');
@@ -97,7 +104,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		return SymbolInfCol;
 	}
 	// Function called from Main !!
-	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
+	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
 		return new Promise((resolve, reject) => {
 			if (token.isCancellationRequested) {
 				setDiagnostics(document, undefined);
@@ -122,6 +129,7 @@ export class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider 
 		});
 	}
 }
+
 /**
  * Initialized mxsDocumentSymbolProvider. Intended to be consumed by the SymbolProviders and be persistent for the current editor, i norder to acces it from the minifier
  */

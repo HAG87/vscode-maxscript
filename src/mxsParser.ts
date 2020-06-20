@@ -1,5 +1,8 @@
 "use strict";
-import * as nCrypto from 'crypto';
+import {
+	BinaryLike,
+	createHash
+} from 'crypto';
 //-----------------------------------------------------------------------------------
 import * as nearley from 'nearley';
 import grammar = require('./lib/grammar.js');
@@ -320,9 +323,8 @@ export class mxsParseSource {
 		});
 		return possibleTokens;
 	}
-
 	/** MD5 hash */
-	static HashSource(source: nCrypto.BinaryLike): string {
-		return nCrypto.createHash('md5').update(source).digest('hex');
+	static HashSource(source: BinaryLike): string {
+		return createHash('md5').update(source).digest('hex');
 	}
 }
