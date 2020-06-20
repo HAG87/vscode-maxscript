@@ -3,16 +3,21 @@ TODO:
 [x] Ignore comments
 */
 'use strict';
-import * as vscode from 'vscode';
+import {
+	CancellationToken,
+	DocumentSymbolProvider,
+	Location,
+	SymbolInformation,
+	TextDocument
+} from 'vscode';
 
-import { mxsSymbolMatch } from './schema/mxsSymbolDef';
-import { mxsSymbols } from './schema/mxsSymbolDef';
+import { mxsSymbols, mxsSymbolMatch } from './schema/mxsSymbolDef';
 
-export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+export default class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 
-	private _getDocumentSymbols(document: vscode.TextDocument, tokens: mxsSymbolMatch[]): vscode.SymbolInformation[] {
+	private _getDocumentSymbols(document: TextDocument, tokens: mxsSymbolMatch[]): SymbolInformation[] {
 
-		let SymbolInfCol = new Array<vscode.SymbolInformation>();
+		let SymbolInfCol = new Array<SymbolInformation>();
 
 		let docTxt = document.getText();
 		// skip comment rules
@@ -37,11 +42,11 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 				if (scomment || bcomment) continue;
 
 				SymbolInfCol.push(
-					new vscode.SymbolInformation(
+					new SymbolInformation(
 						matchSymbols[type.decl],
 						type.kind,
 						type.type,
-						new vscode.Location(document.uri, document.positionAt(matchSymbols.index))
+						new Location(document.uri, document.positionAt(matchSymbols.index))
 					)
 				);
 			}
@@ -50,7 +55,7 @@ export default class mxsDocumentSymbolProvider implements vscode.DocumentSymbolP
 		return SymbolInfCol;
 	}
 	// Function called from Main !!
-	public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SymbolInformation[]> {
+	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
 		return new Promise((resolve, reject) => {
 			try {
 				resolve(this._getDocumentSymbols(document, mxsSymbols));
