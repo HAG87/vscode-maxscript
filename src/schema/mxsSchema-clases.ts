@@ -1,6 +1,6 @@
-import { CompletionItemKind } from "vscode";
+import { CompletionItem, CompletionItemKind } from "vscode";
 
-export const mxClassMembers:any = {
+export const mxClassMembers: {[key: string]: CompletionItem[]} = {
 	'BlendMap': [
 		{ label: 'bitmap', kind: CompletionItemKind.Method, detail: 'bitmap' },
 		{ label: 'elementName', kind: CompletionItemKind.Method, detail: 'string' },

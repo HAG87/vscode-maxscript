@@ -1,6 +1,9 @@
 import {window, Uri} from 'vscode';
-import * as fs from 'fs';
+import {statSync} from 'fs';
 import {posix} from 'path';
+//--------------------------------------------------------------------------------
+var isOdd = function(x: number) { return x & 1; };
+var isEven  = function(x: number) { return !( x & 1 ); };
 //--------------------------------------------------------------------------------
 export function getTextSel(editor = window.activeTextEditor) {
 	if(!editor) {
@@ -10,16 +13,16 @@ export function getTextSel(editor = window.activeTextEditor) {
 	let seltext = editor.document.getText(editor.selection);
 	return seltext;
 }
-export const fileExists = (filePath: string): boolean => fs.statSync(filePath).isFile();
+export const fileExists = (filePath: string): boolean => statSync(filePath).isFile();
 /**
  * Check if the current Document position line is inside a "string" object
  * @param feed
  */
 export function isPositionInString(feed: string): boolean {
-	// Count the number of double quotes in the string. Ignore escaped double quotes
-	let doubleQuotesCnt = (feed.match(/[^\\]\"/g) || []).length;
-	doubleQuotesCnt += feed.startsWith('\"') ? 1 : 0;
-	return doubleQuotesCnt % 2 === 1;
+	// collect only unescaped double quotes
+	let doubleQuotesCnt = feed.match(/[^\\]\"/g)!.length;
+	// quotes qnt. should be Even, if not, one string is open. This will not work for multiline strings.
+	return isEven(doubleQuotesCnt) || false;
 }
 /**
  * find word before dot character, if any
