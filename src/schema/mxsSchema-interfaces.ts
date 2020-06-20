@@ -1,13 +1,5 @@
-import { CompletionItemKind } from 'vscode';
-interface IcompletionItem {
-	label: string;
-	kind: CompletionItemKind;
-	detail?: string;
-}
-interface IcompletionCollection {
-	[key:string] : IcompletionItem[];
-}
-export const mxInterfaceMembers: IcompletionCollection = {
+import { CompletionItem, CompletionItemKind } from 'vscode';
+export const mxInterfaceMembers: {[key: string]: CompletionItem[]} = {
 	'ActionItemOverrideManager': [
 		{ label: 'overridesActive', kind: CompletionItemKind.Property, detail: 'boolean : Read|Write' },
 		{ label: 'timeToStartOverride', kind: CompletionItemKind.Property, detail: 'float : Read|Write' }

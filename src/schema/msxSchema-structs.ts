@@ -1,13 +1,6 @@
-import { CompletionItemKind, CompletionItem } from 'vscode';
-interface IcompletionItem {
-	label: string;
-	kind: CompletionItemKind;
-	detail?: string;
-}
-interface IcompletionCollection {
-	[key:string] : IcompletionItem[];
-}
-export const mxStructsMembers: IcompletionCollection = {
+import { CompletionItem, CompletionItemKind } from 'vscode';
+
+export const mxStructsMembers: {[key: string]: CompletionItem[]} = {
 	'gw': [
 		{ label: 'dualPlane', kind: CompletionItemKind.Property },
 		{ label: 'GetCPDisp', kind: CompletionItemKind.Method },
