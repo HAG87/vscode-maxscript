@@ -28,7 +28,7 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 		let lineTillCurrentPosition = lineText.substr(0, position.character);
 
 		// escape strings
-		if (!(util.isPositionInString(lineTillCurrentPosition)) && lineTillCurrentPosition.endsWith('\"')) {
+		if (!(util.isPositionInString(lineTillCurrentPosition))) {
 			return [];
 		}
 		// get current word
@@ -41,7 +41,7 @@ export default class mxsCompletion implements vscode.CompletionItemProvider {
 			currentWord = word.substr(0, position.character - wordAtPosition.start.character);
 		};
 		// escape numbers
-		if (currentWord.match(/^\d+$/)) { return []; }
+		if (/^\d+$/.test(currentWord)) { return []; }
 		// test if currPos is after dot
 		// let dotPattern = /\w+[.]\w*?$/;
 		let dotPattern = /\w+[.]$/;
