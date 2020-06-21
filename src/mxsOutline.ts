@@ -18,6 +18,8 @@ import {
 
 import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
 import { mxsParseSource } from './mxsParser';
+import { mxsSymbols, mxsSymbolMatch } from './schema/mxsSymbolDef';
+
 //--------------------------------------------------------------------------------
 /**
  * Provide document symbols. Impements the parser.
@@ -103,6 +105,7 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 		// return SymbolInfCol.length > 0 ? SymbolInfCol : undefined;
 		return SymbolInfCol;
 	}
+
 	// Function called from Main !!
 	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
 		return new Promise((resolve, reject) => {

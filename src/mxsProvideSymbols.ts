@@ -72,22 +72,18 @@ interface Tpos {
  * Functions for getting the range of a statement. Grouped in a static class for coherency
  */
 export abstract class range {
-
-	
 	static fromStartEndOffsets(startOff: number, endOff: number, value1: string): Trange<number> {
 		return {
 			start: startOff,
 			end: (endOff + value1.length)
 		};
 	}
-
 	static fromOffset(offset: number, value: string): Trange<number> {
 		return {
 			start: offset,
 			end: (offset + value.length)
 		};
 	}
-
 	static offsetFromTokenLineCol(src: string | string[], node: any) {
 
 		let lines = Array.isArray(src) ? src : src.split('\n');
@@ -97,7 +93,6 @@ export abstract class range {
 		}, 0);
 		return (charcount += node.col - 1);
 	}
-
 	static fromLineCol(src: string | string[], node: any) {
 		let offset = range.offsetFromTokenLineCol(src, node);
 		return {
@@ -128,8 +123,7 @@ export abstract class range {
 		let last = childs[childs.length - 1];
 
 		return range.fromStartEndOffsets(start, last.offset, last.text);
-	}
-	
+	}	
 	/**
 	 *  Get the range of the statement from the line-column of the first and last child of the node
 	 * @param source Reference, the original string.
@@ -152,7 +146,6 @@ export abstract class range {
 		let end = {line: last.line, col: last.col};
 		return {start: start, end: end};
 	}
-
 	/**
 	 * Get the position of the last child
 	 * @param node CST node
@@ -173,17 +166,6 @@ export abstract class range {
 	}
 }
 //-----------------------------------------------------------------------------------
-/*
-export const vsRangeFromToken = (document: TextDocument, token: moo.Token, source?: string | string[]) => {
-	let loc = !source
-		? range.fromOffset(token.offset, token.text)
-		: range.fromLineCol(source, token);
-	return new Range(
-		document.positionAt(loc.start),
-		document.positionAt(loc.end)
-	);
-};
-*/
 export function getTokenRange(document: TextDocument, token: moo.Token) {
 	let startPosition = new Position( token.line - 1, token.col );
 	let endOffset = token.col + (token.text.length || token.value.length);

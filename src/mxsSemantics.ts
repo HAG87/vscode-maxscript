@@ -1,9 +1,15 @@
 'use strict';
-import * as vscode from 'vscode';
+import {
+	CancellationToken,
+	DocumentSemanticTokensProvider,
+	SemanticTokens,
+	SemanticTokensBuilder,
+	SemanticTokensLegend,
+	TextDocument
+} from 'vscode';
 //-------------------------------------------------------------------------------------------------------------
 import * as moo from 'moo';
 import maxAPI from './schema/mxsAPI';
-// const {mxLexer} = require('./lib/mooTokenize.js');
 //-------------------------------------------------------------------------------------------------------------
 const caseInsensitiveKeywords = (map: { [k: string]: string | string[] }) => {
 	const transform = moo.keywords(map);
@@ -107,7 +113,7 @@ export const legend = (function () {
 	];
 	tokenModifiersLegend.forEach((tokenModifier, index) => tokenModifiers.set(tokenModifier, index));
 
-	return new vscode.SemanticTokensLegend(tokenTypesLegend, tokenModifiersLegend);
+	return new SemanticTokensLegend(tokenTypesLegend, tokenModifiersLegend);
 })();
 
 interface IParsedToken {
@@ -118,11 +124,11 @@ interface IParsedToken {
 	tokenModifiers: string[];
 }
 
-export class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
-	async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
+export class mxsDocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
+	async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
 		const allTokens = this._parseText(document.getText());
 
-		const builder = new vscode.SemanticTokensBuilder();
+		const builder = new SemanticTokensBuilder();
 		allTokens.forEach((token) => {
 			builder.push(token.line, token.startCharacter, token.length, this._encodeTokenType(token.tokenType), this._encodeTokenModifiers(token.tokenModifiers));
 		});

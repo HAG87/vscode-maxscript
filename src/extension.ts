@@ -2,11 +2,12 @@
 import * as vscode from 'vscode';
 import { getTextSel } from './utils';
 
-import mxsCompletion from './mxsAutocomplete';
+import mxsCompletion from './mxsCompletions';
 
 import mxsDefinitions from './mxsDefinitions';
 import { mxsDocumentSymbols } from './mxsOutline';
-import { DocumentSemanticTokensProvider, legend } from './mxsSemantics';
+import mxsDocumentSymbolslegacy from './mxsOutlineLegacy';
+import { mxsDocumentSemanticTokensProvider, legend } from './mxsSemantics';
 import { DiagnosticCollection }  from './mxsDiagnostics';
 import mxsMinifier from './mxsMin';
 
@@ -51,11 +52,27 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerTextEditorCommand('mxs.help', (textEditor) => { msxHelp(textEditor, help_addr); }));
 	// completions
 	if (mxsConfig.get('completions', true)) {
-		context.subscriptions.push(vscode.languages.registerCompletionItemProvider(MXS_DOC.language!, new mxsCompletion(), '.'));
+		context.subscriptions.push(
+			vscode.languages.registerCompletionItemProvider(
+				MXS_DOC.language!,
+				new mxsCompletion(),
+				'.'
+			));
 	}
 	// outliner
 	if (mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(MXS_DOC, mxsDocumentSymbols));
+		context.subscriptions.push(
+			vscode.languages.registerDocumentSymbolProvider(
+				MXS_DOC,
+				mxsDocumentSymbols
+			));
+	} else {
+		// fallback to regex match
+		context.subscriptions.push(
+			vscode.languages.registerDocumentSymbolProvider(
+				MXS_DOC,
+				new mxsDocumentSymbolslegacy()
+			));
 	}
 	// Diagnostics
 	// Diagnostics are handled by the parser.
@@ -73,11 +90,20 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 	// definition provider
 	if (mxsConfig.get('gotodefinition', true) && mxsConfig.get('gotosymbol', true)) {
-		context.subscriptions.push(vscode.languages.registerDefinitionProvider(MXS_DOC, new mxsDefinitions()));
+		context.subscriptions.push(
+			vscode.languages.registerDefinitionProvider(
+				MXS_DOC,
+				new mxsDefinitions()
+			));
 	}
 	// semantics
 	if (mxsConfig.get('semantics', true)) {
-		context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(MXS_DOC.language!, new DocumentSemanticTokensProvider(), legend));
+		context.subscriptions.push(
+			vscode.languages.registerDocumentSemanticTokensProvider(
+				MXS_DOC.language!,
+				new mxsDocumentSemanticTokensProvider(),
+				legend
+			));
 	}
 	// Minify
 	context.subscriptions.push(
