@@ -4,6 +4,7 @@ import {
 	Position,
 	Range,
 	SymbolInformation,
+	DocumentSymbol,
 	SymbolKind,
 	TextDocument
 } from 'vscode';
@@ -231,6 +232,53 @@ export function collectStatementsFromCST(CST: any[], filter: string = 'id') {
 	});
 	return statements;
 }
+
+function isNode(node:  any) {
+	return (typeof node === 'object' && node != undefined);
+}
+
+interface NodeMap {
+	node: any;
+	childs: NodeMap[];
+}
+
+export function ReCollectStatementsFromCST(node: any) {
+
+	return _visit(node, undefined);
+
+	function _visit(node: any, parent: any) {
+		let childStack: NodeMap[] = [];
+		// get the node keys
+		const keys = Object.keys(node);
+		// loop through the keys
+		for (let i = 0; i < keys.length; i++) {
+			// child is the value of each key
+			let key = keys[i];
+			const child = node[key];
+			// could be an array of nodes or just an object
+			if (Array.isArray(child)) {
+				// value is an array, visit each item
+				for (let j = 0; j < child.length; j++) {
+					// visit each node in the array
+					if (isNode(child[j])) {
+						let res = _visit(child[j], node);
+						if (res) childStack = childStack.concat(res);
+					}
+				}
+			} else if (isNode(child)) {
+				let res = _visit(child, node);
+				if (res) childStack = childStack.concat(res);
+			}
+		}
+		// if (isNode(node) && childStack.length > 0) {
+		// }
+		if ('id' in node ) {			
+			return {node: node, childs: childStack};
+		} else {
+			return childStack.length > 0 ? childStack : undefined;
+		}
+	}
+}
 //-----------------------------------------------------------------------------------
 /**
  * For each element of a object-path collection, return a valid {name|parent|kind|location} node
@@ -257,6 +305,47 @@ export function collectSymbols(document: TextDocument, CST: any, paths: string[]
 		});
 
 	return theSymbols;
+}
+
+export async function ReCollectSymbols(document: TextDocument, nodes: NodeMap[] | NodeMap):Promise<DocumentSymbol[]>
+{
+	let _transformStatements = (_nodes: NodeMap[]):Promise<DocumentSymbol[]> => {
+		return new Promise((resolve, reject) =>
+		{
+			let SymbolCollection: DocumentSymbol[] = [];
+			for (let node of _nodes) {
+				try {
+					let symbolLoc = getDocumentPositions(document, node.node);
+					let symbolName = node.node.id.value.toString();
+					let symbolKind = SymbolKindMatch[node.node.type] || SymbolKind.Method;
+					let theSymbol = new DocumentSymbol(
+						symbolName,
+						SymbolKind[symbolKind],
+						symbolKind,
+						symbolLoc.range,
+						symbolLoc.range
+					);
+					if (node.childs.length > 0) {
+						_transformStatements(node.childs)
+							.then ((result) => {
+								theSymbol.children = result;
+							});
+					}
+					SymbolCollection.push(theSymbol);
+				} catch (err) {
+					reject(err);
+				}
+			}
+			resolve(SymbolCollection);
+		});
+	};
+	return new Promise((resolve, reject) => {
+		_transformStatements(Array.isArray(nodes) ? nodes : [nodes])
+			.then(
+				(result) => resolve(result),
+				(err) => reject(err)
+			);
+	});
 }
 //-----------------------------------------------------------------------------------
 // INVALID TOKENS

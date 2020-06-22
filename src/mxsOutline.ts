@@ -5,6 +5,7 @@ import {
 	Diagnostic,
 	DocumentSymbolProvider,
 	SymbolInformation,
+	DocumentSymbol,
 	TextDocument,
 	window
 } from 'vscode';
@@ -12,13 +13,17 @@ import {
 	provideParserDiagnostic,
 	setDiagnostics,
 	provideTokenDiagnostic,
-	ParserError,
-	DiagnosticCollection
+	ParserError
 } from './mxsDiagnostics';
 
-import { collectStatementsFromCST, collectSymbols, collectTokens } from './mxsProvideSymbols';
+import {
+	collectStatementsFromCST,
+	collectSymbols,
+	ReCollectStatementsFromCST,
+	ReCollectSymbols,
+	collectTokens
+} from './mxsProvideSymbols';
 import { mxsParseSource } from './mxsParser';
-import { mxsSymbols, mxsSymbolMatch } from './schema/mxsSymbolDef';
 
 //--------------------------------------------------------------------------------
 /**
@@ -28,7 +33,8 @@ import { mxsSymbols, mxsSymbolMatch } from './schema/mxsSymbolDef';
  *  - implement async version
  * 	- implement child_process
  */
-export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
+export class mxsDocumentSymbolProvider implements DocumentSymbolProvider
+{
 	/** Start a parser instance */
 	msxParser = new mxsParseSource('');
 	/** Current active document */
@@ -36,15 +42,22 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 	/** Current document symbols */
 	// activeDocumentSymbols: SymbolInformation[] = [];
 
-	private documentSymbolsFromCST(document: TextDocument, CST: any, options = {remapLocations: false}) {
-		let CSTstatements = collectStatementsFromCST(CST);		
-		let Symbols = collectSymbols(document, CST, CSTstatements);
+	private async documentSymbolsFromCST(
+		document: TextDocument,
+		CST: any,
+		options = {remapLocations: false}
+	):Promise<SymbolInformation[] | DocumentSymbol[]>
+	{
+		let CSTstatements = ReCollectStatementsFromCST(CST)!;
+		let Symbols = await ReCollectSymbols(document, CSTstatements);
+		// let CSTstatements = collectStatementsFromCST(CST);		
+		// let Symbols = collectSymbols(document, CST, CSTstatements);
 		return Symbols;
 	}
 
-	private async parseDocument(document: TextDocument):Promise<SymbolInformation[]> {
+	private async parseDocument(document: TextDocument):Promise<SymbolInformation[] | DocumentSymbol[]>
+	{
 		this.activeDocument = undefined;
-
 		return new Promise((resolve, reject) => {
 			setTimeout( () => {
 				if (window.activeTextEditor?.document == document) {
@@ -63,9 +76,9 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 		});
 	}
 
-	private async _getDocumentSymbols(document: TextDocument) {
-
-		let SymbolInfCol = new Array<SymbolInformation>();
+	private async _getDocumentSymbols(document: TextDocument)
+	{
+		let SymbolInfCol: SymbolInformation[] | DocumentSymbol[] = [];
 		let diagnostics: Diagnostic[] = [];
 
 		try {
@@ -74,18 +87,17 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 			this.msxParser.source = document.getText();
 			await this.msxParser.ParseSourceAsync();
 			// this.documentCST = this.msxParser.parsedCST;
-			SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST);
+			SymbolInfCol = await this.documentSymbolsFromCST(document, this.msxParser.parsedCST);
 			diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
-
 		} catch (err) {
 			// console.log(err);
 			if (err.recoverable !== undefined) {
 				// console.log('parse error! recover?: '+ err.recoverable);
 				if (err.recoverable === true) {
 					//recovered from error
-					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
-					SymbolInfCol = this.documentSymbolsFromCST(document, this.msxParser.parsedCST,{remapLocations: true});
+					SymbolInfCol = await this.documentSymbolsFromCST(document, this.msxParser.parsedCST,{remapLocations: true});
 					diagnostics.push(...provideTokenDiagnostic(document, collectTokens(this.msxParser.parsedCST, 'type', 'error')));
+					diagnostics.push(...provideParserDiagnostic(document, <ParserError>err));
 					// throw err;
 				} else {
 					// fatal error
@@ -95,7 +107,7 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 				}
 			} else {
 				// not a parser error
-				console.log(err);
+				console.log('ERROR:' + err.message);
 				throw err;
 			}
 		}
@@ -103,18 +115,28 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider {
 		setDiagnostics(document, diagnostics.length !== 0 ? diagnostics : undefined);
 		// return
 		// return SymbolInfCol.length > 0 ? SymbolInfCol : undefined;
+		// console.log(SymbolInfCol);
+
 		return SymbolInfCol;
 	}
 
 	// Function called from Main !!
-	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
+	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): Thenable<SymbolInformation[] | DocumentSymbol[]>
+	{
 		return new Promise((resolve, reject) => {
 			if (token.isCancellationRequested) {
 				setDiagnostics(document, undefined);
 				resolve([]);
 			}
 			this.parseDocument(document)
-				.then((symbols) => resolve(symbols), (err) => {console.log('err:'+err); reject(err);});
+				.then((symbols) => {
+					// console.log(symbols);
+					resolve(symbols);
+				},
+				(err) => {
+					console.log('err:'+err);
+					reject(err);
+				});
 			/*
 			try {
 				// this hack tries to limit the parser execution. will keep it until I find a better solution.
