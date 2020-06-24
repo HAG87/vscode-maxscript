@@ -72,7 +72,7 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider
 				} else {
 					reject('document closed');
 				}
-			}, 1000);
+			}, 500);
 		});
 	}
 
@@ -107,6 +107,7 @@ export class mxsDocumentSymbolProvider implements DocumentSymbolProvider
 				}
 			} else {
 				// not a parser error
+				setDiagnostics(document, undefined);
 				console.log('ERROR:' + err.message);
 				throw err;
 			}
