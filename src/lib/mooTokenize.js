@@ -134,9 +134,10 @@ var mxLexer = moo.compile({
 			type: caseInsensitiveKeywords(keywordsDB)
 		}
 	],
-	param: { match: /:{1}/ },
 	// a mounstrosity
-	typed_iden: { match: /'(?:\\['\\rn]|[^'\\\n])*?'/},
+	typed_iden: { match: /'(?:[^'])*?'/},
+	// parameter assign
+	param: { match: /:{1}/ },
 	// array marker #(...) | #{...}
 	arraydef: { match: /#[ \t]*\(/ },
 	bitarraydef: { match: /#[ \t]*{/ },
