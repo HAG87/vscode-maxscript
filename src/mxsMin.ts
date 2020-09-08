@@ -17,6 +17,21 @@ export default class mxsMinifier {
 		let min: string = mxsMinify(parsed);
 		await workspace.fs.writeFile(targetUri, Buffer.from(min, 'utf8'));
 	}
+	static async MinifyParsedDoc(fileUri: Uri, parsings:any, prefix?: string) {
+		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
+		
+		// console.log('prefix: '+_prefix);
+
+		let newUri = prefixFile(fileUri, _prefix);
+		try {
+			await mxsMinifier.minifyWriter(newUri, parsings);
+			window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
+			return true;
+		} catch (err) {
+			window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
+			throw err;
+		}
+	}
 	/**
 	 * Minify current editor
 	 */
@@ -43,22 +58,6 @@ export default class mxsMinifier {
 		// child.send({targetUri:newUri, parsed:parsed});
 
 		await mxsMinifier.MinifyParsedDoc(document.uri, parsed, prefix);
-	}
-
-	static async MinifyParsedDoc(fileUri: Uri, parsings:any, prefix?: string) {
-		let _prefix = prefix ||  workspace.getConfiguration('maxscript').get('minprefix', 'min_');
-		
-		console.log('prefix: '+_prefix);
-
-		let newUri = prefixFile(fileUri, _prefix);
-		try {
-			await mxsMinifier.minifyWriter(newUri, parsings);
-			window.showInformationMessage(`MaxScript minify sucess: ${posix.basename(newUri.path)}`);
-			return true;
-		} catch (err) {
-			window.showErrorMessage(`MaxScript minify failed at: ${posix.basename(newUri.path)}.`);
-			throw err;
-		}
 	}
 	/**
 	 * Minify a specific file
@@ -116,7 +115,7 @@ export default class mxsMinifier {
 		if (files) {
 			for (const file of files) {
 				// check file extension
-				let ext = posix.extname(file.path);
+				let ext = posix.extname(file.fsPath);
 				
 				if (ext !== '.ms' && ext !== '.mcr') {
 					window.showErrorMessage(`MaxScript minify: Invalid file: ${posix.basename(file.path)}.`);

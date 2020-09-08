@@ -17,8 +17,6 @@ import {
 } from './mxsDiagnostics';
 
 import {
-	collectStatementsFromCST,
-	collectSymbols,
 	ReCollectStatementsFromCST,
 	ReCollectSymbols,
 	collectTokens
