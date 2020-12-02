@@ -2,6 +2,8 @@
 
 Autodesk 3ds Max Scripting language (MaxScript) support.
 
+**This project is no longer maintained, please follow the new version at: https://github.com/HAG87/vscode-maxscript-lsp**
+
 ## Features
 
 - Syntax highlight.
